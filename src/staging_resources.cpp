@@ -129,6 +129,8 @@ std::pair<VkSemaphore, VkFence> StagingResources::MakeFence() {
 void StagingResources::WaitForCompletion() {
     if (has_completed)
         return;
+    if (completed == VK_NULL_HANDLE)
+        return;
     auto *dev = get_device(device);
     if (!dev)
         return;

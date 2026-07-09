@@ -1,7 +1,7 @@
 #include "layer.hpp"
 
 #include "logger.hpp"
-#include "pipeline_state.hpp"
+#include "spoof_profile.hpp"
 #include "vk_func.hpp"
 #include "vulkan/vk_layer.h"
 
@@ -10,6 +10,7 @@
 #include <cstring>
 #include <memory>
 #include <unistd.h>
+#include <unordered_set>
 #include <utility>
 #include <vector>
 #include <vulkan/vulkan.h>
@@ -21,10 +22,11 @@ std::unordered_map<void *, VkPhysicalDeviceProperties2> propertiesMap;
 std::unordered_map<void *, VkPhysicalDeviceDriverProperties>
     driverPropertiesMap;
 std::unordered_map<void *, std::shared_ptr<struct device>> deviceMap;
+std::unordered_map<void *, std::unordered_set<std::string>> deviceExtensionsMap;
 
 std::mutex global_lock;
 
-static void *GetInstanceKey(VkPhysicalDevice physicalDevice) {
+void *GetInstanceKey(VkPhysicalDevice physicalDevice) {
     auto instance = instanceMap[GetKey(physicalDevice)];
     if (!instance) {
         Logger::log("error", "no instance found for physical device %p",
@@ -314,9 +316,10 @@ DxvkMaliCompatLayer_EnumeratePhysicalDevices(
         return result;
 
     for (uint32_t index = 0; index < *pPhysicalDeviceCount; index++) {
+        VkPhysicalDevice pd = pPhysicalDevices[index];
         VkPhysicalDeviceFeatures features{};
-        instanceDispatch[GetKey(instance)].GetPhysicalDeviceFeatures(
-            pPhysicalDevices[index], &features);
+        instanceDispatch[GetKey(instance)].GetPhysicalDeviceFeatures(pd,
+                                                                     &features);
 
         VkPhysicalDeviceDriverProperties driverProperties{};
         VkPhysicalDeviceProperties2 props2{};
@@ -325,11 +328,24 @@ DxvkMaliCompatLayer_EnumeratePhysicalDevices(
         props2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
         props2.pNext = &driverProperties;
         instanceDispatch[GetKey(instance)].GetPhysicalDeviceProperties2(
-            pPhysicalDevices[index], &props2);
+            pd, &props2);
 
-        featuresMap[GetKey(pPhysicalDevices[index])] = features;
-        propertiesMap[GetKey(pPhysicalDevices[index])] = props2;
-        driverPropertiesMap[GetKey(pPhysicalDevices[index])] = driverProperties;
+        featuresMap[GetKey(pd)] = features;
+        propertiesMap[GetKey(pd)] = props2;
+        driverPropertiesMap[GetKey(pd)] = driverProperties;
+
+        uint32_t extCount = 0;
+        instanceDispatch[GetKey(instance)].EnumerateDeviceExtensionProperties(
+            pd, nullptr, &extCount, nullptr);
+        std::vector<VkExtensionProperties> extProps(extCount);
+        instanceDispatch[GetKey(instance)].EnumerateDeviceExtensionProperties(
+            pd, nullptr, &extCount, extProps.data());
+
+        auto &extSet = deviceExtensionsMap[GetKey(pd)];
+        extSet.clear();
+        for (const auto &ext : extProps) {
+            extSet.insert(ext.extensionName);
+        }
     }
 
     return VK_SUCCESS;
@@ -341,6 +357,8 @@ VK_LAYER_EXPORT void VKAPI_CALL DxvkMaliCompatLayer_GetPhysicalDeviceFeatures(
 
     instanceDispatch[GetInstanceKey(physicalDevice)].GetPhysicalDeviceFeatures(
         physicalDevice, pFeatures);
+
+    spoof_core_features(pFeatures);
 }
 
 VK_LAYER_EXPORT void VKAPI_CALL DxvkMaliCompatLayer_GetPhysicalDeviceFeatures2(
@@ -350,23 +368,17 @@ VK_LAYER_EXPORT void VKAPI_CALL DxvkMaliCompatLayer_GetPhysicalDeviceFeatures2(
     instanceDispatch[GetInstanceKey(physicalDevice)].GetPhysicalDeviceFeatures2(
         physicalDevice, pFeatures);
 
-    for (auto *next = static_cast<VkBaseOutStructure *>(pFeatures->pNext);
-         next != nullptr; next = next->pNext) {
-        if (next->sType ==
-            VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_BUFFER_FEATURES_EXT) {
-            auto *features =
-                reinterpret_cast<VkPhysicalDeviceDescriptorBufferFeaturesEXT *>(
-                    next);
-            features->descriptorBuffer = VK_TRUE;
-            features->descriptorBufferCaptureReplay = VK_FALSE; // not emulated
-            features->descriptorBufferImageLayoutIgnored =
-                VK_FALSE; // not emulated
-            // TODO(leegao): needed for the optimal_performance profile in vkd3d
-            // https://github.com/HansKristian-Work/vkd3d-proton/blob/ce3c862c26ef5b1b74a3a24cf637bddb1adb7a7c/VP_D3D12_VKD3D_PROTON_profile.json#L502
-            features->descriptorBufferPushDescriptors =
-                VK_FALSE; // not emulated
-        }
-    }
+    spoof_core_features(&pFeatures->features);
+    spoof_next_features(reinterpret_cast<VkBaseOutStructure *>(pFeatures));
+}
+
+VK_LAYER_EXPORT void VKAPI_CALL DxvkMaliCompatLayer_GetPhysicalDeviceProperties(
+    VkPhysicalDevice physicalDevice, VkPhysicalDeviceProperties *pProperties) {
+    scoped_lock l(global_lock);
+
+    instanceDispatch[GetInstanceKey(physicalDevice)]
+        .GetPhysicalDeviceProperties(physicalDevice, pProperties);
+    spoof_core_properties(pProperties);
 }
 
 VK_LAYER_EXPORT void VKAPI_CALL
@@ -376,19 +388,8 @@ DxvkMaliCompatLayer_GetPhysicalDeviceProperties2(
 
     instanceDispatch[GetInstanceKey(physicalDevice)]
         .GetPhysicalDeviceProperties2(physicalDevice, pProperties);
-
-    for (auto *next = static_cast<VkBaseOutStructure *>(pProperties->pNext);
-         next != nullptr; next = next->pNext) {
-        if (next->sType ==
-            VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_BUFFER_PROPERTIES_EXT) {
-            auto *props = reinterpret_cast<
-                VkPhysicalDeviceDescriptorBufferPropertiesEXT *>(next);
-            props->combinedImageSamplerDescriptorSingleArray = VK_TRUE;
-            props->bufferlessPushDescriptors = VK_FALSE;
-            props->allowSamplerImageViewPostSubmitCreation = VK_FALSE;
-            // TODO ...
-        }
-    }
+    spoof_core_properties(&pProperties->properties);
+    spoof_properties(reinterpret_cast<VkBaseOutStructure *>(pProperties));
 }
 
 VK_LAYER_EXPORT VkResult VKAPI_CALL
@@ -397,13 +398,24 @@ DxvkMaliCompatLayer_EnumerateDeviceExtensionProperties(
     uint32_t *pPropertyCount, VkExtensionProperties *pProperties) {
     scoped_lock l(global_lock);
 
-    auto &table = instanceDispatch[GetInstanceKey(physicalDevice)];
+    auto instanceKey = GetInstanceKey(physicalDevice);
+    if (!instanceKey)
+        return VK_ERROR_INITIALIZATION_FAILED;
+    auto &table = instanceDispatch[instanceKey];
 
+    if (pLayerName != nullptr) {
+        return table.EnumerateDeviceExtensionProperties(
+            physicalDevice, pLayerName, pPropertyCount, pProperties);
+    }
+
+    auto spoofed = get_unsupported_spoofed_extensions(physicalDevice);
     if (pProperties == nullptr) {
+        uint32_t count = 0;
         VkResult result = table.EnumerateDeviceExtensionProperties(
-            physicalDevice, pLayerName, pPropertyCount, nullptr);
-        if (result == VK_SUCCESS)
-            *pPropertyCount += 1;
+            physicalDevice, nullptr, &count, nullptr);
+        if (result == VK_SUCCESS) {
+            *pPropertyCount = count + static_cast<uint32_t>(spoofed.size());
+        }
         return result;
     }
 
@@ -412,27 +424,33 @@ DxvkMaliCompatLayer_EnumerateDeviceExtensionProperties(
         return VK_SUCCESS;
     }
 
-    uint32_t queryCount = capacity - 1;
+    uint32_t actualCount = 0;
     VkResult result = table.EnumerateDeviceExtensionProperties(
-        physicalDevice, pLayerName, &queryCount, pProperties);
+        physicalDevice, nullptr, &actualCount, nullptr);
+    if (result != VK_SUCCESS) {
+        return result;
+    }
 
+    std::vector<VkExtensionProperties> actualProps(actualCount);
+    result = table.EnumerateDeviceExtensionProperties(
+        physicalDevice, nullptr, &actualCount, actualProps.data());
     if (result != VK_SUCCESS && result != VK_INCOMPLETE) {
         return result;
     }
 
-    VkExtensionProperties vkExtDescriptorBuffer{
-        .extensionName = VK_EXT_DESCRIPTOR_BUFFER_EXTENSION_NAME,
-        .specVersion = VK_EXT_DESCRIPTOR_BUFFER_SPEC_VERSION,
-    };
+    std::vector<VkExtensionProperties> combined = actualProps;
+    for (const auto &ext : spoofed) {
+        combined.push_back(ext);
+    }
 
-    pProperties[queryCount] = vkExtDescriptorBuffer;
-    *pPropertyCount = queryCount + 1;
+    uint32_t copyCount =
+        std::min(capacity, static_cast<uint32_t>(combined.size()));
+    std::memcpy(pProperties, combined.data(),
+                copyCount * sizeof(VkExtensionProperties));
 
-    uint32_t count = 0;
-    table.EnumerateDeviceExtensionProperties(physicalDevice, pLayerName, &count,
-                                             nullptr);
+    *pPropertyCount = copyCount;
 
-    if ((*pPropertyCount) < (count + 1)) {
+    if (copyCount < combined.size()) {
         return VK_INCOMPLETE;
     }
 
@@ -474,69 +492,6 @@ void FinalizerThread(struct device *dev) {
     }
 }
 
-struct BufferFeatures {
-    bool shaderBufferInt64Atomics;
-    bool shaderSharedInt64Atomics;
-    bool storageBuffer8BitAccess;
-    bool storageBuffer16BitAccess;
-    bool shaderInt8;
-    bool shaderFloat16;
-};
-
-BufferFeatures CheckForBufferFeatureSupport(VkInstance instance,
-                                            VkPhysicalDevice physicalDevice) {
-    auto props = propertiesMap[GetKey(physicalDevice)];
-    if (props.properties.apiVersion < VK_API_VERSION_1_1) {
-        // 1.0 does not support 8bit
-        return {
-            .shaderBufferInt64Atomics = false,
-            .shaderSharedInt64Atomics = false,
-            .storageBuffer8BitAccess = false,
-            .storageBuffer16BitAccess = false,
-            .shaderInt8 = false,
-            .shaderFloat16 = false,
-        };
-    }
-
-    VkPhysicalDeviceShaderAtomicInt64Features int64Atomics = {
-        .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_ATOMIC_INT64_FEATURES,
-    };
-
-    VkPhysicalDevice8BitStorageFeaturesKHR storage8Bit = {
-        .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_8BIT_STORAGE_FEATURES_KHR,
-        .pNext = &int64Atomics};
-
-    VkPhysicalDevice16BitStorageFeaturesKHR storage16Bit = {
-        .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_16BIT_STORAGE_FEATURES_KHR,
-        .pNext = &storage8Bit};
-
-    VkPhysicalDeviceShaderFloat16Int8FeaturesKHR arithmeticFloat16Int8 = {
-        .sType =
-            VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_FLOAT16_INT8_FEATURES_KHR,
-        .pNext = &storage16Bit,
-    };
-
-    VkPhysicalDeviceFeatures2 features2 = {
-        .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2,
-        .pNext = &arithmeticFloat16Int8,
-    };
-
-    instanceDispatch[GetKey(instance)].GetPhysicalDeviceFeatures2(
-        physicalDevice, &features2);
-    return {
-        .shaderBufferInt64Atomics =
-            (int64Atomics.shaderBufferInt64Atomics == VK_TRUE),
-        .shaderSharedInt64Atomics =
-            (int64Atomics.shaderSharedInt64Atomics == VK_TRUE),
-        .storageBuffer8BitAccess =
-            (storage8Bit.storageBuffer8BitAccess == VK_TRUE),
-        .storageBuffer16BitAccess =
-            (storage16Bit.storageBuffer16BitAccess == VK_TRUE),
-        .shaderInt8 = (arithmeticFloat16Int8.shaderInt8 == VK_TRUE),
-        .shaderFloat16 = (arithmeticFloat16Int8.shaderFloat16 == VK_TRUE),
-    };
-}
-
 VkPhysicalDeviceFaultFeaturesEXT
 CheckForFaultSupport(VkInstance instance, VkPhysicalDevice physicalDevice) {
     VkPhysicalDeviceFaultFeaturesEXT faultFeatures = {
@@ -551,24 +506,6 @@ CheckForFaultSupport(VkInstance instance, VkPhysicalDevice physicalDevice) {
         physicalDevice, &features);
 
     return faultFeatures;
-}
-
-VkPhysicalDeviceBufferDeviceAddressFeatures
-CheckForBufferDeviceAddressSupport(VkInstance instance,
-                                   VkPhysicalDevice physicalDevice) {
-    VkPhysicalDeviceBufferDeviceAddressFeatures bdaFeatures = {
-        .sType =
-            VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BUFFER_DEVICE_ADDRESS_FEATURES,
-    };
-    VkPhysicalDeviceFeatures2 features = {
-        .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2,
-        .pNext = &bdaFeatures,
-    };
-
-    instanceDispatch[GetKey(instance)].GetPhysicalDeviceFeatures2(
-        physicalDevice, &features);
-
-    return bdaFeatures;
 }
 
 VK_LAYER_EXPORT VkResult VKAPI_CALL DxvkMaliCompatLayer_CreateDevice(
@@ -622,14 +559,6 @@ VK_LAYER_EXPORT VkResult VKAPI_CALL DxvkMaliCompatLayer_CreateDevice(
     auto memoryIndex = idx < memoryProps.memoryTypeCount ? idx : UINT32_MAX;
     auto queriedFaultFeatures = CheckForFaultSupport(instance, physicalDevice);
     bool hasFaultSupport = queriedFaultFeatures.deviceFault;
-    auto queriedBDAFeatures =
-        CheckForBufferDeviceAddressSupport(instance, physicalDevice);
-
-    if (!queriedBDAFeatures.bufferDeviceAddress) {
-        Logger::log("error", "FATAL: " VK_EXT_DEVICE_FAULT_EXTENSION_NAME
-                             " not supported, cannot proceed.");
-        return VK_ERROR_INITIALIZATION_FAILED;
-    }
 
     VkBaseOutStructure *ext = (VkBaseOutStructure *)createInfo.pNext;
     VkPhysicalDeviceFeatures2 *appFeatures2 = nullptr;
@@ -649,14 +578,28 @@ VK_LAYER_EXPORT VkResult VKAPI_CALL DxvkMaliCompatLayer_CreateDevice(
         propertiesMap[GetKey(physicalDevice)];
     uint32_t apiVersion = physProps.properties.apiVersion;
 
+    auto actualExtensions = get_actual_device_extensions(physicalDevice);
     std::vector<const char *> enabledExtensions;
     if (createInfo.ppEnabledExtensionNames &&
         createInfo.enabledExtensionCount > 0) {
         for (uint32_t i = 0; i < createInfo.enabledExtensionCount; ++i) {
-            if (strcmp(createInfo.ppEnabledExtensionNames[i],
-                       VK_EXT_DESCRIPTOR_BUFFER_EXTENSION_NAME) != 0) {
-                enabledExtensions.push_back(
-                    createInfo.ppEnabledExtensionNames[i]);
+            const char *extName = createInfo.ppEnabledExtensionNames[i];
+            bool is_spoofed = false;
+            for (size_t k = 0; k < SPOOFED_EXTENSIONS_COUNT; ++k) {
+                if (SPOOFED_EXTENSIONS[k].name == extName) {
+                    is_spoofed = true;
+                    break;
+                }
+            }
+
+            if (is_spoofed) {
+                if (actualExtensions.find(extName) != actualExtensions.end()) {
+                    enabledExtensions.push_back(extName);
+                } else {
+                    Logger::log("info", "Masking extension: %s", extName);
+                }
+            } else {
+                enabledExtensions.push_back(extName);
             }
         }
     }
@@ -673,14 +616,6 @@ VK_LAYER_EXPORT VkResult VKAPI_CALL DxvkMaliCompatLayer_CreateDevice(
         Logger::log("info",
                     "Adding extension " VK_EXT_DEVICE_FAULT_EXTENSION_NAME);
         enabledExtensions.push_back(VK_EXT_DEVICE_FAULT_EXTENSION_NAME);
-    }
-
-    if (!hasExtension(VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME)) {
-        Logger::log(
-            "info",
-            "Adding extension " VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME);
-        enabledExtensions.push_back(
-            VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME);
     }
 
     createInfo.ppEnabledExtensionNames = enabledExtensions.data();
@@ -704,6 +639,22 @@ VK_LAYER_EXPORT VkResult VKAPI_CALL DxvkMaliCompatLayer_CreateDevice(
             createInfo.pNext = &layerFaultFeatures;
         }
     }
+
+    VkPhysicalDeviceFeatures actualCoreFeatures{};
+    instanceDispatch[GetKey(instance)].GetPhysicalDeviceFeatures(
+        physicalDevice, &actualCoreFeatures);
+
+    VkPhysicalDeviceFeatures mutableCoreFeatures{};
+    if (createInfo.pEnabledFeatures) {
+        mutableCoreFeatures = *createInfo.pEnabledFeatures;
+        mask_core_features(&mutableCoreFeatures, &actualCoreFeatures);
+        createInfo.pEnabledFeatures = &mutableCoreFeatures;
+    }
+
+    mask_next_features(
+        physicalDevice,
+        const_cast<VkBaseOutStructure *>(
+            reinterpret_cast<const VkBaseOutStructure *>(createInfo.pNext)));
 
     PFN_vkCreateDevice createDevice =
         (PFN_vkCreateDevice)gipa(instance, "vkCreateDevice");
@@ -885,6 +836,7 @@ DxvkMaliCompatLayer_GetInstanceProcAddr(VkInstance instance,
     }
     GETPROCADDR(CreateInstance);
     GETPROCADDR(EnumeratePhysicalDevices)
+    GETPROCADDR(GetPhysicalDeviceProperties);
     GETPROCADDR(GetPhysicalDeviceFeatures);
     GETPROCADDR(EnumerateDeviceExtensionProperties);
     GETPROCADDR(DestroyInstance);

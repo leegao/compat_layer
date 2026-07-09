@@ -15,6 +15,7 @@
 #include <thread>
 #include <unistd.h>
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 #include <vulkan/vulkan.h>
 
@@ -30,7 +31,13 @@
 #define VK_DRIVER_ID_MESA_TURNIP 18
 #define VK_DRIVER_ID_SAMSUNG_PROPRIETARY 21
 
+extern std::unordered_map<void *, VkLayerInstanceDispatchTable>
+    instanceDispatch;
+extern std::unordered_map<void *, VkInstance> instanceMap;
+extern std::unordered_map<void *, std::unordered_set<std::string>>
+    deviceExtensionsMap;
 template <typename T> void *GetKey(T item) { return *(void **)item; }
+void *GetInstanceKey(VkPhysicalDevice physicalDevice);
 
 extern std::mutex global_lock;
 typedef std::lock_guard<std::mutex> scoped_lock;

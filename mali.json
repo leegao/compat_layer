@@ -3,9 +3,9 @@
     "capabilities": {
         "device": {
             "extensions": {
-                "VK_EXT_depth_clip_enable": 1,
-                "VK_EXT_robustness2": 1,
-                "VK_EXT_vertex_attribute_divisor": 3,
+                "VK_EXT_depth_clip_enable_DISABLED": 1,
+                "VK_EXT_robustness2_DISABLED": 1,
+                "VK_EXT_vertex_attribute_divisor_DISABLED": 3,
 
                 "VK_EXT_mutable_descriptor_type_DISABLED": 1,
                 "VK_EXT_descriptor_buffer_DISABLED": 1,
@@ -324,7 +324,7 @@
                 "VkPhysicalDeviceDepthClipEnableFeaturesEXT": {
                     "depthClipEnable": true
                 },
-                "VkPhysicalDeviceDescriptorBufferFeaturesEXT": {
+                "VkPhysicalDeviceDescriptorBufferFeaturesEXT_DISABLED": {
                     "descriptorBuffer": true,
                     "descriptorBufferCaptureReplay": true,
                     "descriptorBufferImageLayoutIgnored": true,
@@ -345,7 +345,7 @@
                     "extendedDynamicState2LogicOp": true,
                     "extendedDynamicState2PatchControlPoints": true
                 },
-                "VkPhysicalDeviceExtendedDynamicState3FeaturesEXT": {
+                "VkPhysicalDeviceExtendedDynamicState3FeaturesEXT_DISABLED": {
                     "extendedDynamicState3TessellationDomainOrigin": true,
                     "extendedDynamicState3DepthClampEnable": true,
                     "extendedDynamicState3PolygonMode": true,
@@ -423,13 +423,13 @@
                     "memoryMapRangePlaced": false,
                     "memoryUnmapReserve": true
                 },
-                "VkPhysicalDeviceMemoryPriorityFeaturesEXT": {
+                "VkPhysicalDeviceMemoryPriorityFeaturesEXT_DISABLED": {
                     "memoryPriority": true
                 },
                 "VkPhysicalDeviceMultiDrawFeaturesEXT": {
                     "multiDraw": true
                 },
-                "VkPhysicalDeviceMutableDescriptorTypeFeaturesEXT": {
+                "VkPhysicalDeviceMutableDescriptorTypeFeaturesEXT_DISABLED": {
                     "mutableDescriptorType": true
                 },
                 "VkPhysicalDeviceNestedCommandBufferFeaturesEXT": {
@@ -437,7 +437,7 @@
                     "nestedCommandBufferRendering": true,
                     "nestedCommandBufferSimultaneousUse": true
                 },
-                "VkPhysicalDeviceNonSeamlessCubeMapFeaturesEXT": {
+                "VkPhysicalDeviceNonSeamlessCubeMapFeaturesEXT_DISABLED": {
                     "nonSeamlessCubeMap": true
                 },
                 "VkPhysicalDevicePipelineBinaryFeaturesKHR": {
@@ -876,10 +876,10 @@
                 "VkPhysicalDeviceCustomBorderColorPropertiesEXT": {
                     "maxCustomBorderColorSamplers": 4096
                 },
-                "VkPhysicalDeviceDescriptorBufferDensityMapPropertiesEXT": {
+                "VkPhysicalDeviceDescriptorBufferDensityMapPropertiesEXT_DISABLED": {
                     "combinedImageSamplerDensityMapDescriptorSize": 0
                 },
-                "VkPhysicalDeviceDescriptorBufferPropertiesEXT": {
+                "VkPhysicalDeviceDescriptorBufferPropertiesEXT_DISABLED": {
                     "combinedImageSamplerDescriptorSingleArray": true,
                     "bufferlessPushDescriptors": true,
                     "allowSamplerImageViewPostSubmitCreation": false,
@@ -953,7 +953,7 @@
                     "renderMajor": 226,
                     "renderMinor": 128
                 },
-                "VkPhysicalDeviceExtendedDynamicState3PropertiesEXT": {
+                "VkPhysicalDeviceExtendedDynamicState3PropertiesEXT_DISABLED": {
                     "dynamicPrimitiveTopologyUnrestricted": false
                 },
                 "VkPhysicalDeviceExternalMemoryHostPropertiesEXT": {
