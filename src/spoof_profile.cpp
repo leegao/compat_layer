@@ -128,11 +128,15 @@ void mask_core_features(VkPhysicalDeviceFeatures *requested,
     if (!requested || !actual)
         return;
 
+    static auto force_masking = getenv("COMPAT_FORCE_MASKING")
+                                    ? atoi(getenv("COMPAT_FORCE_MASKING"))
+                                    : 0;
+
     for (const auto &[sType, offset, structName, fieldName] :
          SPOOFED_CORE_FEATURES) {
         auto *req_ptr = get_field(requested, offset);
         const auto *act_ptr = get_field(actual, offset);
-        if (*req_ptr && !(*act_ptr)) {
+        if (*req_ptr && !(*act_ptr) || force_masking) {
             Logger::log("info", "Masking feature %.*s in %.*s",
                         static_cast<int>(fieldName.size()), fieldName.data(),
                         static_cast<int>(structName.size()), structName.data());
@@ -151,6 +155,10 @@ void mask_next_features(VkPhysicalDevice physicalDevice,
         instanceDispatch[instanceKey].GetPhysicalDeviceFeatures2;
     if (!GetPhysicalDeviceFeatures2_fn)
         return;
+
+    static auto force_masking = getenv("COMPAT_FORCE_MASKING")
+                                    ? atoi(getenv("COMPAT_FORCE_MASKING"))
+                                    : 0;
 
     for (; next != nullptr; next = next->pNext) {
         if (next->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2) {
@@ -181,7 +189,7 @@ void mask_next_features(VkPhysicalDevice physicalDevice,
                 GetPhysicalDeviceFeatures2_fn(physicalDevice, &query);
 
                 if (const auto *act_ptr = get_field(buffer, offset);
-                    !(*act_ptr)) {
+                    !(*act_ptr) || force_masking) {
                     Logger::log(
                         "info", "Masking feature %.*s in %.*s",
                         static_cast<int>(fieldName.size()), fieldName.data(),
