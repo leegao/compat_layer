@@ -1,0 +1,51 @@
+name: Build Android ARM64 Library
+run-name: ${{ github.actor }} is building libdxvk_mali_compat_layer.so
+
+on:
+    push:
+        branches: ["**"]
+        tags: ["*"]
+    pull_request:
+        branches: ["**"]
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Install System Dependencies
+              run: |
+                  sudo apt-get update
+                  sudo apt-get install -y --no-install-recommends \
+                    openjdk-17-jre-headless \
+                    glslang-tools \
+                    glslc \
+                    xxd \
+                    libvulkan-dev \
+                    glibc-source
+
+            - name: Checkout source code
+              uses: actions/checkout@v6
+              with:
+                  submodules: recursive
+
+            - name: Configure CMake for Android ARM64
+              run: |
+                  cmake -B build \
+                    -DCMAKE_SYSTEM_NAME=Android \
+                    -DANDROID_PLATFORM=26 \
+                    -DANDROID_ABI=arm64-v8a \
+                    -DANDROID_TOOLCHAIN=clang \
+                    -DANDROID_STL=c++_static \
+                    -DCMAKE_BUILD_TYPE=Release \
+                    -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_LATEST_HOME/build/cmake/android.toolchain.cmake \
+                    -DFORCE_GLSL=OFF
+
+            - name: Build libdescriptor_buffer_layer.so for Android ARM64
+              run: cmake --build build --config Release --target dxvk_mali_compat_layer
+
+            - name: Upload libdescriptor_buffer_layer.so for Android ARM64
+              uses: actions/upload-artifact@v6
+              with:
+                  name: libdxvk_mali_compat_layer.so
+                  path: build/libdxvk_mali_compat_layer.so
