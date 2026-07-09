@@ -67,3 +67,9 @@ vcpkg_installed/
 # test output & cache
 Testing/
 .cache/
+
+build/
+build_*/
+game*.sh
+vkd3d.py
+wine*.sh

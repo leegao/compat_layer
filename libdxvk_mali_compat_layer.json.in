@@ -1,0 +1,21 @@
+{
+  "file_format_version" : "1.0.0",
+  "layer" : {
+    "name": "VK_LAYER_COMPAT_DxvkMaliCompatLayer",
+    "type": "GLOBAL",
+    "library_path": "@JSON_LIBRARY_PATH@libdxvk_mali_compat_layer.so",
+    "api_version": "1.0.0",
+    "implementation_version": "1",
+    "description": "Descriptor Buffer Layer",
+    "functions": {
+      "vkGetInstanceProcAddr": "DxvkMaliCompatLayer_GetInstanceProcAddr",
+      "vkGetDeviceProcAddr": "DxvkMaliCompatLayer_GetDeviceProcAddr"
+    },
+    "enable_environment": {
+      "ENABLE_DXVK_MALI_COMPAT_LAYER": "1"
+    },
+    "disable_environment": {
+      "DISABLE_DXVK_MALI_COMPAT_LAYER": "1"
+    }
+  }
+}
