@@ -3,7 +3,6 @@
     "capabilities": {
         "baseline_features": {
             "extensions": {
-                "VK_KHR_push_descriptor": 1,
                 "VK_KHR_swapchain": 1,
                 "VK_EXT_calibrated_timestamps": 1,
                 "VK_EXT_custom_border_color": 1,
@@ -102,9 +101,6 @@
                 }
             },
             "properties": {
-                "VkPhysicalDevicePushDescriptorPropertiesKHR": {
-                    "maxPushDescriptors": 32
-                },
                 "VkPhysicalDeviceCustomBorderColorPropertiesEXT": {
                     "maxCustomBorderColorSamplers": 2048
                 },
@@ -361,9 +357,6 @@
         "fl_12_0_optimal_properties": {
             "properties": {
                 "VkPhysicalDeviceProperties": {
-                    "limits": {
-                        "maxPushConstantsSize": 256
-                    },
                     "sparseProperties": {
                         "residencyStandard2DBlockShape": true,
                         "residencyAlignedMipSize": false,
@@ -401,9 +394,6 @@
         "fl_12_2_optimal_properties": {
             "properties": {
                 "VkPhysicalDeviceProperties": {
-                    "limits": {
-                        "maxPushConstantsSize": 256
-                    },
                     "sparseProperties": {
                         "residencyStandard2DBlockShape": true,
                         "residencyStandard3DBlockShape": true,
@@ -524,8 +514,7 @@
             },
             "features": {
                 "VkPhysicalDeviceDescriptorBufferFeaturesEXT": {
-                    "descriptorBuffer": true,
-                    "descriptorBufferPushDescriptors": true
+                    "descriptorBuffer": true
                 },
                 "VkPhysicalDeviceMutableDescriptorTypeFeaturesEXT": {
                     "mutableDescriptorType": true

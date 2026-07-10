@@ -10,7 +10,6 @@ const SpoofedExtension SPOOFED_EXTENSIONS[] = {
     { "VK_EXT_robustness2", 1 },
     { "VK_EXT_transform_feedback", 1 },
     { "VK_EXT_vertex_attribute_divisor", 3 },
-    { "VK_KHR_push_descriptor", 1 },
     { "VK_KHR_swapchain", 1 },
 };
 const size_t SPOOFED_EXTENSIONS_COUNT = sizeof(SPOOFED_EXTENSIONS) / sizeof(SPOOFED_EXTENSIONS[0]);
@@ -111,7 +110,6 @@ const size_t SPOOFED_CORE_PROPERTIES_COUNT = sizeof(SPOOFED_CORE_PROPERTIES) / s
 
 const SpoofedProperty SPOOFED_PROPERTIES[] = {
     { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_CUSTOM_BORDER_COLOR_PROPERTIES_EXT, offsetof(VkPhysicalDeviceCustomBorderColorPropertiesEXT, maxCustomBorderColorSamplers), false, 2048, "VkPhysicalDeviceCustomBorderColorPropertiesEXT", "maxCustomBorderColorSamplers" },
-    { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PUSH_DESCRIPTOR_PROPERTIES_KHR, offsetof(VkPhysicalDevicePushDescriptorPropertiesKHR, maxPushDescriptors), false, 32, "VkPhysicalDevicePushDescriptorPropertiesKHR", "maxPushDescriptors" },
     { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TRANSFORM_FEEDBACK_PROPERTIES_EXT, offsetof(VkPhysicalDeviceTransformFeedbackPropertiesEXT, transformFeedbackQueries), true, 1, "VkPhysicalDeviceTransformFeedbackPropertiesEXT", "transformFeedbackQueries" },
     { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_PROPERTIES, offsetof(VkPhysicalDeviceVulkan11Properties, subgroupSupportedOperations), false, VK_SUBGROUP_FEATURE_BALLOT_BIT | VK_SUBGROUP_FEATURE_BASIC_BIT | VK_SUBGROUP_FEATURE_VOTE_BIT | VK_SUBGROUP_FEATURE_SHUFFLE_BIT | VK_SUBGROUP_FEATURE_QUAD_BIT | VK_SUBGROUP_FEATURE_ARITHMETIC_BIT, "VkPhysicalDeviceVulkan11Properties", "subgroupSupportedOperations" },
     { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_PROPERTIES, offsetof(VkPhysicalDeviceVulkan11Properties, subgroupSupportedStages), false, VK_SHADER_STAGE_COMPUTE_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, "VkPhysicalDeviceVulkan11Properties", "subgroupSupportedStages" },

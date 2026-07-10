@@ -1,5 +1,19 @@
 # compat_layer
 
+Without push descriptors support on vkd3d 2.14:
+
+```
+vkd3d_init_device_caps: Push descriptors are not supported by this implementation. This is required for correct operation
+```
+
+same on vkd3d 2.12 and 2.9
+
+```
+13828.543:00e0:00e4:err:vkd3d-proton:vkd3d_init_device_caps: Push descriptors are not supported by this implementation. This is required for correct operation.
+```
+
+silent crash on 2.8
+
 ---
 
 Difference between Mali v1.r44p1 and v1.r54p3:
@@ -7,7 +21,7 @@ Difference between Mali v1.r44p1 and v1.r54p3:
 ```
 * VK_EXT_depth_clip_enable (Required version: 1)
 * VK_EXT_robustness2 (Required version: 1)
-* VK_KHR_push_descriptor (Required version: 1)
+* VK_KHR_push_descriptor (Required version: 1) <<<
 * VkPhysicalDeviceDepthClipEnableFeaturesEXT (missing feature struct) -> depthClipEnable
 * VkPhysicalDeviceFeatures -> dualSrcBlend
 * VkPhysicalDeviceFeatures -> logicOp
