@@ -824,6 +824,8 @@ DxvkMaliCompatLayer_GetDeviceProcAddr(VkDevice device, const char *pName) {
 VK_LAYER_EXPORT PFN_vkVoidFunction VKAPI_CALL
 DxvkMaliCompatLayer_GetInstanceProcAddr(VkInstance instance,
                                         const char *pName) {
+    GETPROCADDR(GetInstanceProcAddr); // Layers have to also hook their own
+                                      // GetInstanceProcAddr
     if (!strcmp(pName, "vkGetPhysicalDeviceProperties2") ||
         !strcmp(pName, "vkGetPhysicalDeviceProperties2KHR")) {
         return (
