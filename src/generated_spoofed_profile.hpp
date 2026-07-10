@@ -37,6 +37,7 @@ const SpoofedFeature SPOOFED_CORE_FEATURES[] = {
     { VK_STRUCTURE_TYPE_MAX_ENUM, offsetof(VkPhysicalDeviceFeatures, shaderClipDistance), "VkPhysicalDeviceFeatures", "shaderClipDistance" },
     { VK_STRUCTURE_TYPE_MAX_ENUM, offsetof(VkPhysicalDeviceFeatures, shaderCullDistance), "VkPhysicalDeviceFeatures", "shaderCullDistance" },
     { VK_STRUCTURE_TYPE_MAX_ENUM, offsetof(VkPhysicalDeviceFeatures, shaderImageGatherExtended), "VkPhysicalDeviceFeatures", "shaderImageGatherExtended" },
+    { VK_STRUCTURE_TYPE_MAX_ENUM, offsetof(VkPhysicalDeviceFeatures, shaderInt16), "VkPhysicalDeviceFeatures", "shaderInt16" },
     { VK_STRUCTURE_TYPE_MAX_ENUM, offsetof(VkPhysicalDeviceFeatures, shaderResourceMinLod), "VkPhysicalDeviceFeatures", "shaderResourceMinLod" },
     { VK_STRUCTURE_TYPE_MAX_ENUM, offsetof(VkPhysicalDeviceFeatures, shaderResourceResidency), "VkPhysicalDeviceFeatures", "shaderResourceResidency" },
     { VK_STRUCTURE_TYPE_MAX_ENUM, offsetof(VkPhysicalDeviceFeatures, shaderSampledImageArrayDynamicIndexing), "VkPhysicalDeviceFeatures", "shaderSampledImageArrayDynamicIndexing" },
@@ -102,7 +103,6 @@ const SpoofedFeature SPOOFED_NEXT_FEATURES[] = {
 const size_t SPOOFED_NEXT_FEATURES_COUNT = sizeof(SPOOFED_NEXT_FEATURES) / sizeof(SPOOFED_NEXT_FEATURES[0]);
 
 const SpoofedProperty SPOOFED_CORE_PROPERTIES[] = {
-    { VK_STRUCTURE_TYPE_MAX_ENUM, offsetof(VkPhysicalDeviceProperties, limits.bufferImageGranularity), false, 65536, "VkPhysicalDeviceProperties", "limits.bufferImageGranularity" },
     { VK_STRUCTURE_TYPE_MAX_ENUM, offsetof(VkPhysicalDeviceProperties, sparseProperties.residencyAlignedMipSize), true, 0, "VkPhysicalDeviceProperties", "sparseProperties.residencyAlignedMipSize" },
     { VK_STRUCTURE_TYPE_MAX_ENUM, offsetof(VkPhysicalDeviceProperties, sparseProperties.residencyNonResidentStrict), true, 1, "VkPhysicalDeviceProperties", "sparseProperties.residencyNonResidentStrict" },
     { VK_STRUCTURE_TYPE_MAX_ENUM, offsetof(VkPhysicalDeviceProperties, sparseProperties.residencyStandard2DBlockShape), true, 1, "VkPhysicalDeviceProperties", "sparseProperties.residencyStandard2DBlockShape" },

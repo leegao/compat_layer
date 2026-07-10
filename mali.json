@@ -10,6 +10,7 @@
                 "VK_EXT_mutable_descriptor_type_DISABLED": 1,
                 "VK_EXT_descriptor_buffer_DISABLED": 1,
                 "VK_VALVE_mutable_descriptor_type_DISABLED": 1,
+                "VK_KHR_push_descriptor_DISABLED": 2,
 
                 "VK_AMD_buffer_marker": 1,
                 "VK_AMD_device_coherent_memory": 1,
@@ -161,7 +162,6 @@
                 "VK_KHR_present_id2": 1,
                 "VK_KHR_present_wait": 1,
                 "VK_KHR_present_wait2": 1,
-                "VK_KHR_push_descriptor": 2,
                 "VK_KHR_relaxed_block_layout": 1,
                 "VK_KHR_robustness2": 1,
                 "VK_KHR_sampler_mirror_clamp_to_edge": 3,
