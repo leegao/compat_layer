@@ -1,7 +1,6 @@
 #ifndef PIPELINE_STATE_HPP
 #define PIPELINE_STATE_HPP
 
-#include "logger.hpp"
 #include <vulkan/vulkan.h>
 
 #include <array>
@@ -54,7 +53,6 @@ class ComputePipelineBindingsState {
                              uint32_t dynamicOffsetCount,
                              const uint32_t *pDynamicOffsets);
 
-  private:
     bool pipelineBound = false;
     VkPipeline pipeline = VK_NULL_HANDLE;
 #ifdef ENABLE_COMPUTE_TRACKING

@@ -3,6 +3,17 @@
 #include "pipelines.hpp"
 #include <vulkan/vulkan.h>
 
+std::unordered_map<VkPipelineLayout, std::unique_ptr<pipeline_layout>>
+    pipelineLayoutsMap;
+
+pipeline_layout *get_pipeline_layout(VkPipelineLayout layout) {
+    auto it = pipelineLayoutsMap.find(layout);
+    if (it != pipelineLayoutsMap.end()) {
+        return it->second.get();
+    }
+    return nullptr;
+}
+
 VK_LAYER_EXPORT VkResult VKAPI_CALL DxvkMaliCompatLayer_CreatePipelineLayout(
     VkDevice device, const VkPipelineLayoutCreateInfo *pCreateInfo,
     const VkAllocationCallbacks *pAllocator,
@@ -16,6 +27,19 @@ VK_LAYER_EXPORT VkResult VKAPI_CALL DxvkMaliCompatLayer_CreatePipelineLayout(
         return result;
     }
 
+    auto wrapper = std::make_unique<pipeline_layout>();
+    wrapper->handle = *pPipelineLayout;
+    if (pCreateInfo->pSetLayouts && pCreateInfo->setLayoutCount > 0) {
+        wrapper->setLayouts.assign(pCreateInfo->pSetLayouts,
+                                   pCreateInfo->pSetLayouts +
+                                       pCreateInfo->setLayoutCount);
+    }
+
+    {
+        scoped_lock l(global_lock);
+        pipelineLayoutsMap[*pPipelineLayout] = std::move(wrapper);
+    }
+
     return VK_SUCCESS;
 }
 
@@ -25,6 +49,11 @@ VK_LAYER_EXPORT void VKAPI_CALL DxvkMaliCompatLayer_DestroyPipelineLayout(
     struct device *dev = get_device(device);
 
     dev->table.DestroyPipelineLayout(device, pipelineLayout, pAllocator);
+
+    {
+        scoped_lock l(global_lock);
+        pipelineLayoutsMap.erase(pipelineLayout);
+    }
 }
 
 VK_LAYER_EXPORT VkResult VKAPI_CALL DxvkMaliCompatLayer_CreateGraphicsPipelines(

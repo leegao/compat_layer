@@ -1,6 +1,7 @@
 #include "queue.hpp"
 
 #include "command_buffer.hpp"
+#include "logger.hpp"
 #include "mali_gpu_profiler.hpp"
 #include "staging_resources.hpp"
 #include <vulkan/vulkan.h>

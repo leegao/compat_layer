@@ -795,16 +795,29 @@ DxvkMaliCompatLayer_GetDeviceProcAddr(VkDevice device, const char *pName) {
     // GETPROCADDR(CmdBindDescriptorSets2);
     // GETPROCADDR(CmdPushConstants);
     // GETPROCADDR(CmdPushConstants2);
-    // GETPROCADDR(CreateDescriptorSetLayout);
-    // GETPROCADDR(DestroyDescriptorSetLayout);
-    // GETPROCADDR(CreatePipelineLayout);
-    // GETPROCADDR(DestroyPipelineLayout);
+    GETPROCADDR(CreateDescriptorSetLayout);
+    GETPROCADDR(DestroyDescriptorSetLayout);
+    GETPROCADDR(CreatePipelineLayout);
+    GETPROCADDR(DestroyPipelineLayout);
     // GETPROCADDR(CreateGraphicsPipelines);
     // GETPROCADDR(CreateComputePipelines);
     // GETPROCADDR(DestroyPipeline);
     GETPROCADDR(GetDeviceQueue);
     GETPROCADDR(QueueSubmit);
     GETPROCADDR(QueueSubmit2);
+
+    GETPROCADDR(CmdPushDescriptorSetKHR);
+    GETPROCADDR(CmdPushDescriptorSetWithTemplateKHR);
+    if (!strcmp(pName, "vkCreateDescriptorUpdateTemplate") ||
+        !strcmp(pName, "vkCreateDescriptorUpdateTemplateKHR")) {
+        return (
+            PFN_vkVoidFunction)&DxvkMaliCompatLayer_CreateDescriptorUpdateTemplate;
+    }
+    if (!strcmp(pName, "vkDestroyDescriptorUpdateTemplate") ||
+        !strcmp(pName, "vkDestroyDescriptorUpdateTemplateKHR")) {
+        return (
+            PFN_vkVoidFunction)&DxvkMaliCompatLayer_DestroyDescriptorUpdateTemplate;
+    }
 
     // if (!strcmp(pName, "vkBindBufferMemory2") ||
     //     !strcmp(pName, "vkBindBufferMemory2KHR")) {

@@ -166,7 +166,10 @@ void init_dispatch_table(PFN_vkGetDeviceProcAddr gdpa, VkDevice device,
     GET_DEVICE_PROC(CmdDebugMarkerInsertEXT);
     GET_DEVICE_PROC(GetDeviceFaultInfoEXT);
     GET_DEVICE_PROC(DeviceSetApiDumpState);
-    GET_DEVICE_PROC(GetBufferDeviceAddress)
+    GET_DEVICE_PROC(GetBufferDeviceAddress);
+    GET_DEVICE_PROC(CreateDescriptorUpdateTemplate);
+    GET_DEVICE_PROC(DestroyDescriptorUpdateTemplate);
+    GET_DEVICE_PROC(UpdateDescriptorSetWithTemplate);
 
 #undef GET_DEVICE_PROC
 }

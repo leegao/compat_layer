@@ -216,6 +216,9 @@ typedef struct VkLayerDispatchTable_ {
     PFN_vkCmdDebugMarkerInsertEXT CmdDebugMarkerInsertEXT;
     PFN_vkGetDeviceFaultInfoEXT GetDeviceFaultInfoEXT;
     PFN_vkGetBufferDeviceAddress GetBufferDeviceAddress;
+    PFN_vkCreateDescriptorUpdateTemplate CreateDescriptorUpdateTemplate;
+    PFN_vkDestroyDescriptorUpdateTemplate DestroyDescriptorUpdateTemplate;
+    PFN_vkUpdateDescriptorSetWithTemplate UpdateDescriptorSetWithTemplate;
     void (*DeviceSetApiDumpState)(VkDevice, bool);
 } VkLayerDispatchTable;
 
