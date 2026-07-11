@@ -224,6 +224,7 @@ typedef struct VkLayerDispatchTable_ {
     PFN_vkCmdPushDescriptorSetWithTemplateKHR
         CmdPushDescriptorSetWithTemplateKHR;
     PFN_vkCmdPushDescriptorSetWithTemplateKHR CmdPushDescriptorSetWithTemplate;
+    PFN_vkCmdBindVertexBuffers2 CmdBindVertexBuffers2;
     void (*DeviceSetApiDumpState)(VkDevice, bool);
 } VkLayerDispatchTable;
 

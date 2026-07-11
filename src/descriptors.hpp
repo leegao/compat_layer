@@ -14,11 +14,21 @@ struct descriptor_set_layout {
     bool isEmulatedPushDescriptor = false;
 };
 
+struct descriptor_update_template_entry {
+    VkDescriptorType descriptorType;
+    uint32_t dstBinding;
+    uint32_t dstArrayElement;
+    uint32_t descriptorCount;
+    size_t offset;
+    size_t stride;
+};
+
 struct descriptor_update_template {
     VkDescriptorUpdateTemplate handle;
     VkDescriptorSetLayout layout;
     VkPipelineBindPoint pipelineBindPoint;
     bool isEmulatedPushDescriptor = false;
+    std::vector<descriptor_update_template_entry> entries;
 };
 
 using DescriptorSetLayoutsMap =

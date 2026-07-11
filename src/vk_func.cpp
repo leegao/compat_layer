@@ -182,6 +182,13 @@ void init_dispatch_table(PFN_vkGetDeviceProcAddr gdpa, VkDevice device,
     GET_DEVICE_PROC(CmdPushDescriptorSet);
     GET_DEVICE_PROC(CmdPushDescriptorSetWithTemplateKHR);
     GET_DEVICE_PROC(CmdPushDescriptorSetWithTemplate);
+    GET_DEVICE_PROC(CmdBindVertexBuffers);
+    GET_DEVICE_PROC(CmdBindVertexBuffers2);
+    if (!table.CmdBindVertexBuffers2) {
+        table.CmdBindVertexBuffers2 =
+            reinterpret_cast<decltype(table.CmdBindVertexBuffers2)>(
+                gdpa(device, "vkCmdBindVertexBuffers2EXT"));
+    }
 
 #undef GET_DEVICE_PROC
 }

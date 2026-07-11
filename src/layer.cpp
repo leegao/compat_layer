@@ -1,6 +1,7 @@
 #include "layer.hpp"
 
 #include "logger.hpp"
+#include "null_descriptors.hpp"
 #include "spoof_profile.hpp"
 #include "vk_func.hpp"
 #include "vulkan/vk_layer.h"
@@ -773,6 +774,7 @@ VK_LAYER_EXPORT VkResult VKAPI_CALL DxvkMaliCompatLayer_CreateDevice(
         deviceMap[GetKey(*pDevice)] = device;
     }
 
+    create_null_resources(device.get());
     return VK_SUCCESS;
 }
 
@@ -801,6 +803,7 @@ VK_LAYER_EXPORT void VKAPI_CALL DxvkMaliCompatLayer_DestroyDevice(
     dev->syncPool.reset();
     dev->descriptorSetAllocator->cleanup();
     dev->descriptorSetAllocator.reset();
+    destroy_null_resources(dev);
 
     if (device != VK_NULL_HANDLE)
         dev->table.DestroyDevice(device, pAllocator);
@@ -848,6 +851,12 @@ DxvkMaliCompatLayer_GetDeviceProcAddr(VkDevice device, const char *pName) {
         !strcmp(pName, "vkDestroyDescriptorUpdateTemplateKHR")) {
         return (
             PFN_vkVoidFunction)&DxvkMaliCompatLayer_DestroyDescriptorUpdateTemplate;
+    }
+    GETPROCADDR(UpdateDescriptorSets);
+    if (!strcmp(pName, "vkUpdateDescriptorSetWithTemplate") ||
+        !strcmp(pName, "vkUpdateDescriptorSetWithTemplateKHR")) {
+        return (
+            PFN_vkVoidFunction)&DxvkMaliCompatLayer_UpdateDescriptorSetWithTemplate;
     }
 
     // if (!strcmp(pName, "vkBindBufferMemory2") ||

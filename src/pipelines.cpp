@@ -1,6 +1,8 @@
 #include "layer.hpp"
 #include "logger.hpp"
 #include "pipelines.hpp"
+#include <cstdint>
+#include <unordered_map>
 #include <vulkan/vulkan.h>
 
 std::shared_mutex pipelineLayoutsLock;

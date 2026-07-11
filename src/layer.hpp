@@ -93,6 +93,16 @@ class DescriptorSetAllocator {
     const size_t maxEmptyPoolsToReserve = 2;
 };
 
+struct null_descriptor_emulation {
+    VkBuffer null_buffer = VK_NULL_HANDLE;
+    VkDeviceMemory null_buffer_memory = VK_NULL_HANDLE;
+    VkBufferView null_buffer_view = VK_NULL_HANDLE;
+    VkImage null_image = VK_NULL_HANDLE;
+    VkDeviceMemory null_image_memory = VK_NULL_HANDLE;
+    VkImageView null_image_view = VK_NULL_HANDLE;
+    VkSampler null_sampler = VK_NULL_HANDLE;
+};
+
 struct device {
     VkDevice handle;
     uint32_t deviceId;
@@ -107,6 +117,7 @@ struct device {
     int profile_transfers = 0;
     int sample_gpu_counters = 0;
     int emulate_push_descriptors = 0;
+    int emulate_null_descriptor = 1;
     const VkAllocationCallbacks *alloc;
     std::unique_ptr<SyncPool> syncPool;
     std::unique_ptr<DescriptorSetAllocator> descriptorSetAllocator;
@@ -116,6 +127,7 @@ struct device {
     std::atomic_bool stop_thread{false};
     std::string dump_buffers_path;
     bool has_more_layers = false;
+    null_descriptor_emulation null_descriptors;
 };
 
 struct device *get_device(VkDevice);

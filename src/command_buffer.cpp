@@ -535,3 +535,61 @@ DxvkMaliCompatLayer_CmdPushDescriptorSetWithTemplateKHR(
                                                      &allocatedSet, 0, nullptr);
     }
 }
+
+VK_LAYER_EXPORT void VKAPI_CALL DxvkMaliCompatLayer_CmdBindVertexBuffers(
+    VkCommandBuffer commandBuffer, uint32_t firstBinding, uint32_t bindingCount,
+    const VkBuffer *pBuffers, const VkDeviceSize *pOffsets) {
+    struct command_buffer *cb = get_command_buffer(commandBuffer);
+    if (!cb)
+        return;
+    struct device *dev = cb->device;
+
+    if (dev->emulate_null_descriptor && pBuffers) {
+        std::vector<VkBuffer> bufs(bindingCount);
+        for (uint32_t i = 0; i < bindingCount; i++) {
+            bufs[i] =
+                pBuffers[i] ? pBuffers[i] : dev->null_descriptors.null_buffer;
+        }
+        dev->table.CmdBindVertexBuffers(commandBuffer, firstBinding,
+                                        bindingCount, bufs.data(), pOffsets);
+    } else {
+        dev->table.CmdBindVertexBuffers(commandBuffer, firstBinding,
+                                        bindingCount, pBuffers, pOffsets);
+    }
+}
+
+VK_LAYER_EXPORT void VKAPI_CALL DxvkMaliCompatLayer_CmdBindVertexBuffers2(
+    VkCommandBuffer commandBuffer, uint32_t firstBinding, uint32_t bindingCount,
+    const VkBuffer *pBuffers, const VkDeviceSize *pOffsets,
+    const VkDeviceSize *pSizes, const VkDeviceSize *pStrides) {
+    struct command_buffer *cb = get_command_buffer(commandBuffer);
+    if (!cb)
+        return;
+    struct device *dev = cb->device;
+
+    if (dev->emulate_null_descriptor && pBuffers) {
+        std::vector<VkBuffer> bufs(bindingCount);
+        std::vector<VkDeviceSize> sizes;
+        if (pSizes)
+            sizes.assign(pSizes, pSizes + bindingCount);
+
+        for (uint32_t i = 0; i < bindingCount; i++) {
+            if (pBuffers[i] == VK_NULL_HANDLE) {
+                bufs[i] = dev->null_descriptors.null_buffer;
+                if (pSizes) {
+                    sizes[i] = std::min(pSizes[i], static_cast<VkDeviceSize>(
+                                                       65536)); // Safely clamp
+                }
+            } else {
+                bufs[i] = pBuffers[i];
+            }
+        }
+        dev->table.CmdBindVertexBuffers2(
+            commandBuffer, firstBinding, bindingCount, bufs.data(), pOffsets,
+            pSizes ? sizes.data() : nullptr, pStrides);
+    } else {
+        dev->table.CmdBindVertexBuffers2(commandBuffer, firstBinding,
+                                         bindingCount, pBuffers, pOffsets,
+                                         pSizes, pStrides);
+    }
+}
