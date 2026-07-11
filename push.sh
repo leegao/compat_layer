@@ -16,3 +16,5 @@ push libdxvk_mali_compat_layer.so
 cd -
 
 push_vvl libdxvk_mali_compat_layer.json
+
+echo VK_INSTANCE_LAYERS=VK_LAYER_COMPAT_DxvkMaliCompatLayer
