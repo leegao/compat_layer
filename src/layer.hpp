@@ -106,6 +106,7 @@ struct device {
     uint32_t memoryIndex;
     int profile_transfers = 0;
     int sample_gpu_counters = 0;
+    int emulate_push_descriptors = 0;
     const VkAllocationCallbacks *alloc;
     std::unique_ptr<SyncPool> syncPool;
     std::unique_ptr<DescriptorSetAllocator> descriptorSetAllocator;

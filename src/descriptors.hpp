@@ -9,15 +9,15 @@
 
 struct descriptor_set_layout {
     VkDescriptorSetLayout handle;
-    bool isPushDescriptor = false;
     std::vector<VkDescriptorSetLayoutBinding> bindings;
+    bool isEmulatedPushDescriptor = false;
 };
 
 struct descriptor_update_template {
     VkDescriptorUpdateTemplate handle;
     VkDescriptorSetLayout layout;
     VkPipelineBindPoint pipelineBindPoint;
-    bool isPushDescriptor = false;
+    bool isEmulatedPushDescriptor = false;
 };
 
 using DescriptorSetLayoutsMap =

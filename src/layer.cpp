@@ -508,6 +508,23 @@ CheckForFaultSupport(VkInstance instance, VkPhysicalDevice physicalDevice) {
     return faultFeatures;
 }
 
+bool CheckForPushDescriptorSupport(VkInstance instance,
+                                   VkPhysicalDevice physicalDevice) {
+    VkPhysicalDevicePushDescriptorPropertiesKHR pushDescriptorProps = {
+        .sType =
+            VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PUSH_DESCRIPTOR_PROPERTIES_KHR,
+    };
+    VkPhysicalDeviceProperties2 properties = {
+        .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2,
+        .pNext = &pushDescriptorProps,
+    };
+
+    instanceDispatch[GetKey(instance)].GetPhysicalDeviceProperties2(
+        physicalDevice, &properties);
+
+    return pushDescriptorProps.maxPushDescriptors > 0;
+}
+
 VK_LAYER_EXPORT VkResult VKAPI_CALL DxvkMaliCompatLayer_CreateDevice(
     VkPhysicalDevice physicalDevice, const VkDeviceCreateInfo *pCreateInfo,
     const VkAllocationCallbacks *pAllocator, VkDevice *pDevice) {
@@ -559,6 +576,17 @@ VK_LAYER_EXPORT VkResult VKAPI_CALL DxvkMaliCompatLayer_CreateDevice(
     auto memoryIndex = idx < memoryProps.memoryTypeCount ? idx : UINT32_MAX;
     auto queriedFaultFeatures = CheckForFaultSupport(instance, physicalDevice);
     bool hasFaultSupport = queriedFaultFeatures.deviceFault;
+    bool hasPushDescriptorSupport =
+        CheckForPushDescriptorSupport(instance, physicalDevice);
+
+    auto emulate_push_descriptors =
+        getenv("COMPAT_EMULATE_PUSH_DESCRIPTORS")
+            ? atoi(getenv("COMPAT_EMULATE_PUSH_DESCRIPTORS"))
+            : !hasPushDescriptorSupport;
+
+    if (emulate_push_descriptors) {
+        Logger::log("info", "Emulating VK_KHR_push_descriptor");
+    }
 
     VkBaseOutStructure *ext = (VkBaseOutStructure *)createInfo.pNext;
     VkPhysicalDeviceFeatures2 *appFeatures2 = nullptr;
@@ -706,6 +734,7 @@ VK_LAYER_EXPORT VkResult VKAPI_CALL DxvkMaliCompatLayer_CreateDevice(
     device->profile_transfers = profile_transfers;
     device->sample_gpu_counters = sample_gpu_counters;
     device->has_more_layers = has_more_layers;
+    device->emulate_push_descriptors = emulate_push_descriptors;
 
     device->syncPool = std::make_unique<SyncPool>(device->handle);
 

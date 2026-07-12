@@ -1,2 +1,2 @@
 CompileFlags:
-    Add: [-DENABLE_COMPUTE_TRACKING=1]
+    Add: [-UENABLE_COMPUTE_TRACKING=1]

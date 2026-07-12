@@ -117,7 +117,15 @@ void init_dispatch_table(PFN_vkGetDeviceProcAddr gdpa, VkDevice device,
     GET_DEVICE_PROC(CmdDrawIndexed);
     GET_DEVICE_PROC(CmdDrawIndirect);
     GET_DEVICE_PROC(CmdDrawIndexedIndirect);
+#ifdef ENABLE_COMPUTE_TRACKING
     GET_DEVICE_PROC(CmdDispatch);
+#else
+    table.CmdDispatch = [](auto... args) {
+        Logger::log("error", "vkCmdDispatch called without "
+                             "ENABLE_COMPUTE_TRACKING=1, FAILING NOW");
+        abort();
+    };
+#endif
     GET_DEVICE_PROC(CmdDispatchIndirect);
     GET_DEVICE_PROC(CmdCopyBuffer);
     GET_DEVICE_PROC(CmdCopyBuffer2);
@@ -170,6 +178,10 @@ void init_dispatch_table(PFN_vkGetDeviceProcAddr gdpa, VkDevice device,
     GET_DEVICE_PROC(CreateDescriptorUpdateTemplate);
     GET_DEVICE_PROC(DestroyDescriptorUpdateTemplate);
     GET_DEVICE_PROC(UpdateDescriptorSetWithTemplate);
+    GET_DEVICE_PROC(CmdPushDescriptorSetKHR);
+    GET_DEVICE_PROC(CmdPushDescriptorSet);
+    GET_DEVICE_PROC(CmdPushDescriptorSetWithTemplateKHR);
+    GET_DEVICE_PROC(CmdPushDescriptorSetWithTemplate);
 
 #undef GET_DEVICE_PROC
 }

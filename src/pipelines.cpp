@@ -27,17 +27,17 @@ VK_LAYER_EXPORT VkResult VKAPI_CALL DxvkMaliCompatLayer_CreatePipelineLayout(
         return result;
     }
 
-    auto wrapper = std::make_unique<pipeline_layout>();
-    wrapper->handle = *pPipelineLayout;
+    auto pipelineLayout = std::make_unique<pipeline_layout>();
+    pipelineLayout->handle = *pPipelineLayout;
     if (pCreateInfo->pSetLayouts && pCreateInfo->setLayoutCount > 0) {
-        wrapper->setLayouts.assign(pCreateInfo->pSetLayouts,
-                                   pCreateInfo->pSetLayouts +
-                                       pCreateInfo->setLayoutCount);
+        pipelineLayout->setLayouts.assign(pCreateInfo->pSetLayouts,
+                                          pCreateInfo->pSetLayouts +
+                                              pCreateInfo->setLayoutCount);
     }
 
     {
         scoped_lock l(global_lock);
-        pipelineLayoutsMap[*pPipelineLayout] = std::move(wrapper);
+        pipelineLayoutsMap[*pPipelineLayout] = std::move(pipelineLayout);
     }
 
     return VK_SUCCESS;
