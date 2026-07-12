@@ -3,8 +3,8 @@
     "capabilities": {
         "device": {
             "extensions": {
-                "VK_EXT_depth_clip_enable_DISABLED": 1,
-                "VK_EXT_robustness2_DISABLED": 1,
+                "VK_EXT_depth_clip_enable": 1,
+                "VK_EXT_robustness2": 1,
                 "VK_EXT_vertex_attribute_divisor_DISABLED": 3,
 
                 "VK_EXT_mutable_descriptor_type_DISABLED": 1,
