@@ -106,7 +106,11 @@ typedef struct VkLayerDispatchTable_ {
     PFN_vkCreateQueryPool CreateQueryPool;
     PFN_vkDestroyQueryPool DestroyQueryPool;
     PFN_vkGetQueryPoolResults GetQueryPoolResults;
+#ifdef ENABLE_BUFFER_TRACKING
     PFN_vkCreateBuffer CreateBuffer;
+#else
+    PFN_vkCreateBuffer CreateBuffer_;
+#endif
     PFN_vkDestroyBuffer DestroyBuffer;
     PFN_vkCreateBufferView CreateBufferView;
     PFN_vkDestroyBufferView DestroyBufferView;

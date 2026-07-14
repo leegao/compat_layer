@@ -56,7 +56,12 @@ void init_dispatch_table(PFN_vkGetDeviceProcAddr gdpa, VkDevice device,
     GET_DEVICE_PROC(CreateQueryPool);
     GET_DEVICE_PROC(DestroyQueryPool);
     GET_DEVICE_PROC(GetQueryPoolResults);
+#ifdef ENABLE_BUFFER_TRACKING
     GET_DEVICE_PROC(CreateBuffer);
+#else
+    table.CreateBuffer_ =
+        reinterpret_cast<PFN_vkCreateBuffer>(gdpa(device, "vkCreateBuffer"));
+#endif
     GET_DEVICE_PROC(DestroyBuffer);
     GET_DEVICE_PROC(CreateBufferView);
     GET_DEVICE_PROC(DestroyBufferView);

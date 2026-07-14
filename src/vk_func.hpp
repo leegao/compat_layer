@@ -20,6 +20,7 @@ VkResult VKAPI_CALL DxvkMaliCompatLayer_CreateImageView(
 void VKAPI_CALL DxvkMaliCompatLayer_DestroyImage(
     VkDevice device, VkImage image, const VkAllocationCallbacks *pAllocator);
 
+#ifdef ENABLE_BUFFER_TRACKING
 VkResult VKAPI_CALL DxvkMaliCompatLayer_CreateBuffer(
     VkDevice device, const VkBufferCreateInfo *pCreateInfo,
     const VkAllocationCallbacks *pAllocator, VkBuffer *pBuffer);
@@ -32,8 +33,13 @@ VkResult VKAPI_CALL
 DxvkMaliCompatLayer_BindBufferMemory2(VkDevice device, uint32_t bindInfoCount,
                                       const VkBindBufferMemoryInfo *pBindInfos);
 
+void VKAPI_CALL
+DxvkMaliCompatLayer_FreeMemory(VkDevice device, VkDeviceMemory memory,
+                               const VkAllocationCallbacks *pAllocator);
+
 void VKAPI_CALL DxvkMaliCompatLayer_DestroyBuffer(
     VkDevice device, VkBuffer buffer, const VkAllocationCallbacks *pAllocator);
+#endif
 
 VkResult VKAPI_CALL DxvkMaliCompatLayer_AllocateCommandBuffers(
     VkDevice device, const VkCommandBufferAllocateInfo *pAllocateInfo,
@@ -196,10 +202,6 @@ VkResult VKAPI_CALL DxvkMaliCompatLayer_MapMemory(
 
 void VKAPI_CALL DxvkMaliCompatLayer_UnmapMemory(VkDevice device,
                                                 VkDeviceMemory memory);
-
-void VKAPI_CALL
-DxvkMaliCompatLayer_FreeMemory(VkDevice device, VkDeviceMemory memory,
-                               const VkAllocationCallbacks *pAllocator);
 
 VkDeviceAddress VKAPI_CALL DxvkMaliCompatLayer_GetBufferDeviceAddress(
     VkDevice device, const VkBufferDeviceAddressInfo *pInfo);

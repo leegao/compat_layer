@@ -5,6 +5,7 @@
 #include "logger.hpp"
 #include "mali_gpu_profiler.hpp"
 #include "pipeline_state.hpp"
+#include "pipelines.hpp"
 #include "staging_resources.hpp"
 #include <algorithm>
 

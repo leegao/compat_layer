@@ -9,6 +9,8 @@ std::unordered_map<VkBuffer, std::unique_ptr<struct buffer>> buffersMap;
 
 std::atomic<int> bufferIdCounter;
 
+#ifdef ENABLE_BUFFER_TRACKING
+
 struct buffer *find_buffer(VkBuffer buffer) {
     auto it = buffersMap.find(buffer);
 
@@ -132,3 +134,5 @@ VK_LAYER_EXPORT void VKAPI_CALL DxvkMaliCompatLayer_DestroyBuffer(
     dev->table.DestroyBuffer(device, buffer, pAllocator);
     buffersMap.erase(buffer);
 }
+
+#endif

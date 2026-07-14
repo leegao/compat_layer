@@ -1,17 +1,15 @@
 #ifndef LAYER_HPP
 #define LAYER_HPP
 
-#include "pipelines.hpp"
+#include "null_descriptors.hpp"
 #include "staging_resources.hpp"
 #include "vulkan/vk_layer.h"
 
 #include <atomic>
 #include <condition_variable>
 #include <cstdint>
-#include <map>
 #include <memory>
 #include <mutex>
-#include <shared_mutex>
 #include <thread>
 #include <unistd.h>
 #include <unordered_map>
@@ -117,6 +115,7 @@ struct device {
     std::atomic_bool stop_thread{false};
     std::string dump_buffers_path;
     bool has_more_layers = false;
+    null_descriptor_emulation null_descriptors;
 };
 
 struct device *get_device(VkDevice);

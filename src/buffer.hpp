@@ -1,5 +1,5 @@
-#ifndef __BUFFER_HPP
-#define __BUFFER_HPP
+#pragma once
+
 #include <vulkan/vulkan.h>
 
 #include <string_view>
@@ -20,5 +20,3 @@ struct buffer {
 };
 
 struct buffer *find_buffer(VkBuffer);
-
-#endif

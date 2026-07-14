@@ -1,6 +1,7 @@
 #include "layer.hpp"
 
 #include "logger.hpp"
+#include "null_descriptors.hpp"
 #include "spoof_profile.hpp"
 #include "vk_func.hpp"
 #include "vulkan/vk_layer.h"
@@ -872,6 +873,7 @@ VK_LAYER_EXPORT VkResult VKAPI_CALL DxvkMaliCompatLayer_CreateDevice(
         deviceMap[GetKey(*pDevice)] = device;
     }
 
+    create_null_resources(device.get());
     return VK_SUCCESS;
 }
 
@@ -900,6 +902,7 @@ VK_LAYER_EXPORT void VKAPI_CALL DxvkMaliCompatLayer_DestroyDevice(
     dev->syncPool.reset();
     dev->descriptorSetAllocator->cleanup();
     dev->descriptorSetAllocator.reset();
+    destroy_null_resources(dev);
 
     if (device != VK_NULL_HANDLE)
         dev->table.DestroyDevice(device, pAllocator);
@@ -910,10 +913,14 @@ VK_LAYER_EXPORT void VKAPI_CALL DxvkMaliCompatLayer_DestroyDevice(
 VK_LAYER_EXPORT PFN_vkVoidFunction VKAPI_CALL
 DxvkMaliCompatLayer_GetDeviceProcAddr(VkDevice device, const char *pName) {
     GETPROCADDR(DestroyDevice);
-    // GETPROCADDR(CreateBuffer);
-    // GETPROCADDR(BindBufferMemory);
-    // GETPROCADDR(BindBufferMemory2);
-    // GETPROCADDR(DestroyBuffer);
+
+#ifdef ENABLE_BUFFER_TRACKING
+    GETPROCADDR(CreateBuffer);
+    GETPROCADDR(BindBufferMemory);
+    GETPROCADDR(BindBufferMemory2);
+    GETPROCADDR(DestroyBuffer);
+#endif
+
     GETPROCADDR(AllocateCommandBuffers);
     GETPROCADDR(FreeCommandBuffers);
     GETPROCADDR(BeginCommandBuffer);
