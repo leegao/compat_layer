@@ -6,9 +6,11 @@
 #include "mali_gpu_profiler.hpp"
 #include "pipeline_state.hpp"
 #include "staging_resources.hpp"
+#include <algorithm>
 
 std::unordered_map<VkCommandBuffer, std::shared_ptr<struct command_buffer>>
     commandBuffersMap;
+std::unordered_map<VkCommandPool, std::vector<VkCommandBuffer>> commandPoolsMap;
 
 struct command_buffer *get_command_buffer(VkCommandBuffer commandbuffer) {
     auto it = commandBuffersMap.find(commandbuffer);
@@ -17,6 +19,16 @@ struct command_buffer *get_command_buffer(VkCommandBuffer commandbuffer) {
         return nullptr;
 
     return it->second.get();
+}
+
+void command_buffer::kill_descriptor_sets() {
+    if (liveDescriptorSets.empty()) {
+        return;
+    }
+    for (auto [pool, set] : liveDescriptorSets) {
+        device->descriptorSetAllocator->free(pool, set);
+    }
+    liveDescriptorSets.clear();
 }
 
 VkResult DispatchOneShotAndSample(
@@ -77,6 +89,7 @@ VkResult DispatchOneShotAndSample(
     {
         scoped_lock l(global_lock);
         commandBuffersMap[commandBuffer] = cb;
+        commandPoolsMap[command_pool].push_back(cb->handle);
     }
 
     VkCommandBufferBeginInfo begin_info = {
@@ -180,6 +193,8 @@ VK_LAYER_EXPORT VkResult VKAPI_CALL DxvkMaliCompatLayer_AllocateCommandBuffers(
         {
             scoped_lock l(global_lock);
             commandBuffersMap[pCommandBuffers[i]] = cmd;
+            commandPoolsMap[pAllocateInfo->commandPool].push_back(
+                pCommandBuffers[i]);
         }
 
         if (dev->has_more_layers) {
@@ -200,13 +215,19 @@ VK_LAYER_EXPORT void VKAPI_CALL DxvkMaliCompatLayer_FreeCommandBuffers(
     if (!dev)
         return;
 
+    auto &poolBuffers = commandPoolsMap[commandPool];
     for (uint32_t i = 0; i < commandBufferCount; i++) {
         struct command_buffer *cb = get_command_buffer(pCommandBuffers[i]);
         if (!cb)
             continue;
 
+        cb->kill_descriptor_sets();
+
         dev->table.FreeCommandBuffers(dev->handle, commandPool, 1, &cb->handle);
         commandBuffersMap.erase(pCommandBuffers[i]);
+        poolBuffers.erase(std::remove(poolBuffers.begin(), poolBuffers.end(),
+                                      pCommandBuffers[i]),
+                          poolBuffers.end());
     }
 }
 
@@ -217,6 +238,11 @@ VK_LAYER_EXPORT VkResult VKAPI_CALL DxvkMaliCompatLayer_BeginCommandBuffer(
 
     cb->reset_compute_state(); // begin/reset should clear inherited compute
                                // pipeline states
+
+    {
+        scoped_lock l(global_lock);
+        cb->kill_descriptor_sets(); // clear any live descriptor sets
+    }
 
     return dev->table.BeginCommandBuffer(commandBuffer, pBeginInfo);
 }
@@ -229,7 +255,53 @@ VK_LAYER_EXPORT VkResult VKAPI_CALL DxvkMaliCompatLayer_ResetCommandBuffer(
     cb->reset_compute_state(); // begin/reset should clear inherited compute
                                // pipeline states
 
+    {
+        scoped_lock l(global_lock);
+        cb->kill_descriptor_sets(); // clear any live descriptor sets
+    }
+
     return dev->table.ResetCommandBuffer(commandBuffer, flags);
+}
+
+VK_LAYER_EXPORT VkResult VKAPI_CALL DxvkMaliCompatLayer_ResetCommandPool(
+    VkDevice device, VkCommandPool commandPool, VkCommandPoolResetFlags flags) {
+    struct device *dev = get_device(device);
+
+    {
+        scoped_lock l(global_lock);
+        auto &commandBuffers = commandPoolsMap[commandPool];
+        for (auto &commandBuffer : commandBuffers) {
+            auto *cb = get_command_buffer(commandBuffer);
+            if (cb) {
+                cb->kill_descriptor_sets();
+                cb->reset_compute_state();
+            }
+        }
+    }
+
+    return dev->table.ResetCommandPool(device, commandPool, flags);
+}
+
+VK_LAYER_EXPORT void VKAPI_CALL DxvkMaliCompatLayer_DestroyCommandPool(
+    VkDevice device, VkCommandPool commandPool,
+    const VkAllocationCallbacks *pAllocator) {
+    struct device *dev = get_device(device);
+    if (!dev)
+        return;
+
+    {
+        scoped_lock l(global_lock);
+        auto &commandBuffers = commandPoolsMap[commandPool];
+        for (auto &commandBuffer : commandBuffers) {
+            auto *cb = get_command_buffer(commandBuffer);
+            if (cb) {
+                cb->kill_descriptor_sets();
+            }
+        }
+        commandPoolsMap.erase(commandPool);
+    }
+
+    dev->table.DestroyCommandPool(device, commandPool, pAllocator);
 }
 
 VK_LAYER_EXPORT void VKAPI_CALL DxvkMaliCompatLayer_CmdBindPipeline(
@@ -310,7 +382,6 @@ VK_LAYER_EXPORT void VKAPI_CALL DxvkMaliCompatLayer_CmdPushConstants2(
     dev->table.CmdPushConstants2(commandBuffer, pPushConstantsInfo);
 }
 
-// TODO(leegao): look into late-binding instead of immediate state changes
 VK_LAYER_EXPORT void VKAPI_CALL DxvkMaliCompatLayer_CmdPushDescriptorSetKHR(
     VkCommandBuffer commandBuffer, VkPipelineBindPoint pipelineBindPoint,
     VkPipelineLayout layout, uint32_t set, uint32_t descriptorWriteCount,
@@ -365,8 +436,14 @@ VK_LAYER_EXPORT void VKAPI_CALL DxvkMaliCompatLayer_CmdPushDescriptorSetKHR(
         return;
     }
 
-    // TODO: work out the proper lifecycle
-    // cb->currentStagingResources->AddDescriptorSet(pool, allocatedSet);
+    // Because command buffers can be recycled, and we're performing
+    // immediate descriptor set updates, we need to tie these to the
+    // lifecycle of the command buffer and not the submission.
+    // See https://github.com/leegao/compat_layer/issues/1
+    {
+        scoped_lock l(global_lock);
+        cb->liveDescriptorSets.push_back({pool, allocatedSet});
+    }
 
     std::vector<VkWriteDescriptorSet> updates(
         pDescriptorWrites, pDescriptorWrites + descriptorWriteCount);
@@ -374,6 +451,7 @@ VK_LAYER_EXPORT void VKAPI_CALL DxvkMaliCompatLayer_CmdPushDescriptorSetKHR(
         updates[i].dstSet = allocatedSet;
     }
 
+    // TODO(leegao): look into late-binding instead of immediate state changes
     dev->table.UpdateDescriptorSets(dev->handle, descriptorWriteCount,
                                     updates.data(), 0, nullptr);
     dev->table.CmdBindDescriptorSets(commandBuffer, pipelineBindPoint, layout,
@@ -436,10 +514,17 @@ DxvkMaliCompatLayer_CmdPushDescriptorSetWithTemplateKHR(
         return;
     }
 
-    // TODO: work out the proper lifecycle
-    // cb->currentStagingResources->AddDescriptorSet(pool, allocatedSet);
+    // Because command buffers can be recycled, and we're performing
+    // immediate descriptor set updates, we need to tie these to the
+    // lifecycle of the command buffer and not the submission.
+    // See https://github.com/leegao/compat_layer/issues/1
+    {
+        scoped_lock l(global_lock);
+        cb->liveDescriptorSets.push_back({pool, allocatedSet});
+    }
 
     auto pipelineBindPoint = descriptor_update_template->pipelineBindPoint;
+    // TODO(leegao): look into late-binding instead of immediate state changes
     dev->table.UpdateDescriptorSetWithTemplate(dev->handle, allocatedSet,
                                                descriptorUpdateTemplate, pData);
     dev->table.CmdBindDescriptorSets(commandBuffer, pipelineBindPoint, layout,

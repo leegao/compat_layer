@@ -240,5 +240,12 @@ void VKAPI_CALL DxvkMaliCompatLayer_CmdPushDescriptorSetWithTemplateKHR(
     VkDescriptorUpdateTemplate descriptorUpdateTemplate,
     VkPipelineLayout layout, uint32_t set, const void *pData);
 
+VkResult VKAPI_CALL DxvkMaliCompatLayer_ResetCommandPool(
+    VkDevice device, VkCommandPool commandPool, VkCommandPoolResetFlags flags);
+
+void VKAPI_CALL DxvkMaliCompatLayer_DestroyCommandPool(
+    VkDevice device, VkCommandPool commandPool,
+    const VkAllocationCallbacks *pAllocator);
+
 } // extern "C"
 #endif

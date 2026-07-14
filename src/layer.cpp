@@ -817,8 +817,10 @@ DxvkMaliCompatLayer_GetDeviceProcAddr(VkDevice device, const char *pName) {
     // GETPROCADDR(DestroyBuffer);
     GETPROCADDR(AllocateCommandBuffers);
     GETPROCADDR(FreeCommandBuffers);
-    // GETPROCADDR(BeginCommandBuffer);
-    // GETPROCADDR(ResetCommandBuffer);
+    GETPROCADDR(BeginCommandBuffer);
+    GETPROCADDR(ResetCommandBuffer);
+    GETPROCADDR(ResetCommandPool);
+    GETPROCADDR(DestroyCommandPool);
     // GETPROCADDR(CmdBindPipeline);
     // GETPROCADDR(CmdBindDescriptorSets);
     // GETPROCADDR(CmdBindDescriptorSets2);
