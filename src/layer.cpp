@@ -835,6 +835,8 @@ DxvkMaliCompatLayer_GetDeviceProcAddr(VkDevice device, const char *pName) {
     GETPROCADDR(QueueSubmit);
     GETPROCADDR(QueueSubmit2);
 
+    GETPROCADDR(CmdPushDescriptorSetKHR);
+    GETPROCADDR(CmdPushDescriptorSetWithTemplateKHR);
     if (!strcmp(pName, "vkCreateDescriptorUpdateTemplate") ||
         !strcmp(pName, "vkCreateDescriptorUpdateTemplateKHR")) {
         return (

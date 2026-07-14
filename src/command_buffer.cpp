@@ -1,5 +1,6 @@
 #include "command_buffer.hpp"
 
+#include "descriptors.hpp"
 #include "layer.hpp"
 #include "logger.hpp"
 #include "mali_gpu_profiler.hpp"
@@ -307,4 +308,145 @@ VK_LAYER_EXPORT void VKAPI_CALL DxvkMaliCompatLayer_CmdPushConstants2(
         pPushConstantsInfo->pValues);
 
     dev->table.CmdPushConstants2(commandBuffer, pPushConstantsInfo);
+}
+
+// TODO(leegao): look into late-binding instead of immediate state changes
+VK_LAYER_EXPORT void VKAPI_CALL DxvkMaliCompatLayer_CmdPushDescriptorSetKHR(
+    VkCommandBuffer commandBuffer, VkPipelineBindPoint pipelineBindPoint,
+    VkPipelineLayout layout, uint32_t set, uint32_t descriptorWriteCount,
+    const VkWriteDescriptorSet *pDescriptorWrites) {
+    auto *cb = get_command_buffer(commandBuffer);
+    auto *dev = cb->device;
+
+    auto *pipelineLayout = ({
+        std::shared_lock l(pipelineLayoutsLock); // reader
+        get_pipeline_layout(layout);
+    });
+    if (!pipelineLayout || set >= pipelineLayout->setLayouts.size()) {
+        Logger::log(
+            "error",
+            "vkCmdPushDescriptorSetKHR: pipeline layout or set index invalid");
+        if (dev->table.CmdPushDescriptorSet) {
+            dev->table.CmdPushDescriptorSet(commandBuffer, pipelineBindPoint,
+                                            layout, set, descriptorWriteCount,
+                                            pDescriptorWrites);
+        }
+        return;
+    }
+
+    auto *descriptorSetLayout = ({
+        std::shared_lock l(descriptorSetLayoutsLock); // reader
+        pipelineLayout->GetDescriptorSetLayout(set);
+    });
+    if (!descriptorSetLayout ||
+        !descriptorSetLayout->isEmulatedPushDescriptor) {
+        if (!descriptorSetLayout)
+            Logger::log("error",
+                        "vkCmdPushDescriptorSetKHR: descriptor set layout "
+                        "not found");
+        if (dev->table.CmdPushDescriptorSet) {
+            dev->table.CmdPushDescriptorSet(commandBuffer, pipelineBindPoint,
+                                            layout, set, descriptorWriteCount,
+                                            pDescriptorWrites);
+        }
+        return;
+    }
+
+    // Emulated path
+    VkDescriptorPool pool = VK_NULL_HANDLE;
+    VkDescriptorSet allocatedSet = VK_NULL_HANDLE;
+    VkResult res = dev->descriptorSetAllocator->allocate(
+        descriptorSetLayout->handle, &pool, &allocatedSet);
+    if (res != VK_SUCCESS) {
+        Logger::log("error",
+                    "vkCmdPushDescriptorSetKHR: "
+                    "DescriptorSetAllocator::allocate failed: %d",
+                    res);
+        return;
+    }
+
+    // TODO: work out the proper lifecycle
+    // cb->currentStagingResources->AddDescriptorSet(pool, allocatedSet);
+
+    std::vector<VkWriteDescriptorSet> updates(
+        pDescriptorWrites, pDescriptorWrites + descriptorWriteCount);
+    for (uint32_t i = 0; i < descriptorWriteCount; ++i) {
+        updates[i].dstSet = allocatedSet;
+    }
+
+    dev->table.UpdateDescriptorSets(dev->handle, descriptorWriteCount,
+                                    updates.data(), 0, nullptr);
+    dev->table.CmdBindDescriptorSets(commandBuffer, pipelineBindPoint, layout,
+                                     set, 1, &allocatedSet, 0, nullptr);
+
+    if (pipelineBindPoint == VK_PIPELINE_BIND_POINT_COMPUTE) {
+        cb->computePipelineState.TrackDescriptorSets(layout, set, 1,
+                                                     &allocatedSet, 0, nullptr);
+    }
+}
+
+VK_LAYER_EXPORT void VKAPI_CALL
+DxvkMaliCompatLayer_CmdPushDescriptorSetWithTemplateKHR(
+    VkCommandBuffer commandBuffer,
+    VkDescriptorUpdateTemplate descriptorUpdateTemplate,
+    VkPipelineLayout layout, uint32_t set, const void *pData) {
+    struct command_buffer *cb = get_command_buffer(commandBuffer);
+    struct device *dev = cb->device;
+
+    auto *descriptor_update_template = ({
+        std::shared_lock l(descriptorSetLayoutsLock); // reader
+        get_descriptor_update_template(descriptorUpdateTemplate);
+    });
+    if (!descriptor_update_template) {
+        Logger::log("error", "vkCmdPushDescriptorSetWithTemplateKHR: template "
+                             "not found");
+        if (dev->table.CmdPushDescriptorSetWithTemplate) {
+            dev->table.CmdPushDescriptorSetWithTemplate(
+                commandBuffer, descriptorUpdateTemplate, layout, set, pData);
+        }
+        return;
+    }
+
+    auto *descriptorSetLayout = ({
+        std::shared_lock l(descriptorSetLayoutsLock); // reader
+        get_descriptor_set_layout(descriptor_update_template->layout);
+    });
+    if (!descriptorSetLayout ||
+        !descriptorSetLayout->isEmulatedPushDescriptor) {
+        if (!descriptorSetLayout)
+            Logger::log("error",
+                        "vkCmdPushDescriptorSetWithTemplateKHR: layout "
+                        "not found or is not a push descriptor set");
+        if (dev->table.CmdPushDescriptorSetWithTemplate) {
+            dev->table.CmdPushDescriptorSetWithTemplate(
+                commandBuffer, descriptorUpdateTemplate, layout, set, pData);
+        }
+        return;
+    }
+
+    VkDescriptorPool pool = VK_NULL_HANDLE;
+    VkDescriptorSet allocatedSet = VK_NULL_HANDLE;
+    VkResult res = dev->descriptorSetAllocator->allocate(
+        descriptorSetLayout->handle, &pool, &allocatedSet);
+    if (res != VK_SUCCESS) {
+        Logger::log("error",
+                    "vkCmdPushDescriptorSetWithTemplateKHR: "
+                    "DescriptorSetAllocator::allocate failed: %d",
+                    res);
+        return;
+    }
+
+    // TODO: work out the proper lifecycle
+    // cb->currentStagingResources->AddDescriptorSet(pool, allocatedSet);
+
+    auto pipelineBindPoint = descriptor_update_template->pipelineBindPoint;
+    dev->table.UpdateDescriptorSetWithTemplate(dev->handle, allocatedSet,
+                                               descriptorUpdateTemplate, pData);
+    dev->table.CmdBindDescriptorSets(commandBuffer, pipelineBindPoint, layout,
+                                     set, 1, &allocatedSet, 0, nullptr);
+
+    if (pipelineBindPoint == VK_PIPELINE_BIND_POINT_COMPUTE) {
+        cb->computePipelineState.TrackDescriptorSets(layout, set, 1,
+                                                     &allocatedSet, 0, nullptr);
+    }
 }
