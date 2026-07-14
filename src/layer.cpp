@@ -525,6 +525,40 @@ bool CheckForPushDescriptorSupport(VkInstance instance,
     return pushDescriptorProps.maxPushDescriptors > 0;
 }
 
+VkPhysicalDeviceRobustness2FeaturesEXT
+CheckForRobustness2Support(VkInstance instance,
+                           VkPhysicalDevice physicalDevice) {
+    VkPhysicalDeviceRobustness2FeaturesEXT extFeatures = {
+        .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ROBUSTNESS_2_FEATURES_EXT,
+    };
+    VkPhysicalDeviceFeatures2 features = {
+        .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2,
+        .pNext = &extFeatures,
+    };
+
+    instanceDispatch[GetKey(instance)].GetPhysicalDeviceFeatures2(
+        physicalDevice, &features);
+
+    return extFeatures;
+}
+
+bool CheckForImageRobustnessSupport(VkInstance instance,
+                                    VkPhysicalDevice physicalDevice) {
+    VkPhysicalDeviceImageRobustnessFeaturesEXT extFeatures = {
+        .sType =
+            VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGE_ROBUSTNESS_FEATURES_EXT,
+    };
+    VkPhysicalDeviceFeatures2 features = {
+        .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2,
+        .pNext = &extFeatures,
+    };
+
+    instanceDispatch[GetKey(instance)].GetPhysicalDeviceFeatures2(
+        physicalDevice, &features);
+
+    return extFeatures.robustImageAccess;
+}
+
 VK_LAYER_EXPORT VkResult VKAPI_CALL DxvkMaliCompatLayer_CreateDevice(
     VkPhysicalDevice physicalDevice, const VkDeviceCreateInfo *pCreateInfo,
     const VkAllocationCallbacks *pAllocator, VkDevice *pDevice) {
@@ -578,6 +612,11 @@ VK_LAYER_EXPORT VkResult VKAPI_CALL DxvkMaliCompatLayer_CreateDevice(
     bool hasFaultSupport = queriedFaultFeatures.deviceFault;
     bool hasPushDescriptorSupport =
         CheckForPushDescriptorSupport(instance, physicalDevice);
+    auto queriedRobustness2Features =
+        CheckForRobustness2Support(instance, physicalDevice);
+    bool hasNullDescriptorSupport = queriedRobustness2Features.nullDescriptor;
+    bool hasImageRobustnessSupport =
+        CheckForImageRobustnessSupport(instance, physicalDevice);
 
     auto emulate_push_descriptors =
         getenv("COMPAT_EMULATE_PUSH_DESCRIPTORS")
@@ -588,9 +627,20 @@ VK_LAYER_EXPORT VkResult VKAPI_CALL DxvkMaliCompatLayer_CreateDevice(
         Logger::log("info", "Emulating VK_KHR_push_descriptor");
     }
 
+    auto emulate_null_descriptor =
+        getenv("COMPAT_EMULATE_NULL_DESCRIPTORS")
+            ? atoi(getenv("COMPAT_EMULATE_NULL_DESCRIPTORS"))
+            : !hasNullDescriptorSupport;
+
+    if (emulate_null_descriptor) {
+        Logger::log("info", "Emulating VK_EXT_robustness2::nullDescriptor");
+    }
+
     VkBaseOutStructure *ext = (VkBaseOutStructure *)createInfo.pNext;
     VkPhysicalDeviceFeatures2 *appFeatures2 = nullptr;
     VkPhysicalDeviceFaultFeaturesEXT *appFaultFeatures = nullptr;
+    VkPhysicalDeviceImageRobustnessFeaturesEXT *appRobustnessFeatures = nullptr;
+    VkPhysicalDeviceVulkan13Features *vulkan13Features = nullptr;
 
     while (ext) {
         if (ext->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2) {
@@ -598,6 +648,14 @@ VK_LAYER_EXPORT VkResult VKAPI_CALL DxvkMaliCompatLayer_CreateDevice(
         } else if (ext->sType ==
                    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FAULT_FEATURES_EXT) {
             appFaultFeatures = (VkPhysicalDeviceFaultFeaturesEXT *)ext;
+        } else if (
+            ext->sType ==
+            VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGE_ROBUSTNESS_FEATURES_EXT) {
+            appRobustnessFeatures =
+                (VkPhysicalDeviceImageRobustnessFeaturesEXT *)ext;
+        } else if (ext->sType ==
+                   VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES) {
+            vulkan13Features = (VkPhysicalDeviceVulkan13Features *)ext;
         }
         ext = ext->pNext;
     }
@@ -646,6 +704,14 @@ VK_LAYER_EXPORT VkResult VKAPI_CALL DxvkMaliCompatLayer_CreateDevice(
         enabledExtensions.push_back(VK_EXT_DEVICE_FAULT_EXTENSION_NAME);
     }
 
+    if (emulate_null_descriptor && hasImageRobustnessSupport &&
+        !hasExtension(VK_EXT_IMAGE_ROBUSTNESS_EXTENSION_NAME)) {
+        Logger::log("info",
+                    "Adding extension " VK_EXT_IMAGE_ROBUSTNESS_EXTENSION_NAME
+                    " for VK_EXT_null_descriptor emulation");
+        enabledExtensions.push_back(VK_EXT_IMAGE_ROBUSTNESS_EXTENSION_NAME);
+    }
+
     createInfo.ppEnabledExtensionNames = enabledExtensions.data();
     createInfo.enabledExtensionCount =
         static_cast<uint32_t>(enabledExtensions.size());
@@ -654,6 +720,12 @@ VK_LAYER_EXPORT VkResult VKAPI_CALL DxvkMaliCompatLayer_CreateDevice(
         .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FAULT_FEATURES_EXT,
         .deviceFault = VK_TRUE,
         .deviceFaultVendorBinary = queriedFaultFeatures.deviceFaultVendorBinary,
+    };
+
+    VkPhysicalDeviceImageRobustnessFeaturesEXT layerRobustnessFeatures = {
+        .sType =
+            VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGE_ROBUSTNESS_FEATURES_EXT,
+        .robustImageAccess = VK_TRUE,
     };
 
     if (hasFaultSupport) {
@@ -668,15 +740,41 @@ VK_LAYER_EXPORT VkResult VKAPI_CALL DxvkMaliCompatLayer_CreateDevice(
         }
     }
 
-    VkPhysicalDeviceFeatures actualCoreFeatures{};
-    instanceDispatch[GetKey(instance)].GetPhysicalDeviceFeatures(
-        physicalDevice, &actualCoreFeatures);
+    if (emulate_null_descriptor && hasImageRobustnessSupport) {
+        if (vulkan13Features) {
+            vulkan13Features->robustImageAccess = VK_TRUE;
+        } else if (appRobustnessFeatures) {
+            appRobustnessFeatures->robustImageAccess = VK_TRUE;
+        } else {
+            Logger::log("info", "Enabling VK_EXT_image_robustness features for "
+                                "VK_EXT_robustness2 emulation");
+            layerRobustnessFeatures.pNext = (void *)createInfo.pNext;
+            createInfo.pNext = &layerRobustnessFeatures;
+        }
+    } else if (emulate_null_descriptor) {
+        Logger::log("error", "VK_EXT_image_robustness not supported, "
+                             "VK_EXT_robustness2 emulation may be broken");
+    }
+
+    VkPhysicalDeviceFeatures &actualCoreFeatures =
+        featuresMap[GetKey(physicalDevice)];
 
     VkPhysicalDeviceFeatures mutableCoreFeatures{};
     if (createInfo.pEnabledFeatures) {
         mutableCoreFeatures = *createInfo.pEnabledFeatures;
         mask_core_features(&mutableCoreFeatures, &actualCoreFeatures);
         createInfo.pEnabledFeatures = &mutableCoreFeatures;
+    }
+
+    if (emulate_null_descriptor && actualCoreFeatures.robustBufferAccess) {
+        Logger::log("info", "Enabling robustBufferAccess feature for "
+                            "VK_EXT_robustness2 emulation");
+        mutableCoreFeatures.robustBufferAccess = VK_TRUE;
+        if (appFeatures2)
+            appFeatures2->features.robustBufferAccess = VK_TRUE;
+    } else if (emulate_null_descriptor) {
+        Logger::log("error", "robustBufferAccess not supported, "
+                             "VK_EXT_robustness2 emulation may be broken");
     }
 
     mask_next_features(
@@ -735,6 +833,7 @@ VK_LAYER_EXPORT VkResult VKAPI_CALL DxvkMaliCompatLayer_CreateDevice(
     device->sample_gpu_counters = sample_gpu_counters;
     device->has_more_layers = has_more_layers;
     device->emulate_push_descriptors = emulate_push_descriptors;
+    device->emulate_null_descriptor = emulate_null_descriptor;
 
     device->syncPool = std::make_unique<SyncPool>(device->handle);
 
