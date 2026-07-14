@@ -1,6 +1,7 @@
 #include "layer.hpp"
 
 #include "command_buffer.hpp"
+#include "logger.hpp"
 #include "pipeline_state.hpp"
 #include <cstring>
 
