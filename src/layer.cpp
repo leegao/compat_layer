@@ -955,6 +955,12 @@ DxvkMaliCompatLayer_GetDeviceProcAddr(VkDevice device, const char *pName) {
         return (
             PFN_vkVoidFunction)&DxvkMaliCompatLayer_DestroyDescriptorUpdateTemplate;
     }
+    GETPROCADDR(UpdateDescriptorSets);
+    if (!strcmp(pName, "vkUpdateDescriptorSetWithTemplate") ||
+        !strcmp(pName, "vkUpdateDescriptorSetWithTemplateKHR")) {
+        return (
+            PFN_vkVoidFunction)&DxvkMaliCompatLayer_UpdateDescriptorSetWithTemplate;
+    }
 
     // if (!strcmp(pName, "vkBindBufferMemory2") ||
     //     !strcmp(pName, "vkBindBufferMemory2KHR")) {

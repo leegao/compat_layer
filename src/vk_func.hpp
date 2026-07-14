@@ -249,5 +249,14 @@ void VKAPI_CALL DxvkMaliCompatLayer_DestroyCommandPool(
     VkDevice device, VkCommandPool commandPool,
     const VkAllocationCallbacks *pAllocator);
 
+void VKAPI_CALL DxvkMaliCompatLayer_UpdateDescriptorSetWithTemplate(
+    VkDevice device, VkDescriptorSet descriptorSet,
+    VkDescriptorUpdateTemplate descriptorUpdateTemplate, const void *pData);
+
+void VKAPI_CALL DxvkMaliCompatLayer_UpdateDescriptorSets(
+    VkDevice device, uint32_t descriptorWriteCount,
+    const VkWriteDescriptorSet *pDescriptorWrites, uint32_t descriptorCopyCount,
+    const VkCopyDescriptorSet *pDescriptorCopies);
+
 } // extern "C"
 #endif

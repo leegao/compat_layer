@@ -1,6 +1,7 @@
 #include "descriptors.hpp"
 #include "layer.hpp"
 #include "logger.hpp"
+#include "null_descriptors.hpp"
 #include <mutex>
 #include <shared_mutex>
 
@@ -113,6 +114,16 @@ DxvkMaliCompatLayer_CreateDescriptorUpdateTemplate(
     descriptor_template->pipelineBindPoint = pCreateInfo->pipelineBindPoint;
     descriptor_template->isEmulatedPushDescriptor = isEmulatedPushDescriptor;
 
+    if (pCreateInfo->pDescriptorUpdateEntries &&
+        pCreateInfo->descriptorUpdateEntryCount > 0) {
+        descriptor_template->entries.reserve(
+            pCreateInfo->descriptorUpdateEntryCount);
+        for (uint32_t i = 0; i < pCreateInfo->descriptorUpdateEntryCount; ++i) {
+            const auto src = pCreateInfo->pDescriptorUpdateEntries[i];
+            descriptor_template->entries.push_back(src);
+        }
+    }
+
     {
         std::unique_lock l(descriptorSetLayoutsLock);
         descriptorUpdateTemplatesMap[*pDescriptorUpdateTemplate] =
@@ -135,4 +146,49 @@ DxvkMaliCompatLayer_DestroyDescriptorUpdateTemplate(
         std::unique_lock l(descriptorSetLayoutsLock);
         descriptorUpdateTemplatesMap.erase(descriptorUpdateTemplate);
     }
+}
+
+VK_LAYER_EXPORT void VKAPI_CALL DxvkMaliCompatLayer_UpdateDescriptorSets(
+    VkDevice device, uint32_t descriptorWriteCount,
+    const VkWriteDescriptorSet *pDescriptorWrites, uint32_t descriptorCopyCount,
+    const VkCopyDescriptorSet *pDescriptorCopies) {
+    struct device *dev = get_device(device);
+
+    if (!dev->emulate_null_descriptor || descriptorWriteCount == 0) {
+        dev->table.UpdateDescriptorSets(device, descriptorWriteCount,
+                                        pDescriptorWrites, descriptorCopyCount,
+                                        pDescriptorCopies);
+        return;
+    }
+
+    fix_null_descriptors(
+        dev, descriptorWriteCount, pDescriptorWrites,
+        [&](const VkWriteDescriptorSet *patchedDescriptorWrites) {
+            dev->table.UpdateDescriptorSets(
+                device, descriptorWriteCount, patchedDescriptorWrites,
+                descriptorCopyCount, pDescriptorCopies);
+        });
+}
+
+VK_LAYER_EXPORT void VKAPI_CALL
+DxvkMaliCompatLayer_UpdateDescriptorSetWithTemplate(
+    VkDevice device, VkDescriptorSet descriptorSet,
+    VkDescriptorUpdateTemplate descriptorUpdateTemplate, const void *pData) {
+    struct device *dev = get_device(device);
+
+    auto *updateTemplate =
+        get_descriptor_update_template(descriptorUpdateTemplate);
+
+    if (!dev->emulate_null_descriptor || !updateTemplate ||
+        updateTemplate->entries.empty() || !pData) {
+        dev->table.UpdateDescriptorSetWithTemplate(
+            device, descriptorSet, descriptorUpdateTemplate, pData);
+        return;
+    }
+
+    fix_null_descriptor_templates(
+        dev, updateTemplate, pData, [&](const void *data) {
+            dev->table.UpdateDescriptorSetWithTemplate(
+                device, descriptorSet, descriptorUpdateTemplate, data);
+        });
 }

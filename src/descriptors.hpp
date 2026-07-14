@@ -19,6 +19,7 @@ struct descriptor_update_template {
     VkDescriptorSetLayout layout;
     VkPipelineBindPoint pipelineBindPoint;
     bool isEmulatedPushDescriptor = false;
+    std::vector<VkDescriptorUpdateTemplateEntry> entries;
 };
 
 using DescriptorSetLayoutsMap =
