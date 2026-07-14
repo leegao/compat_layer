@@ -536,3 +536,63 @@ DxvkMaliCompatLayer_CmdPushDescriptorSetWithTemplateKHR(
                                                      &allocatedSet, 0, nullptr);
     }
 }
+
+VK_LAYER_EXPORT void VKAPI_CALL DxvkMaliCompatLayer_CmdBindVertexBuffers(
+    VkCommandBuffer commandBuffer, uint32_t firstBinding, uint32_t bindingCount,
+    const VkBuffer *pBuffers, const VkDeviceSize *pOffsets) {
+    struct command_buffer *cb = get_command_buffer(commandBuffer);
+    if (!cb)
+        return;
+    struct device *dev = cb->device;
+
+    if (dev->emulate_null_descriptor && pBuffers) {
+        std::vector<VkBuffer> buffers(bindingCount);
+        for (int i = 0; i < bindingCount; i++) {
+            buffers[i] = pBuffers[i] != VK_NULL_HANDLE
+                             ? pBuffers[i]
+                             : dev->null_descriptors.null_buffer;
+        }
+        dev->table.CmdBindVertexBuffers(commandBuffer, firstBinding,
+                                        bindingCount, buffers.data(), pOffsets);
+    } else {
+        dev->table.CmdBindVertexBuffers(commandBuffer, firstBinding,
+                                        bindingCount, pBuffers, pOffsets);
+    }
+}
+
+VK_LAYER_EXPORT void VKAPI_CALL DxvkMaliCompatLayer_CmdBindVertexBuffers2(
+    VkCommandBuffer commandBuffer, uint32_t firstBinding, uint32_t bindingCount,
+    const VkBuffer *pBuffers, const VkDeviceSize *pOffsets,
+    const VkDeviceSize *pSizes, const VkDeviceSize *pStrides) {
+    struct command_buffer *cb = get_command_buffer(commandBuffer);
+    if (!cb)
+        return;
+    struct device *dev = cb->device;
+
+    if (dev->emulate_null_descriptor && pBuffers) {
+        std::vector<VkBuffer> buffers(bindingCount);
+        std::vector<VkDeviceSize> sizes;
+        if (pSizes)
+            sizes.assign(pSizes, pSizes + bindingCount);
+
+        for (int i = 0; i < bindingCount; i++) {
+            if (pBuffers[i] == VK_NULL_HANDLE) {
+                buffers[i] = dev->null_descriptors.null_buffer;
+                if (pSizes) {
+                    // Arbitrary clamp to 65536
+                    sizes[i] =
+                        std::min(pSizes[i], static_cast<VkDeviceSize>(65536));
+                }
+            } else {
+                buffers[i] = pBuffers[i];
+            }
+        }
+        dev->table.CmdBindVertexBuffers2(
+            commandBuffer, firstBinding, bindingCount, buffers.data(), pOffsets,
+            pSizes ? sizes.data() : nullptr, pStrides);
+    } else {
+        dev->table.CmdBindVertexBuffers2(commandBuffer, firstBinding,
+                                         bindingCount, pBuffers, pOffsets,
+                                         pSizes, pStrides);
+    }
+}
