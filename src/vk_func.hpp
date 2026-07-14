@@ -28,9 +28,9 @@ VkResult VKAPI_CALL DxvkMaliCompatLayer_BindBufferMemory(
     VkDevice device, VkBuffer buffer, VkDeviceMemory memory,
     VkDeviceSize memoryOffset);
 
-VkResult VKAPI_CALL DxvkMaliCompatLayer_BindBufferMemory2(
-    VkDevice device, uint32_t bindInfoCount,
-    const VkBindBufferMemoryInfo *pBindInfos);
+VkResult VKAPI_CALL
+DxvkMaliCompatLayer_BindBufferMemory2(VkDevice device, uint32_t bindInfoCount,
+                                      const VkBindBufferMemoryInfo *pBindInfos);
 
 void VKAPI_CALL DxvkMaliCompatLayer_DestroyBuffer(
     VkDevice device, VkBuffer buffer, const VkAllocationCallbacks *pAllocator);
@@ -84,15 +84,19 @@ void VKAPI_CALL DxvkMaliCompatLayer_CmdCopyBufferToImage2(
 void VKAPI_CALL DxvkMaliCompatLayer_CmdCopyImage2(
     VkCommandBuffer commandBuffer, const VkCopyImageInfo2 *pCopyImageInfo);
 
-void VKAPI_CALL DxvkMaliCompatLayer_CmdCopyImage(
-    VkCommandBuffer commandBuffer, VkImage srcImage,
-    VkImageLayout srcImageLayout, VkImage dstImage,
-    VkImageLayout dstImageLayout, uint32_t regionCount,
-    const VkImageCopy *pRegions);
+void VKAPI_CALL DxvkMaliCompatLayer_CmdCopyImage(VkCommandBuffer commandBuffer,
+                                                 VkImage srcImage,
+                                                 VkImageLayout srcImageLayout,
+                                                 VkImage dstImage,
+                                                 VkImageLayout dstImageLayout,
+                                                 uint32_t regionCount,
+                                                 const VkImageCopy *pRegions);
 
-void VKAPI_CALL DxvkMaliCompatLayer_CmdCopyBuffer(
-    VkCommandBuffer commandBuffer, VkBuffer srcBuffer, VkBuffer dstBuffer,
-    uint32_t regionCount, const VkBufferCopy *pRegions);
+void VKAPI_CALL DxvkMaliCompatLayer_CmdCopyBuffer(VkCommandBuffer commandBuffer,
+                                                  VkBuffer srcBuffer,
+                                                  VkBuffer dstBuffer,
+                                                  uint32_t regionCount,
+                                                  const VkBufferCopy *pRegions);
 
 void VKAPI_CALL DxvkMaliCompatLayer_CmdCopyBuffer2(
     VkCommandBuffer commandBuffer, const VkCopyBufferInfo2 *pCopyBufferInfo);
@@ -111,10 +115,10 @@ void VKAPI_CALL DxvkMaliCompatLayer_CmdSetDescriptorBufferOffsetsEXT(
     const uint32_t *pBufferIndices, const VkDeviceSize *pOffsets);
 
 void VKAPI_CALL DxvkMaliCompatLayer_CmdDraw(VkCommandBuffer commandBuffer,
-                                              uint32_t vertexCount,
-                                              uint32_t instanceCount,
-                                              uint32_t firstVertex,
-                                              uint32_t firstInstance);
+                                            uint32_t vertexCount,
+                                            uint32_t instanceCount,
+                                            uint32_t firstVertex,
+                                            uint32_t firstInstance);
 
 void VKAPI_CALL DxvkMaliCompatLayer_CmdDrawIndexed(
     VkCommandBuffer commandBuffer, uint32_t indexCount, uint32_t instanceCount,
@@ -129,17 +133,17 @@ void VKAPI_CALL DxvkMaliCompatLayer_CmdDrawIndexedIndirect(
     uint32_t drawCount, uint32_t stride);
 
 void VKAPI_CALL DxvkMaliCompatLayer_CmdDispatch(VkCommandBuffer commandBuffer,
-                                                  uint32_t groupCountX,
-                                                  uint32_t groupCountY,
-                                                  uint32_t groupCountZ);
+                                                uint32_t groupCountX,
+                                                uint32_t groupCountY,
+                                                uint32_t groupCountZ);
 
 void VKAPI_CALL DxvkMaliCompatLayer_CmdDispatchIndirect(
     VkCommandBuffer commandBuffer, VkBuffer buffer, VkDeviceSize offset);
 
 void VKAPI_CALL DxvkMaliCompatLayer_GetDeviceQueue(VkDevice device,
-                                                     uint32_t queueFamilyIndex,
-                                                     uint32_t queueIndex,
-                                                     VkQueue *pQueue);
+                                                   uint32_t queueFamilyIndex,
+                                                   uint32_t queueIndex,
+                                                   VkQueue *pQueue);
 
 VkResult VKAPI_CALL DxvkMaliCompatLayer_QueueSubmit(
     VkQueue queue, uint32_t submitInfoCount, const VkSubmitInfo *pSubmitInfos,
@@ -184,18 +188,18 @@ VkResult VKAPI_CALL DxvkMaliCompatLayer_CreateComputePipelines(
 
 void VKAPI_CALL
 DxvkMaliCompatLayer_DestroyPipeline(VkDevice device, VkPipeline pipeline,
-                                      const VkAllocationCallbacks *pAllocator);
+                                    const VkAllocationCallbacks *pAllocator);
 
 VkResult VKAPI_CALL DxvkMaliCompatLayer_MapMemory(
     VkDevice device, VkDeviceMemory memory, VkDeviceSize offset,
     VkDeviceSize size, VkMemoryMapFlags flags, void **ppData);
 
 void VKAPI_CALL DxvkMaliCompatLayer_UnmapMemory(VkDevice device,
-                                                  VkDeviceMemory memory);
+                                                VkDeviceMemory memory);
 
 void VKAPI_CALL
 DxvkMaliCompatLayer_FreeMemory(VkDevice device, VkDeviceMemory memory,
-                                 const VkAllocationCallbacks *pAllocator);
+                               const VkAllocationCallbacks *pAllocator);
 
 VkDeviceAddress VKAPI_CALL DxvkMaliCompatLayer_GetBufferDeviceAddress(
     VkDevice device, const VkBufferDeviceAddressInfo *pInfo);
@@ -205,10 +209,10 @@ VkResult VKAPI_CALL DxvkMaliCompatLayer_CreateFence(
     const VkAllocationCallbacks *pAllocator, VkFence *pFence);
 
 VkResult VKAPI_CALL DxvkMaliCompatLayer_WaitForFences(VkDevice device,
-                                                        uint32_t fenceCount,
-                                                        const VkFence *pFences,
-                                                        VkBool32 waitAll,
-                                                        uint64_t timeout);
+                                                      uint32_t fenceCount,
+                                                      const VkFence *pFences,
+                                                      VkBool32 waitAll,
+                                                      uint64_t timeout);
 
 void VKAPI_CALL DxvkMaliCompatLayer_DestroyFence(
     VkDevice device, VkFence fence, const VkAllocationCallbacks *pAllocator);
@@ -216,6 +220,25 @@ void VKAPI_CALL DxvkMaliCompatLayer_DestroyFence(
 void VKAPI_CALL DxvkMaliCompatLayer_GetDescriptorEXT(
     VkDevice device, const VkDescriptorGetInfoEXT *pDescriptorInfo,
     size_t dataSize, void *pDescriptor);
+
+VkResult VKAPI_CALL DxvkMaliCompatLayer_CreateDescriptorUpdateTemplate(
+    VkDevice device, const VkDescriptorUpdateTemplateCreateInfo *pCreateInfo,
+    const VkAllocationCallbacks *pAllocator,
+    VkDescriptorUpdateTemplate *pDescriptorUpdateTemplate);
+
+void VKAPI_CALL DxvkMaliCompatLayer_DestroyDescriptorUpdateTemplate(
+    VkDevice device, VkDescriptorUpdateTemplate descriptorUpdateTemplate,
+    const VkAllocationCallbacks *pAllocator);
+
+void VKAPI_CALL DxvkMaliCompatLayer_CmdPushDescriptorSetKHR(
+    VkCommandBuffer commandBuffer, VkPipelineBindPoint pipelineBindPoint,
+    VkPipelineLayout layout, uint32_t set, uint32_t descriptorWriteCount,
+    const VkWriteDescriptorSet *pDescriptorWrites);
+
+void VKAPI_CALL DxvkMaliCompatLayer_CmdPushDescriptorSetWithTemplateKHR(
+    VkCommandBuffer commandBuffer,
+    VkDescriptorUpdateTemplate descriptorUpdateTemplate,
+    VkPipelineLayout layout, uint32_t set, const void *pData);
 
 } // extern "C"
 #endif
