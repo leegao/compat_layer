@@ -1,0 +1,38 @@
+GPU: Mali-G715
+Driver: v1.r51p0-00eac0.4f946ec15fb242f57c674e5b8dda1435
+Supported API: 1.3.283
+
+[FAILED] Profile: VP_D3D12_FL_12_0_baseline
+  Description: Minimum baseline to create a device with FL 12.0.
+  Vulkan API: 1.3.283, needs at least 1.3.204
+  - Missing/Insufficient Extensions:
+      * VK_EXT_robustness2 (Required version: 1)
+      * VK_EXT_vertex_attribute_divisor (Required version: 3)
+  - Missing Required Feature Flags:
+      * VkPhysicalDeviceFeatures -> fillModeNonSolid 
+      * VkPhysicalDeviceFeatures -> multiViewport 
+      * VkPhysicalDeviceFeatures -> textureCompressionBC 
+      * VkPhysicalDeviceFeatures -> pipelineStatisticsQuery 
+      * VkPhysicalDeviceFeatures -> shaderClipDistance 
+      * VkPhysicalDeviceFeatures -> shaderCullDistance 
+      * VkPhysicalDeviceFeatures -> vertexPipelineStoresAndAtomics 
+      * VkPhysicalDeviceFeatures -> sparseBinding 
+      * VkPhysicalDeviceFeatures -> sparseResidencyAliased 
+      * VkPhysicalDeviceFeatures -> sparseResidencyBuffer 
+      * VkPhysicalDeviceFeatures -> sparseResidencyImage2D 
+      * VkPhysicalDeviceFeatures -> shaderResourceResidency 
+      * VkPhysicalDeviceFeatures -> shaderResourceMinLod 
+      * VkPhysicalDeviceRobustness2FeaturesEXT (missing feature struct) -> robustBufferAccess2
+      * VkPhysicalDeviceRobustness2FeaturesEXT (missing feature struct) -> robustImageAccess2
+      * VkPhysicalDeviceRobustness2FeaturesEXT (missing feature struct) -> nullDescriptor
+      * VkPhysicalDeviceTransformFeedbackFeaturesEXT -> geometryStreams 
+      * VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT (missing feature struct) -> vertexAttributeInstanceRateDivisor
+      * VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT (missing feature struct) -> vertexAttributeInstanceRateZeroDivisor
+  - Failed Properties or Limits Constraints:
+      * VkPhysicalDeviceProperties -> sparseProperties -> residencyStandard2DBlockShape: Device value is False (Expected True)
+      * VkPhysicalDeviceProperties -> sparseProperties -> residencyNonResidentStrict: Device value is False (Expected True)
+      * VkPhysicalDeviceVulkan13Properties -> storageTexelBufferOffsetSingleTexelAlignment: Device value is False (Expected True)
+  - Failed Queue Family Constraints:
+      * Requires queue family with flags: ['VK_QUEUE_SPARSE_BINDING_BIT'] (Minimum Count: 1)
+-----------------------------------------------------------------
+

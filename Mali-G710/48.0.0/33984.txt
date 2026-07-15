@@ -1,0 +1,43 @@
+GPU: Mali-G710
+Driver: v1.r48p0-01eac0.5df5d77a113107e1e50b593bc8073ba3
+Supported API: 1.3.274
+
+[FAILED] Profile: VP_D3D12_FL_12_0_baseline
+  Description: Minimum baseline to create a device with FL 12.0.
+  Vulkan API: 1.3.274, needs at least 1.3.204
+  - Missing/Insufficient Extensions:
+      * VK_EXT_robustness2 (Required version: 1)
+      * VK_EXT_vertex_attribute_divisor (Required version: 3)
+      * VK_KHR_push_descriptor (Required version: 1)
+  - Missing Required Feature Flags:
+      * VkPhysicalDeviceFeatures -> fillModeNonSolid 
+      * VkPhysicalDeviceFeatures -> multiViewport 
+      * VkPhysicalDeviceFeatures -> textureCompressionBC 
+      * VkPhysicalDeviceFeatures -> pipelineStatisticsQuery 
+      * VkPhysicalDeviceFeatures -> shaderClipDistance 
+      * VkPhysicalDeviceFeatures -> shaderCullDistance 
+      * VkPhysicalDeviceFeatures -> vertexPipelineStoresAndAtomics 
+      * VkPhysicalDeviceFeatures -> sparseBinding 
+      * VkPhysicalDeviceFeatures -> sparseResidencyAliased 
+      * VkPhysicalDeviceFeatures -> sparseResidencyBuffer 
+      * VkPhysicalDeviceFeatures -> sparseResidencyImage2D 
+      * VkPhysicalDeviceFeatures -> shaderResourceResidency 
+      * VkPhysicalDeviceFeatures -> shaderResourceMinLod 
+      * VkPhysicalDeviceRobustness2FeaturesEXT (missing feature struct) -> robustBufferAccess2
+      * VkPhysicalDeviceRobustness2FeaturesEXT (missing feature struct) -> robustImageAccess2
+      * VkPhysicalDeviceRobustness2FeaturesEXT (missing feature struct) -> nullDescriptor
+      * VkPhysicalDeviceTransformFeedbackFeaturesEXT -> geometryStreams 
+      * VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT (missing feature struct) -> vertexAttributeInstanceRateDivisor
+      * VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT (missing feature struct) -> vertexAttributeInstanceRateZeroDivisor
+  - Failed Properties or Limits Constraints:
+      * VkPhysicalDeviceProperties -> sparseProperties -> residencyStandard2DBlockShape: Device value is False (Expected True)
+      * VkPhysicalDeviceProperties -> sparseProperties -> residencyNonResidentStrict: Device value is False (Expected True)
+      * VkPhysicalDevicePushDescriptorPropertiesKHR -> maxPushDescriptors: Not specified/supported by device (Requires 32)
+      * VkPhysicalDeviceVulkan12Properties -> maxPerStageDescriptorUpdateAfterBindStorageBuffers: Device value 500000 is less than required minimum of 1000000
+      * VkPhysicalDeviceVulkan12Properties -> maxPerStageDescriptorUpdateAfterBindSampledImages: Device value 500000 is less than required minimum of 1000000
+      * VkPhysicalDeviceVulkan12Properties -> maxPerStageDescriptorUpdateAfterBindStorageImages: Device value 500000 is less than required minimum of 1000000
+      * VkPhysicalDeviceVulkan13Properties -> storageTexelBufferOffsetSingleTexelAlignment: Device value is False (Expected True)
+  - Failed Queue Family Constraints:
+      * Requires queue family with flags: ['VK_QUEUE_SPARSE_BINDING_BIT'] (Minimum Count: 1)
+-----------------------------------------------------------------
+

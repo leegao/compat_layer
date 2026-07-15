@@ -1,0 +1,97 @@
+GPU: Mali-G51
+Driver: v1.r18p0-01rel0.f2d953efce0e3b59c9cfc6029edf3648
+Supported API: 1.1.97
+
+[FAILED] Profile: VP_D3D12_FL_12_0_baseline
+  Description: Minimum baseline to create a device with FL 12.0.
+  Vulkan API: 1.1.97, needs at least 1.3.204
+  - Missing/Insufficient Extensions:
+      * VK_EXT_calibrated_timestamps (Required version: 1)
+      * VK_EXT_custom_border_color (Required version: 1)
+      * VK_EXT_depth_clip_enable (Required version: 1)
+      * VK_EXT_robustness2 (Required version: 1)
+      * VK_EXT_transform_feedback (Required version: 1)
+      * VK_EXT_vertex_attribute_divisor (Required version: 3)
+      * VK_KHR_push_descriptor (Required version: 1)
+  - Missing Required Feature Flags:
+      * VkPhysicalDeviceCustomBorderColorFeaturesEXT (missing feature struct) -> customBorderColors
+      * VkPhysicalDeviceCustomBorderColorFeaturesEXT (missing feature struct) -> customBorderColorWithoutFormat
+      * VkPhysicalDeviceDepthClipEnableFeaturesEXT (missing feature struct) -> depthClipEnable
+      * VkPhysicalDeviceFeatures -> dualSrcBlend 
+      * VkPhysicalDeviceFeatures -> multiDrawIndirect 
+      * VkPhysicalDeviceFeatures -> depthClamp 
+      * VkPhysicalDeviceFeatures -> fillModeNonSolid 
+      * VkPhysicalDeviceFeatures -> multiViewport 
+      * VkPhysicalDeviceFeatures -> textureCompressionBC 
+      * VkPhysicalDeviceFeatures -> pipelineStatisticsQuery 
+      * VkPhysicalDeviceFeatures -> shaderClipDistance 
+      * VkPhysicalDeviceFeatures -> shaderCullDistance 
+      * VkPhysicalDeviceFeatures -> vertexPipelineStoresAndAtomics 
+      * VkPhysicalDeviceFeatures -> logicOp 
+      * VkPhysicalDeviceFeatures -> sparseBinding 
+      * VkPhysicalDeviceFeatures -> sparseResidencyAliased 
+      * VkPhysicalDeviceFeatures -> sparseResidencyBuffer 
+      * VkPhysicalDeviceFeatures -> sparseResidencyImage2D 
+      * VkPhysicalDeviceFeatures -> shaderResourceResidency 
+      * VkPhysicalDeviceFeatures -> shaderResourceMinLod 
+      * VkPhysicalDeviceRobustness2FeaturesEXT (missing feature struct) -> robustBufferAccess2
+      * VkPhysicalDeviceRobustness2FeaturesEXT (missing feature struct) -> robustImageAccess2
+      * VkPhysicalDeviceRobustness2FeaturesEXT (missing feature struct) -> nullDescriptor
+      * VkPhysicalDeviceTransformFeedbackFeaturesEXT (missing feature struct) -> transformFeedback
+      * VkPhysicalDeviceTransformFeedbackFeaturesEXT (missing feature struct) -> geometryStreams
+      * VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT (missing feature struct) -> vertexAttributeInstanceRateDivisor
+      * VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT (missing feature struct) -> vertexAttributeInstanceRateZeroDivisor
+      * VkPhysicalDeviceVulkan11Features (missing feature struct) -> shaderDrawParameters
+      * VkPhysicalDeviceVulkan12Features (missing feature struct) -> samplerMirrorClampToEdge
+      * VkPhysicalDeviceVulkan12Features (missing feature struct) -> drawIndirectCount
+      * VkPhysicalDeviceVulkan12Features (missing feature struct) -> descriptorIndexing
+      * VkPhysicalDeviceVulkan12Features (missing feature struct) -> shaderUniformTexelBufferArrayDynamicIndexing
+      * VkPhysicalDeviceVulkan12Features (missing feature struct) -> shaderStorageTexelBufferArrayDynamicIndexing
+      * VkPhysicalDeviceVulkan12Features (missing feature struct) -> shaderSampledImageArrayNonUniformIndexing
+      * VkPhysicalDeviceVulkan12Features (missing feature struct) -> shaderStorageImageArrayNonUniformIndexing
+      * VkPhysicalDeviceVulkan12Features (missing feature struct) -> shaderStorageBufferArrayNonUniformIndexing
+      * VkPhysicalDeviceVulkan12Features (missing feature struct) -> shaderUniformTexelBufferArrayNonUniformIndexing
+      * VkPhysicalDeviceVulkan12Features (missing feature struct) -> shaderStorageTexelBufferArrayNonUniformIndexing
+      * VkPhysicalDeviceVulkan12Features (missing feature struct) -> descriptorBindingSampledImageUpdateAfterBind
+      * VkPhysicalDeviceVulkan12Features (missing feature struct) -> descriptorBindingStorageImageUpdateAfterBind
+      * VkPhysicalDeviceVulkan12Features (missing feature struct) -> descriptorBindingStorageBufferUpdateAfterBind
+      * VkPhysicalDeviceVulkan12Features (missing feature struct) -> descriptorBindingUniformTexelBufferUpdateAfterBind
+      * VkPhysicalDeviceVulkan12Features (missing feature struct) -> descriptorBindingStorageTexelBufferUpdateAfterBind
+      * VkPhysicalDeviceVulkan12Features (missing feature struct) -> descriptorBindingUpdateUnusedWhilePending
+      * VkPhysicalDeviceVulkan12Features (missing feature struct) -> descriptorBindingPartiallyBound
+      * VkPhysicalDeviceVulkan12Features (missing feature struct) -> descriptorBindingVariableDescriptorCount
+      * VkPhysicalDeviceVulkan12Features (missing feature struct) -> runtimeDescriptorArray
+      * VkPhysicalDeviceVulkan12Features (missing feature struct) -> separateDepthStencilLayouts
+      * VkPhysicalDeviceVulkan12Features (missing feature struct) -> timelineSemaphore
+      * VkPhysicalDeviceVulkan12Features (missing feature struct) -> bufferDeviceAddress
+      * VkPhysicalDeviceVulkan12Features (missing feature struct) -> vulkanMemoryModel
+      * VkPhysicalDeviceVulkan12Features (missing feature struct) -> vulkanMemoryModelDeviceScope
+      * VkPhysicalDeviceVulkan12Features (missing feature struct) -> hostQueryReset
+      * VkPhysicalDeviceVulkan12Features (missing feature struct) -> samplerFilterMinmax
+      * VkPhysicalDeviceVulkan12Features (missing feature struct) -> uniformBufferStandardLayout
+      * VkPhysicalDeviceVulkan13Features (missing feature struct) -> shaderDemoteToHelperInvocation
+      * VkPhysicalDeviceVulkan13Features (missing feature struct) -> synchronization2
+      * VkPhysicalDeviceVulkan13Features (missing feature struct) -> dynamicRendering
+      * VkPhysicalDeviceVulkan13Features (missing feature struct) -> maintenance4
+  - Failed Properties or Limits Constraints:
+      * VkPhysicalDeviceCustomBorderColorPropertiesEXT -> maxCustomBorderColorSamplers: Not specified/supported by device (Requires 2048)
+      * VkPhysicalDeviceProperties -> sparseProperties -> residencyStandard2DBlockShape: Device value is False (Expected True)
+      * VkPhysicalDeviceProperties -> sparseProperties -> residencyNonResidentStrict: Device value is False (Expected True)
+      * VkPhysicalDevicePushDescriptorPropertiesKHR -> maxPushDescriptors: Not specified/supported by device (Requires 32)
+      * VkPhysicalDeviceTransformFeedbackPropertiesEXT -> transformFeedbackQueries: Not specified/supported by device (Requires True)
+      * VkPhysicalDeviceTransformFeedbackPropertiesEXT -> transformFeedbackRasterizationStreamSelect: Not specified/supported by device (Requires False)
+      * VkPhysicalDeviceTransformFeedbackPropertiesEXT -> transformFeedbackStreamsLinesTriangles: Not specified/supported by device (Requires False)
+      * VkPhysicalDeviceTransformFeedbackPropertiesEXT -> transformFeedbackDraw: Not specified/supported by device (Requires False)
+      * VkPhysicalDeviceVulkan11Properties -> subgroupSupportedOperations: Not specified/supported by device (Requires ['VK_SUBGROUP_FEATURE_BALLOT_BIT', 'VK_SUBGROUP_FEATURE_BASIC_BIT', 'VK_SUBGROUP_FEATURE_VOTE_BIT', 'VK_SUBGROUP_FEATURE_SHUFFLE_BIT', 'VK_SUBGROUP_FEATURE_QUAD_BIT', 'VK_SUBGROUP_FEATURE_ARITHMETIC_BIT'])
+      * VkPhysicalDeviceVulkan11Properties -> subgroupSupportedStages: Not specified/supported by device (Requires ['VK_SHADER_STAGE_COMPUTE_BIT', 'VK_SHADER_STAGE_FRAGMENT_BIT'])
+      * VkPhysicalDeviceVulkan12Properties -> robustBufferAccessUpdateAfterBind: Not specified/supported by device (Requires True)
+      * VkPhysicalDeviceVulkan12Properties -> maxPerStageDescriptorUpdateAfterBindStorageBuffers: Not specified/supported by device (Requires 1000000)
+      * VkPhysicalDeviceVulkan12Properties -> maxPerStageDescriptorUpdateAfterBindSampledImages: Not specified/supported by device (Requires 1000000)
+      * VkPhysicalDeviceVulkan12Properties -> maxPerStageDescriptorUpdateAfterBindStorageImages: Not specified/supported by device (Requires 1000000)
+      * VkPhysicalDeviceVulkan12Properties -> filterMinmaxSingleComponentFormats: Not specified/supported by device (Requires True)
+      * VkPhysicalDeviceVulkan13Properties -> storageTexelBufferOffsetSingleTexelAlignment: Not specified/supported by device (Requires True)
+      * VkPhysicalDeviceVulkan13Properties -> uniformTexelBufferOffsetSingleTexelAlignment: Not specified/supported by device (Requires True)
+  - Failed Queue Family Constraints:
+      * Requires queue family with flags: ['VK_QUEUE_SPARSE_BINDING_BIT'] (Minimum Count: 1)
+-----------------------------------------------------------------
+
