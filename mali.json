@@ -4,7 +4,8 @@
         "device": {
             "extensions": {
                 "VK_EXT_depth_clip_enable": 1,
-                "VK_EXT_robustness2": 1,
+                "VK_EXT_robustness2_DISABLED": 1,
+                "VK_KHR_robustness2_DISABLED": 1,
                 "VK_EXT_vertex_attribute_divisor_DISABLED": 3,
 
                 "VK_EXT_mutable_descriptor_type_DISABLED": 1,
@@ -163,7 +164,6 @@
                 "VK_KHR_present_wait": 1,
                 "VK_KHR_present_wait2": 1,
                 "VK_KHR_relaxed_block_layout": 1,
-                "VK_KHR_robustness2": 1,
                 "VK_KHR_sampler_mirror_clamp_to_edge": 3,
                 "VK_KHR_sampler_ycbcr_conversion": 14,
                 "VK_KHR_separate_depth_stencil_layouts": 1,
@@ -472,9 +472,9 @@
                     "transformFeedbackPreservesProvokingVertex": true
                 },
                 "VkPhysicalDeviceRobustness2FeaturesKHR": {
-                    "robustBufferAccess2": true,
-                    "robustImageAccess2": true,
-                    "nullDescriptor": true
+                    "robustBufferAccess2": false,
+                    "robustImageAccess2": false,
+                    "nullDescriptor": false
                 },
                 "VkPhysicalDeviceShaderAtomicFloat2FeaturesEXT": {
                     "shaderBufferFloat16Atomics": false,
@@ -668,7 +668,7 @@
                     "pipelineProtectedAccess": false,
                     "pipelineRobustness": true,
                     "hostImageCopy": false,
-                    "pushDescriptor": true
+                    "pushDescriptor": false
                 },
                 "VkPhysicalDeviceWorkgroupMemoryExplicitLayoutFeaturesKHR": {
                     "workgroupMemoryExplicitLayout": true,
@@ -1223,7 +1223,7 @@
                     "lineSubPixelPrecisionBits": 4,
                     "maxVertexAttribDivisor": 4294967295,
                     "supportsNonZeroFirstInstance": true,
-                    "maxPushDescriptors": 32,
+                    "maxPushDescriptors": 0,
                     "dynamicRenderingLocalReadDepthStencilAttachments": true,
                     "dynamicRenderingLocalReadMultisampledAttachments": true,
                     "earlyFragmentMultisampleCoverageAfterSampleCounting": true,
