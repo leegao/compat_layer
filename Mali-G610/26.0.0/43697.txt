@@ -6,31 +6,29 @@ Supported API: 1.4.330
   Description: Minimum baseline to create a device with FL 12.0.
   Vulkan API: 1.4.330, needs at least 1.3.204
   - Missing/Insufficient Extensions:
-      * VK_EXT_transform_feedback (Required version: 1)
+      * [???] VK_EXT_transform_feedback (Required version: 1)
   - Missing Required Feature Flags:
-      * VkPhysicalDeviceFeatures -> geometryShader 
-      * VkPhysicalDeviceFeatures -> tessellationShader 
-      * VkPhysicalDeviceFeatures -> fillModeNonSolid 
-      * VkPhysicalDeviceFeatures -> multiViewport 
-      * VkPhysicalDeviceFeatures -> pipelineStatisticsQuery 
-      * VkPhysicalDeviceFeatures -> shaderClipDistance 
-      * VkPhysicalDeviceFeatures -> shaderCullDistance 
-      * VkPhysicalDeviceFeatures -> vertexPipelineStoresAndAtomics 
-      * VkPhysicalDeviceFeatures -> sparseResidencyAliased 
-      * VkPhysicalDeviceFeatures -> sparseResidencyImage2D 
-      * VkPhysicalDeviceFeatures -> shaderResourceResidency 
-      * VkPhysicalDeviceFeatures -> shaderResourceMinLod 
-      * VkPhysicalDeviceRobustness2FeaturesEXT -> robustBufferAccess2 
-      * VkPhysicalDeviceRobustness2FeaturesEXT -> robustImageAccess2 
-      * VkPhysicalDeviceTransformFeedbackFeaturesEXT (missing feature struct) -> transformFeedback
-      * VkPhysicalDeviceTransformFeedbackFeaturesEXT (missing feature struct) -> geometryStreams
+      * [???] VkPhysicalDeviceFeatures -> geometryShader 
+      * [???] VkPhysicalDeviceFeatures -> tessellationShader 
+      * [ W ] VkPhysicalDeviceFeatures -> fillModeNonSolid 
+      * [ W ] VkPhysicalDeviceFeatures -> multiViewport 
+      * [ W ] VkPhysicalDeviceFeatures -> shaderClipDistance 
+      * [ W ] VkPhysicalDeviceFeatures -> shaderCullDistance 
+      * [ ✓ ] VkPhysicalDeviceFeatures -> vertexPipelineStoresAndAtomics 
+      * [???] VkPhysicalDeviceFeatures -> sparseResidencyAliased 
+      * [???] VkPhysicalDeviceFeatures -> sparseResidencyImage2D 
+      * [ ✓ ] VkPhysicalDeviceFeatures -> shaderResourceResidency 
+      * [ ✓ ] VkPhysicalDeviceFeatures -> shaderResourceMinLod 
+      * [ W ] VkPhysicalDeviceRobustness2FeaturesEXT -> robustBufferAccess2 
+      * [ W ] VkPhysicalDeviceRobustness2FeaturesEXT -> robustImageAccess2 
+      * [???] VkPhysicalDeviceTransformFeedbackFeaturesEXT (missing feature struct) -> transformFeedback
   - Failed Properties or Limits Constraints:
-      * VkPhysicalDeviceProperties -> sparseProperties -> residencyStandard2DBlockShape: Device value is False (Expected True)
-      * VkPhysicalDeviceProperties -> sparseProperties -> residencyNonResidentStrict: Device value is False (Expected True)
-      * VkPhysicalDeviceTransformFeedbackPropertiesEXT -> transformFeedbackQueries: Not specified/supported by device (Requires True)
-      * VkPhysicalDeviceTransformFeedbackPropertiesEXT -> transformFeedbackRasterizationStreamSelect: Not specified/supported by device (Requires False)
-      * VkPhysicalDeviceTransformFeedbackPropertiesEXT -> transformFeedbackStreamsLinesTriangles: Not specified/supported by device (Requires False)
-      * VkPhysicalDeviceTransformFeedbackPropertiesEXT -> transformFeedbackDraw: Not specified/supported by device (Requires False)
-      * VkPhysicalDeviceVulkan13Properties -> storageTexelBufferOffsetSingleTexelAlignment: Device value is False (Expected True)
+      * [???] VkPhysicalDeviceProperties -> sparseProperties -> residencyStandard2DBlockShape: Device value is False (Expected True)
+      * [???] VkPhysicalDeviceProperties -> sparseProperties -> residencyNonResidentStrict: Device value is False (Expected True)
+      * [???] VkPhysicalDeviceTransformFeedbackPropertiesEXT -> transformFeedbackQueries: Not specified/supported by device (Requires True)
+      * [???] VkPhysicalDeviceTransformFeedbackPropertiesEXT -> transformFeedbackRasterizationStreamSelect: Not specified/supported by device (Requires False)
+      * [???] VkPhysicalDeviceTransformFeedbackPropertiesEXT -> transformFeedbackStreamsLinesTriangles: Not specified/supported by device (Requires False)
+      * [???] VkPhysicalDeviceTransformFeedbackPropertiesEXT -> transformFeedbackDraw: Not specified/supported by device (Requires False)
+      * [ ✓ ] VkPhysicalDeviceVulkan13Properties -> storageTexelBufferOffsetSingleTexelAlignment: Device value is False (Expected True)
 -----------------------------------------------------------------
 
