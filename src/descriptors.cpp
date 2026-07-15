@@ -42,6 +42,21 @@ DxvkMaliCompatLayer_CreateDescriptorSetLayout(
             ~VK_DESCRIPTOR_SET_LAYOUT_CREATE_PUSH_DESCRIPTOR_BIT_KHR;
     }
 
+    if (pCreateInfo->pBindings && pCreateInfo->bindingCount > 0) {
+        for (uint32_t i = 0; i < pCreateInfo->bindingCount; ++i) {
+            VkDescriptorType type = pCreateInfo->pBindings[i].descriptorType;
+            if (pCreateInfo->pBindings[i].descriptorCount >= 100000) {
+                Logger::log(
+                    "info",
+                    "Binding %u exceeds 100000 descriptors: descriptorType=%u, "
+                    "descriptorCount=%u",
+                    i, type, pCreateInfo->pBindings[i].descriptorCount);
+                ((VkDescriptorSetLayoutBinding *)(createInfo.pBindings))[i]
+                    .descriptorCount = 100000;
+            }
+        }
+    }
+
     VkResult result = dev->table.CreateDescriptorSetLayout(
         device, &createInfo, pAllocator, pSetLayout);
     if (result != VK_SUCCESS) {
