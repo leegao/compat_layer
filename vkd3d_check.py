@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import json
-import sys
 import os
+import sys
 
 PROMOTED_EXTENSIONS = {
     "VK_KHR_maintenance1": (1, 1),
@@ -67,20 +67,31 @@ def evaluate_limit(limit_name, device_val, req_val):
         "minMemoryMapAlignment",
         "minTexelBufferOffsetAlignment",
         "minUniformBufferOffsetAlignment",
-        "minStorageBufferOffsetAlignment"
+        "minStorageBufferOffsetAlignment",
     }
 
     if limit_name in at_most_limits:
         if device_val <= req_val:
             return True, ""
-        return False, f"Device value {device_val} exceeds maximum allowed value of {req_val}"
+        return (
+            False,
+            f"Device value {device_val} exceeds maximum allowed value of {req_val}",
+        )
 
     if limit_name == "viewportBoundsRange":
-        if isinstance(device_val, list) and isinstance(req_val, list) and len(device_val) >= 2 and len(req_val) >= 2:
+        if (
+            isinstance(device_val, list)
+            and isinstance(req_val, list)
+            and len(device_val) >= 2
+            and len(req_val) >= 2
+        ):
             ok0 = device_val[0] <= req_val[0]
             ok1 = device_val[1] >= req_val[1]
             if not (ok0 and ok1):
-                return False, f"Viewport bounds {device_val} insufficient (Requires bounds extending to {req_val})"
+                return (
+                    False,
+                    f"Viewport bounds {device_val} insufficient (Requires bounds extending to {req_val})",
+                )
             return True, ""
 
     if isinstance(req_val, bool):
@@ -91,7 +102,10 @@ def evaluate_limit(limit_name, device_val, req_val):
     if isinstance(req_val, (int, float)) and isinstance(device_val, (int, float)):
         if device_val >= req_val:
             return True, ""
-        return False, f"Device value {device_val} is less than required minimum of {req_val}"
+        return (
+            False,
+            f"Device value {device_val} is less than required minimum of {req_val}",
+        )
 
     if device_val == req_val:
         return True, ""
@@ -102,13 +116,20 @@ class ProfileMatcher:
     def __init__(self, device_profile_data, requirements_doc):
         self.dev_root = device_profile_data.get("capabilities", {}).get("device", {})
         self.req_root = requirements_doc
+        self.dev_profile = list(device_profile_data.get("profiles", {}).values())[0]
 
         properties = self.dev_root.get("properties", {})
         vk_props = properties.get("VkPhysicalDeviceProperties", {})
         vk12_props = properties.get("VkPhysicalDeviceVulkan12Properties", {})
+        vkkhr_props = properties.get("VkPhysicalDeviceDriverPropertiesKHR", {})
         api_val = vk_props.get("apiVersion", 0)
         self.device_api_version = parse_api_version(api_val)
-        self.device_name = vk12_props.get("driverInfo", "Unknown Device")
+        self.driver_info = vk12_props.get(
+            "driverInfo", vkkhr_props.get("driverInfo", "Unknown Device")
+        )
+        self.device_name = vk12_props.get(
+            "driverName", vkkhr_props.get("driverName", "Unknown Device")
+        )
         self.device_extensions = set(self.dev_root.get("extensions", {}).keys())
 
     def resolve_target_requirements(self, profile_name):
@@ -137,7 +158,7 @@ class ProfileMatcher:
             "formats": req_formats,
             "queue_families": req_queue_families,
             "api-version": profile.get("api-version", "1.0.0"),
-            "description": profile.get("description", "")
+            "description": profile.get("description", ""),
         }
 
     def evaluate_profile(self, profile_name):
@@ -150,11 +171,13 @@ class ProfileMatcher:
         failed_queues = []
 
         for ext, req_ver in sorted(reqs["extensions"].items()):
-            supported = (ext in self.device_extensions)
+            supported = ext in self.device_extensions
             if not supported and ext in PROMOTED_EXTENSIONS:
                 prom_major, prom_minor = PROMOTED_EXTENSIONS[ext]
-                if (self.device_api_version[0] > prom_major) or \
-                   (self.device_api_version[0] == prom_major and self.device_api_version[1] >= prom_minor):
+                if (self.device_api_version[0] > prom_major) or (
+                    self.device_api_version[0] == prom_major
+                    and self.device_api_version[1] >= prom_minor
+                ):
                     supported = True
             if not supported:
                 missing_exts.append(f"{ext} (Required version: {req_ver})")
@@ -172,13 +195,21 @@ class ProfileMatcher:
                     has_dev_feat = True
 
                 if device_val is None:
-                    device_val = dev_feats.get("VkPhysicalDeviceVulkan14Features", {}).get(field)
+                    device_val = dev_feats.get(
+                        "VkPhysicalDeviceVulkan14Features", {}
+                    ).get(field)
                 if device_val is None:
-                    device_val = dev_feats.get("VkPhysicalDeviceVulkan13Features", {}).get(field)
+                    device_val = dev_feats.get(
+                        "VkPhysicalDeviceVulkan13Features", {}
+                    ).get(field)
                 if device_val is None:
-                    device_val = dev_feats.get("VkPhysicalDeviceVulkan12Features", {}).get(field)
+                    device_val = dev_feats.get(
+                        "VkPhysicalDeviceVulkan12Features", {}
+                    ).get(field)
                 if device_val is None:
-                    device_val = dev_feats.get("VkPhysicalDeviceVulkan11Features", {}).get(field)
+                    device_val = dev_feats.get(
+                        "VkPhysicalDeviceVulkan11Features", {}
+                    ).get(field)
 
                 if device_val is None:
                     for s_name, f_dict in dev_feats.items():
@@ -188,10 +219,17 @@ class ProfileMatcher:
 
                 if not device_val:
                     if has_dev_feat:
-                        has_partial = "VkPhysicalDeviceFeatures" in field or "VkPhysicalDeviceVulkan1" in field
-                        missing_feats.append(f"{struct_name} -> {field} {"(partial)" if has_partial else ""}")
+                        has_partial = (
+                            "VkPhysicalDeviceFeatures" in field
+                            or "VkPhysicalDeviceVulkan1" in field
+                        )
+                        missing_feats.append(
+                            f"{struct_name} -> {field} {'(partial)' if has_partial else ''}"
+                        )
                     else:
-                        missing_feats.append(f"{struct_name} (missing feature struct) -> {field}")
+                        missing_feats.append(
+                            f"{struct_name} (missing feature struct) -> {field}"
+                        )
 
         dev_props = self.dev_root.get("properties", {})
         for struct_name, req_fields in sorted(reqs["properties"].items()):
@@ -200,19 +238,31 @@ class ProfileMatcher:
                     device_nested = dev_props.get(struct_name, {}).get(field, {})
                     for nested_key, nested_val in req_val.items():
                         dev_val = device_nested.get(nested_key)
-                        passed, err_msg = evaluate_limit(nested_key, dev_val, nested_val)
+                        passed, err_msg = evaluate_limit(
+                            nested_key, dev_val, nested_val
+                        )
                         if not passed:
-                            failed_props.append(f"{struct_name} -> {field} -> {nested_key}: {err_msg}")
+                            failed_props.append(
+                                f"{struct_name} -> {field} -> {nested_key}: {err_msg}"
+                            )
                 else:
                     dev_val = dev_props.get(struct_name, {}).get(field)
                     if dev_val is None:
-                        dev_val = dev_props.get("VkPhysicalDeviceVulkan14Properties", {}).get(field)
+                        dev_val = dev_props.get(
+                            "VkPhysicalDeviceVulkan14Properties", {}
+                        ).get(field)
                     if dev_val is None:
-                        dev_val = dev_props.get("VkPhysicalDeviceVulkan13Properties", {}).get(field)
+                        dev_val = dev_props.get(
+                            "VkPhysicalDeviceVulkan13Properties", {}
+                        ).get(field)
                     if dev_val is None:
-                        dev_val = dev_props.get("VkPhysicalDeviceVulkan12Properties", {}).get(field)
+                        dev_val = dev_props.get(
+                            "VkPhysicalDeviceVulkan12Properties", {}
+                        ).get(field)
                     if dev_val is None:
-                        dev_val = dev_props.get("VkPhysicalDeviceVulkan11Properties", {}).get(field)
+                        dev_val = dev_props.get(
+                            "VkPhysicalDeviceVulkan11Properties", {}
+                        ).get(field)
                     passed, err_msg = evaluate_limit(field, dev_val, req_val)
                     if not passed:
                         failed_props.append(f"{struct_name} -> {field}: {err_msg}")
@@ -220,7 +270,9 @@ class ProfileMatcher:
         dev_formats = self.dev_root.get("formats", {})
         for fmt_name, req_fmt_data in sorted(reqs["formats"].items()):
             if fmt_name not in dev_formats:
-                failed_formats.append(f"{fmt_name}: Format entirely unsupported on target device")
+                failed_formats.append(
+                    f"{fmt_name}: Format entirely unsupported on target device"
+                )
                 continue
 
             dev_fmt_props = dev_formats[fmt_name].get("VkFormatProperties", {})
@@ -228,9 +280,13 @@ class ProfileMatcher:
 
             for feature_type, req_features_list in req_fmt_props.items():
                 dev_features_list = dev_fmt_props.get(feature_type, [])
-                missing_flags = [flag for flag in req_features_list if flag not in dev_features_list]
+                missing_flags = [
+                    flag for flag in req_features_list if flag not in dev_features_list
+                ]
                 if missing_flags:
-                    failed_formats.append(f"{fmt_name} -> {feature_type} missing flags: {', '.join(missing_flags)}")
+                    failed_formats.append(
+                        f"{fmt_name} -> {feature_type} missing flags: {', '.join(missing_flags)}"
+                    )
 
         dev_queues = self.dev_root.get("queueFamiliesProperties", [])
         for req_q in reqs["queue_families"]:
@@ -249,9 +305,17 @@ class ProfileMatcher:
                     break
 
             if not matched:
-                failed_queues.append(f"Requires queue family with flags: {list(req_flags)} (Minimum Count: {req_count})")
+                failed_queues.append(
+                    f"Requires queue family with flags: {list(req_flags)} (Minimum Count: {req_count})"
+                )
 
-        all_passed = not (missing_exts or missing_feats or failed_props or failed_formats or failed_queues)
+        all_passed = not (
+            missing_exts
+            or missing_feats
+            or failed_props
+            or failed_formats
+            or failed_queues
+        )
 
         return {
             "passed": all_passed,
@@ -261,7 +325,7 @@ class ProfileMatcher:
             "missing_features": missing_feats,
             "failed_properties": failed_props,
             "failed_formats": failed_formats,
-            "failed_queues": failed_queues
+            "failed_queues": failed_queues,
         }
 
 
@@ -271,7 +335,7 @@ def main():
         sys.exit(1)
 
     hw_path = sys.argv[1]
-    req_path = "VP_D3D12_VKD3D_PROTON_profile.json"
+    req_path = "VP_D3D12_VKD3D_PROTON_profile_2.14.1.json"
 
     for path in [hw_path, req_path]:
         if not os.path.exists(path):
@@ -294,18 +358,22 @@ def main():
 
     matcher = ProfileMatcher(hw_data, req_data)
 
-    print(f"Driver: {matcher.device_name}")
-    print(f"Vulkan API: {'.'.join(map(str, matcher.device_api_version))}")
+    print(f"GPU: {matcher.device_name}")
+    print(f"Driver: {matcher.driver_info}")
+    print(f"Supported API: {'.'.join(map(str, matcher.device_api_version))}")
     print()
 
-    profiles = req_data.get("profiles", {})
-    for profile_name in sorted(profiles.keys()):
+    # profiles = req_data.get("profiles", {})
+    to_check = ["VP_D3D12_FL_12_0_baseline"]
+    for profile_name in to_check:
         result = matcher.evaluate_profile(profile_name)
         status = "PASSED" if result["passed"] else "FAILED"
 
         print(f"[{status}] Profile: {profile_name}")
         print(f"  Description: {result['description']}")
-        print(f"  Target Vulkan API: {result['api-version']}")
+        print(
+            f"  Vulkan API: {'.'.join(map(str, matcher.device_api_version))}, needs at least {result['api-version']}"
+        )
 
         if not result["passed"]:
             if result["missing_extensions"]:
