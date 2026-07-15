@@ -22,6 +22,148 @@ PROMOTED_EXTENSIONS = {
     "VK_EXT_texel_buffer_alignment": (1, 3),
 }
 
+WRAPPER_SPOOFED_DEVICE_EXTENSIONS = {
+    "VK_KHR_pipeline_library",
+    # Wrapper translates/aliases EXT structs into KHR equivalents
+    "VK_EXT_vertex_attribute_divisor",
+}
+
+WRAPPER_SPOOFED_DEVICE_FEATURES = {
+    # Core features
+    "multiViewport",
+    "depthClamp",
+    "depthBiasClamp",
+    "fillModeNonSolid",
+    "shaderClipDistance",  # has spirv spoofing too
+    "shaderCullDistance",  # has spirv spoofing too
+    "dualSrcBlend",
+    "multiDrawIndirect",
+    # Extension features
+    "robustBufferAccess2",
+    "robustImageAccess2",
+    "extendedDynamicState",
+    "extendedDynamicState2",
+    "vertexAttributeInstanceRateDivisor",
+    "vertexAttributeInstanceRateZeroDivisor",
+}
+
+WRAPPER_SPOOFED_DEVICE_PROPERTIES = {
+    # Limits
+    "minPlacedMemoryMapAlignment",
+    "storageTexelBufferOffsetAlignmentBytes",  # Forced to 1 byte
+    "uniformTexelBufferOffsetAlignmentBytes",  # Forced to 1 byte
+    # Subgroup property structures zeroed out
+    "subgroupSupportedOperations",
+    "subgroupSupportedStages",
+    "supportedOperations",
+    "supportedStages",
+}
+
+WRAPPER_EMULATED_DEVICE_EXTENSIONS = {
+    "VK_EXT_map_memory_placed",  # Emulated for x86
+    "VK_KHR_map_memory2",
+}
+
+WRAPPER_EMULATED_DEVICE_FEATURES = {
+    "memoryMapPlaced",  # Emulated for x86
+    "memoryUnmapReserve",  # Emulated for x86
+}
+
+WRAPPER_BLACKLISTED_DEVICE_EXTENSIONS = {
+    "VK_EXT_calibrated_timestamps",
+    "VK_EXT_extended_dynamic_state",
+    "VK_EXT_extended_dynamic_state2",
+}
+
+CAN_BE_SPOOFED = (
+    WRAPPER_SPOOFED_DEVICE_EXTENSIONS
+    | WRAPPER_SPOOFED_DEVICE_FEATURES
+    | WRAPPER_SPOOFED_DEVICE_PROPERTIES
+    | {
+        "VK_EXT_depth_clip_enable",
+        "VK_EXT_vertex_attribute_divisor",
+        "VK_KHR_maintenance5",
+        "depthClipEnable",
+        # TODO(leegao): look into if this needs to be emulated
+        "maintenance5",  # DXVK: No adapters found. Please check your device filter settings
+        "robustBufferAccess2",  # already spoofed in the wrapper
+        "vertexPipelineStoresAndAtomics",  # fails to reach FL_12_0 (nor FL_11_1 even) in d3d12_device_caps_init_feature_level (vertexPipelineStoresAndAtomics needed for FL_11)
+        "storageTexelBufferOffsetSingleTexelAlignment",  # E_INVALIDARG in vkd3d_init_device_caps
+        "uniformTexelBufferOffsetSingleTexelAlignment",  # E_INVALIDARG in vkd3d_init_device_caps
+        "maxPerStageDescriptorUpdateAfterBindStorageBuffers",  # Insufficient descriptor indexing support failure in vkd3d_bindless_state_init if < 1M
+        "maxPerStageDescriptorUpdateAfterBindSampledImages",  # Insufficient descriptor indexing support failure in vkd3d_bindless_state_init if < 1M
+        "maxPerStageDescriptorUpdateAfterBindStorageImages",  # Insufficient descriptor indexing support failure in vkd3d_bindless_state_init if < 1M
+        "logicOp",  # fails to reach FL_12_0 (nor FL_11_1 even) in d3d12_device_caps_init_feature_level (caps->options.OutputMergerLogicOp needed for FL_11)
+        "shaderResourceResidency",  # fails to reach FL_12_0 (d3d12_device_determine_tiled_resources_tier - tier1)
+        "shaderResourceMinLod",  # fails to reach FL_12_0 (d3d12_device_determine_tiled_resources_tier - tier1)
+        # "samplerFilterMinmax", # VK_SAMPLER_REDUCTION_MODE_WEIGHTED_AVERAGE in d3d12_create_static_sampler, but controlled by filterMinmaxSingleComponentFormats
+        "filterMinmaxSingleComponentFormats",  # fails to reach FL_12_0 (d3d12_device_determine_tiled_resources_tier - tier1)
+        "shaderDrawParameters",  # E_INVALIDARG in vkd3d_init_device_caps
+        "samplerMirrorClampToEdge",  # E_INVALIDARG in vkd3d_init_device_caps
+        # TODO(leegao): look into if this needs to be emulated
+        # "descriptorIndexing",  # !!! fail in vkd3d_bindless_state_init
+        "shaderDemoteToHelperInvocation",  # DXVK: No adapters found. Please check your device filter settings
+        # /* Generally, we cannot enable robustness if this is not supported,
+        #  * but this means we cannot support D3D12 at all, so just disabling robustBufferAccess is not a viable option.
+        #  * This can be observed on RADV, where this feature for some reason is not supported at all,
+        #  * but this apparently was just a missed feature bit.
+        #  * https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/9281.
+        #  *
+        #  * Another reason to not disable it, is that we will end up with two
+        #  * split application infos in Fossilize, which is annoying for pragmatic reasons.
+        #  * Validation does not appear to complain, so we just go ahead and enable robustness anyways. */
+        # WARN("Device does not expose robust buffer access for the update after bind feature, enabling it anyways.\n");
+        "robustBufferAccessUpdateAfterBind",  # Should be okay to spoof
+        # TODO(leegao): look into if this needs to be emulated
+        "dynamicRendering",  # !!! DXVK: No adapters found. Please check your device filter settings
+        # TODO(leegao): use the synchronization2 emulation layer from Lunarg/Khronos
+        "synchronization2",  # DXVK: No adapters found. Please check your device filter settings
+        "maintenance4",  # DXVK: No adapters found. Please check your device filter settings
+        # if ((count_buffer || list->predication.fallback_enabled) && !list->device->device_info.vulkan_1_2_features.drawIndirectCount)
+        # {
+        #     FIXME("Count buffers not supported by Vulkan implementation.\n");
+        #     return;
+        # }
+        # "drawIndirectCount",
+        # TODO(leegao): look into if this needs to be emulated
+        # "sparseBinding", # fails to reach FL_12_0 - D3D12_TILED_RESOURCES_TIER_NOT_SUPPORTED in d3d12_device_determine_tiled_resources_tier - tier0
+    }
+)
+
+
+CAN_BE_EMULATED = (
+    WRAPPER_EMULATED_DEVICE_EXTENSIONS
+    | WRAPPER_EMULATED_DEVICE_FEATURES
+    | {
+        "textureCompressionBC",
+        "VK_EXT_robustness2",  # Emulates nullDescriptor
+        "VK_KHR_push_descriptor",  # Emulates nullDescriptor
+        "nullDescriptor",  # Emulated
+        "maxPushDescriptors",  # Emulation reports 32
+    }
+)
+
+NOT_SUPPORTED = WRAPPER_BLACKLISTED_DEVICE_EXTENSIONS
+
+
+def get_marker(item_key):
+    if (
+        item_key
+        in WRAPPER_EMULATED_DEVICE_EXTENSIONS
+        | WRAPPER_EMULATED_DEVICE_FEATURES
+        | WRAPPER_SPOOFED_DEVICE_EXTENSIONS
+        | WRAPPER_SPOOFED_DEVICE_FEATURES
+        | WRAPPER_SPOOFED_DEVICE_PROPERTIES
+    ):
+        return " W "
+    if item_key in NOT_SUPPORTED:
+        return "xxx"
+    if item_key in CAN_BE_SPOOFED:
+        return " ✓ "
+    if item_key in CAN_BE_EMULATED:
+        return " ✓(emulated) "
+    return "???"
+
 
 def merge_dicts(dict1, dict2):
     for k, v in dict2.items():
@@ -180,7 +322,8 @@ class ProfileMatcher:
                 ):
                     supported = True
             if not supported:
-                missing_exts.append(f"{ext} (Required version: {req_ver})")
+                marker = get_marker(ext)
+                missing_exts.append(f"[{marker}] {ext} (Required version: {req_ver})")
 
         dev_feats = self.dev_root.get("features", {})
         for struct_name, req_fields in sorted(reqs["features"].items()):
@@ -218,17 +361,18 @@ class ProfileMatcher:
                             break
 
                 if not device_val:
+                    marker = get_marker(field)
                     if has_dev_feat:
                         has_partial = (
                             "VkPhysicalDeviceFeatures" in field
                             or "VkPhysicalDeviceVulkan1" in field
                         )
                         missing_feats.append(
-                            f"{struct_name} -> {field} {'(partial)' if has_partial else ''}"
+                            f"[{marker}] {struct_name} -> {field} {'(partial)' if has_partial else ''}"
                         )
                     else:
                         missing_feats.append(
-                            f"{struct_name} (missing feature struct) -> {field}"
+                            f"[{marker}] {struct_name} (missing feature struct) -> {field}"
                         )
 
         dev_props = self.dev_root.get("properties", {})
@@ -242,8 +386,9 @@ class ProfileMatcher:
                             nested_key, dev_val, nested_val
                         )
                         if not passed:
+                            marker = get_marker(nested_key)
                             failed_props.append(
-                                f"{struct_name} -> {field} -> {nested_key}: {err_msg}"
+                                f"[{marker}] {struct_name} -> {field} -> {nested_key}: {err_msg}"
                             )
                 else:
                     dev_val = dev_props.get(struct_name, {}).get(field)
@@ -265,13 +410,17 @@ class ProfileMatcher:
                         ).get(field)
                     passed, err_msg = evaluate_limit(field, dev_val, req_val)
                     if not passed:
-                        failed_props.append(f"{struct_name} -> {field}: {err_msg}")
+                        marker = get_marker(field)
+                        failed_props.append(
+                            f"[{marker}] {struct_name} -> {field}: {err_msg}"
+                        )
 
         dev_formats = self.dev_root.get("formats", {})
         for fmt_name, req_fmt_data in sorted(reqs["formats"].items()):
             if fmt_name not in dev_formats:
+                marker = get_marker(fmt_name)
                 failed_formats.append(
-                    f"{fmt_name}: Format entirely unsupported on target device"
+                    f"[{marker}] {fmt_name}: Format entirely unsupported on target device"
                 )
                 continue
 
@@ -284,8 +433,9 @@ class ProfileMatcher:
                     flag for flag in req_features_list if flag not in dev_features_list
                 ]
                 if missing_flags:
+                    marker = get_marker(fmt_name)
                     failed_formats.append(
-                        f"{fmt_name} -> {feature_type} missing flags: {', '.join(missing_flags)}"
+                        f"[{marker}] {fmt_name} -> {feature_type} missing flags: {', '.join(missing_flags)}"
                     )
 
         dev_queues = self.dev_root.get("queueFamiliesProperties", [])
@@ -305,8 +455,9 @@ class ProfileMatcher:
                     break
 
             if not matched:
+                marker = get_marker("queueFamilies")
                 failed_queues.append(
-                    f"Requires queue family with flags: {list(req_flags)} (Minimum Count: {req_count})"
+                    f"[{marker}] Requires queue family with flags: {list(req_flags)} (Minimum Count: {req_count})"
                 )
 
         all_passed = not (

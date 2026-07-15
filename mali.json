@@ -7,6 +7,7 @@
                 "VK_EXT_robustness2_DISABLED": 1,
                 "VK_KHR_robustness2_DISABLED": 1,
                 "VK_EXT_vertex_attribute_divisor_DISABLED": 3,
+                "VK_KHR_vertex_attribute_divisor_DISABLED": 3,
 
                 "VK_EXT_mutable_descriptor_type_DISABLED": 1,
                 "VK_EXT_descriptor_buffer_DISABLED": 1,
@@ -193,7 +194,6 @@
                 "VK_KHR_timeline_semaphore": 2,
                 "VK_KHR_uniform_buffer_standard_layout": 1,
                 "VK_KHR_variable_pointers": 1,
-                "VK_KHR_vertex_attribute_divisor": 1,
                 "VK_KHR_video_decode_h264": 9,
                 "VK_KHR_video_decode_h265": 8,
                 "VK_KHR_video_decode_queue": 8,

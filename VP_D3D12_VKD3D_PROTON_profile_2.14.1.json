@@ -26,8 +26,7 @@
                     "nullDescriptor": true
                 },
                 "VkPhysicalDeviceTransformFeedbackFeaturesEXT": {
-                    "transformFeedback": true,
-                    "geometryStreams": true
+                    "transformFeedback": true
                 },
                 "VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT": {
                     "vertexAttributeInstanceRateDivisor": true,
@@ -38,7 +37,6 @@
                 },
                 "VkPhysicalDeviceVulkan12Features": {
                     "samplerMirrorClampToEdge": true,
-                    "drawIndirectCount": true,
                     "descriptorIndexing": true,
                     "shaderUniformTexelBufferArrayDynamicIndexing": true,
                     "shaderStorageTexelBufferArrayDynamicIndexing": true,
@@ -87,7 +85,6 @@
                     "samplerAnisotropy": true,
                     "textureCompressionBC": true,
                     "occlusionQueryPrecise": true,
-                    "pipelineStatisticsQuery": true,
                     "fragmentStoresAndAtomics": true,
                     "shaderImageGatherExtended": true,
                     "shaderStorageImageExtendedFormats": true,
@@ -137,9 +134,6 @@
                     "sparseResidencyImage2D": true,
                     "shaderResourceResidency": true,
                     "shaderResourceMinLod": true
-                },
-                "VkPhysicalDeviceVulkan12Features": {
-                    "samplerFilterMinmax": true
                 }
             },
             "queueFamiliesProperties": [
