@@ -73,3 +73,4 @@ build_*/
 game*.sh
 vkd3d.py
 wine*.sh
+evaluation_results/

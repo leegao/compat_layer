@@ -53,6 +53,9 @@ jobs:
 
                     python3 vkd3d_check.py "$file" > "$TARGET_DIR/$device_id.txt"
                   done
+            - name: Aggregate Missing Unknown [???] Tags
+              run: |
+                  python summarize.py
 
             - name: Deploy Checks to compatibility-vkd3d-2.14.1
               uses: JamesIves/github-pages-deploy-action@v4
