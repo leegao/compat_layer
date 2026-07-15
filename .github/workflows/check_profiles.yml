@@ -1,0 +1,68 @@
+name: Check Vulkan Profiles for vkd3d 2.14.1
+
+on:
+    push:
+        branches-ignore: ["compatibility-vkd3d-2.14.1"]
+        tags: ["*"]
+        paths:
+            - "VP_*.json"
+            - "vkd3d*.py"
+            - "profiles.zip"
+            - ".github/workflows/check_profiles.yml"
+
+permissions:
+    contents: write
+    pages: write
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+
+            - name: Set up Python
+              uses: actions/setup-python@v5
+              with:
+                  python-version: "3.10"
+
+            - name: Unzip profiles
+              run: |
+                  unzip -q profiles.zip -d extracted_profiles
+
+            - name: Evaluate profiles and generate reports
+              run: |
+                  OUTPUT_DIR="evaluation_results"
+                  mkdir -p "$OUTPUT_DIR"
+
+                  find extracted_profiles -name "*.json" | while read -r file; do
+                    filename=$(basename "$file" .json)
+
+                    device_id="${filename##*_}"
+                    rem="${filename%_*}"
+
+                    api="${rem##*_}"
+                    rem="${rem%_*}"
+
+                    driver_version="${rem##*_}"
+                    gpu="${rem%_*}"
+
+                    TARGET_DIR="$OUTPUT_DIR/$gpu/$driver_version"
+                    mkdir -p "$TARGET_DIR"
+
+                    python3 vkd3d_check.py "$file" > "$TARGET_DIR/$device_id.txt"
+                  done
+
+            - name: Deploy Checks to compatibility-vkd3d-2.14.1
+              uses: JamesIves/github-pages-deploy-action@v4
+              with:
+                  folder: evaluation_results
+                  branch: compatibility-vkd3d-2.14.1
+                  single-commit: false
+
+            - name: Upload evaluation results
+              uses: actions/upload-artifact@v4
+              with:
+                  name: vkd3d-profile-reports
+                  path: evaluation_results/
