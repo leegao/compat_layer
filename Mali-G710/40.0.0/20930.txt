@@ -11,7 +11,7 @@ Supported API: 1.3.225
       * [ W ] VK_EXT_vertex_attribute_divisor (Required version: 3)
       * [ ✓(emulated) ] VK_KHR_push_descriptor (Required version: 1)
   - Missing Required Feature Flags:
-      * [ ✓ ] VkPhysicalDeviceDepthClipEnableFeaturesEXT (missing feature struct) -> depthClipEnable
+      * [ ✓ ] VkPhysicalDeviceDepthClipEnableFeaturesEXT -> depthClipEnable 
       * [ W ] VkPhysicalDeviceFeatures -> dualSrcBlend 
       * [ W ] VkPhysicalDeviceFeatures -> fillModeNonSolid 
       * [ W ] VkPhysicalDeviceFeatures -> multiViewport 
@@ -26,11 +26,11 @@ Supported API: 1.3.225
       * [???] VkPhysicalDeviceFeatures -> sparseResidencyImage2D 
       * [ ✓ ] VkPhysicalDeviceFeatures -> shaderResourceResidency 
       * [ ✓ ] VkPhysicalDeviceFeatures -> shaderResourceMinLod 
-      * [ W ] VkPhysicalDeviceRobustness2FeaturesEXT (missing feature struct) -> robustBufferAccess2
-      * [ W ] VkPhysicalDeviceRobustness2FeaturesEXT (missing feature struct) -> robustImageAccess2
-      * [ ✓(emulated) ] VkPhysicalDeviceRobustness2FeaturesEXT (missing feature struct) -> nullDescriptor
-      * [ W ] VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT (missing feature struct) -> vertexAttributeInstanceRateDivisor
-      * [ W ] VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT (missing feature struct) -> vertexAttributeInstanceRateZeroDivisor
+      * [ W ] VkPhysicalDeviceRobustness2FeaturesEXT -> robustBufferAccess2 
+      * [ W ] VkPhysicalDeviceRobustness2FeaturesEXT -> robustImageAccess2 
+      * [ ✓(emulated) ] VkPhysicalDeviceRobustness2FeaturesEXT -> nullDescriptor 
+      * [ W ] VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT -> vertexAttributeInstanceRateDivisor 
+      * [ W ] VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT -> vertexAttributeInstanceRateZeroDivisor 
   - Failed Properties or Limits Constraints:
       * [???] VkPhysicalDeviceProperties -> sparseProperties -> residencyStandard2DBlockShape: Device value is False (Expected True)
       * [???] VkPhysicalDeviceProperties -> sparseProperties -> residencyNonResidentStrict: Device value is False (Expected True)
