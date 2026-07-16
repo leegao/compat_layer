@@ -362,12 +362,85 @@ VK_LAYER_EXPORT void VKAPI_CALL DxvkMaliCompatLayer_GetPhysicalDeviceFeatures(
     spoof_core_features(pFeatures);
 }
 
+template <typename DstType, typename SrcType>
+void CopyDescriptorIndexingFields(DstType *dst, const SrcType *src) {
+    dst->shaderUniformTexelBufferArrayDynamicIndexing =
+        src->shaderUniformTexelBufferArrayDynamicIndexing;
+    dst->shaderStorageTexelBufferArrayDynamicIndexing =
+        src->shaderStorageTexelBufferArrayDynamicIndexing;
+    dst->shaderSampledImageArrayNonUniformIndexing =
+        src->shaderSampledImageArrayNonUniformIndexing;
+    dst->shaderStorageImageArrayNonUniformIndexing =
+        src->shaderStorageImageArrayNonUniformIndexing;
+    dst->shaderStorageBufferArrayNonUniformIndexing =
+        src->shaderStorageBufferArrayNonUniformIndexing;
+    dst->shaderUniformTexelBufferArrayNonUniformIndexing =
+        src->shaderUniformTexelBufferArrayNonUniformIndexing;
+    dst->shaderStorageTexelBufferArrayNonUniformIndexing =
+        src->shaderStorageTexelBufferArrayNonUniformIndexing;
+    dst->descriptorBindingSampledImageUpdateAfterBind =
+        src->descriptorBindingSampledImageUpdateAfterBind;
+    dst->descriptorBindingStorageImageUpdateAfterBind =
+        src->descriptorBindingStorageImageUpdateAfterBind;
+    dst->descriptorBindingStorageBufferUpdateAfterBind =
+        src->descriptorBindingStorageBufferUpdateAfterBind;
+    dst->descriptorBindingUniformTexelBufferUpdateAfterBind =
+        src->descriptorBindingUniformTexelBufferUpdateAfterBind;
+    dst->descriptorBindingStorageTexelBufferUpdateAfterBind =
+        src->descriptorBindingStorageTexelBufferUpdateAfterBind;
+    dst->descriptorBindingUpdateUnusedWhilePending =
+        src->descriptorBindingUpdateUnusedWhilePending;
+    dst->descriptorBindingPartiallyBound = src->descriptorBindingPartiallyBound;
+    dst->descriptorBindingVariableDescriptorCount =
+        src->descriptorBindingVariableDescriptorCount;
+    dst->runtimeDescriptorArray = src->runtimeDescriptorArray;
+}
+
 VK_LAYER_EXPORT void VKAPI_CALL DxvkMaliCompatLayer_GetPhysicalDeviceFeatures2(
     VkPhysicalDevice physicalDevice, VkPhysicalDeviceFeatures2 *pFeatures) {
     scoped_lock l(global_lock);
 
-    instanceDispatch[GetInstanceKey(physicalDevice)].GetPhysicalDeviceFeatures2(
-        physicalDevice, pFeatures);
+    auto instanceKey = GetInstanceKey(physicalDevice);
+    instanceDispatch[instanceKey].GetPhysicalDeviceFeatures2(physicalDevice,
+                                                             pFeatures);
+
+    // Alias VK_EXT_descriptor_indexing to VK_1_2 features
+    VkPhysicalDeviceProperties2 physProps =
+        propertiesMap[GetKey(physicalDevice)];
+    if (physProps.properties.apiVersion < VK_API_VERSION_1_2) {
+        const auto &supportedExtensions =
+            deviceExtensionsMap[GetKey(physicalDevice)];
+        bool driverSupportsIndexing =
+            supportedExtensions.find(
+                VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME) !=
+            supportedExtensions.end();
+
+        VkBaseOutStructure *ext =
+            reinterpret_cast<VkBaseOutStructure *>(pFeatures->pNext);
+        while (ext) {
+            if (ext->sType ==
+                VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES) {
+                auto *vk12Features =
+                    reinterpret_cast<VkPhysicalDeviceVulkan12Features *>(ext);
+
+                if (driverSupportsIndexing) {
+                    VkPhysicalDeviceDescriptorIndexingFeaturesEXT extIndexing{
+                        .sType =
+                            VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES_EXT};
+                    VkPhysicalDeviceFeatures2 queryFeatures{
+                        .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2,
+                        .pNext = &extIndexing};
+                    instanceDispatch[instanceKey].GetPhysicalDeviceFeatures2(
+                        physicalDevice, &queryFeatures);
+                    CopyDescriptorIndexingFields(vk12Features, &extIndexing);
+                    vk12Features->descriptorIndexing = VK_TRUE;
+                } else {
+                    vk12Features->descriptorIndexing = VK_FALSE;
+                }
+            }
+            ext = ext->pNext;
+        }
+    }
 
     spoof_core_features(&pFeatures->features);
     spoof_next_features(reinterpret_cast<VkBaseOutStructure *>(pFeatures));
@@ -642,6 +715,7 @@ VK_LAYER_EXPORT VkResult VKAPI_CALL DxvkMaliCompatLayer_CreateDevice(
     VkPhysicalDeviceFaultFeaturesEXT *appFaultFeatures = nullptr;
     VkPhysicalDeviceImageRobustnessFeaturesEXT *appRobustnessFeatures = nullptr;
     VkPhysicalDeviceVulkan13Features *vulkan13Features = nullptr;
+    VkPhysicalDeviceVulkan12Features *vulkan12Features = nullptr;
 
     while (ext) {
         if (ext->sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2) {
@@ -657,6 +731,9 @@ VK_LAYER_EXPORT VkResult VKAPI_CALL DxvkMaliCompatLayer_CreateDevice(
         } else if (ext->sType ==
                    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES) {
             vulkan13Features = (VkPhysicalDeviceVulkan13Features *)ext;
+        } else if (ext->sType ==
+                   VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES) {
+            vulkan12Features = (VkPhysicalDeviceVulkan12Features *)ext;
         }
         ext = ext->pNext;
     }
@@ -729,6 +806,10 @@ VK_LAYER_EXPORT VkResult VKAPI_CALL DxvkMaliCompatLayer_CreateDevice(
         .robustImageAccess = VK_TRUE,
     };
 
+    VkPhysicalDeviceDescriptorIndexingFeaturesEXT layerIndexingFeatures{
+        .sType =
+            VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES_EXT};
+
     if (hasFaultSupport) {
         if (appFaultFeatures) {
             appFaultFeatures->deviceFault = VK_TRUE;
@@ -755,6 +836,56 @@ VK_LAYER_EXPORT VkResult VKAPI_CALL DxvkMaliCompatLayer_CreateDevice(
     } else if (emulate_null_descriptor) {
         Logger::log("error", "VK_EXT_image_robustness not supported, "
                              "VK_EXT_robustness2 emulation may be broken");
+    }
+
+    bool aliasDescriptorIndexing = false;
+    if (apiVersion < VK_API_VERSION_1_2 && vulkan12Features != nullptr) {
+        aliasDescriptorIndexing = vulkan12Features->descriptorIndexing;
+        VkBaseOutStructure *curr =
+            reinterpret_cast<VkBaseOutStructure *>(&createInfo);
+        while (curr->pNext) {
+            VkBaseOutStructure *next =
+                reinterpret_cast<VkBaseOutStructure *>(curr->pNext);
+            if (next->sType ==
+                VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES) {
+                curr->pNext = next->pNext; // detach vulkan12Features
+                break;
+            }
+            curr = next;
+        }
+    }
+
+    if (apiVersion < VK_API_VERSION_1_3 && vulkan13Features != nullptr) {
+        VkBaseOutStructure *curr =
+            reinterpret_cast<VkBaseOutStructure *>(&createInfo);
+        while (curr->pNext) {
+            VkBaseOutStructure *next =
+                reinterpret_cast<VkBaseOutStructure *>(curr->pNext);
+            if (next->sType ==
+                VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES) {
+                curr->pNext = next->pNext; // detach vulkan13Features
+                break;
+            }
+            curr = next;
+        }
+    }
+
+    if (aliasDescriptorIndexing &&
+        !hasExtension(VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME)) {
+        Logger::log(
+            "info",
+            "Adding extension " VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME);
+        enabledExtensions.push_back(VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME);
+
+        if (aliasDescriptorIndexing) {
+            Logger::log("info",
+                        "Enabling " VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME
+                        " features");
+            CopyDescriptorIndexingFields(&layerIndexingFeatures,
+                                         vulkan12Features);
+            layerIndexingFeatures.pNext = const_cast<void *>(createInfo.pNext);
+            createInfo.pNext = &layerIndexingFeatures;
+        }
     }
 
     VkPhysicalDeviceFeatures &actualCoreFeatures =
