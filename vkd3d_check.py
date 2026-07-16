@@ -337,6 +337,13 @@ class ProfileMatcher:
                     device_val = dev_feats[struct_name].get(field)
                     has_dev_feat = True
 
+                if (
+                    field == "descriptorIndexing"
+                    and "VK_EXT_descriptor_indexing" in self.device_extensions
+                ):
+                    device_val = True
+                    has_dev_feat = True
+
                 if device_val is None:
                     device_val = dev_feats.get(
                         "VkPhysicalDeviceVulkan14Features", {}
@@ -353,6 +360,16 @@ class ProfileMatcher:
                     device_val = dev_feats.get(
                         "VkPhysicalDeviceVulkan11Features", {}
                     ).get(field)
+                if device_val is None:
+                    device_val = dev_feats.get(
+                        "VkPhysicalDeviceDescriptorIndexingFeaturesEXT", {}
+                    ).get(field)
+                    has_dev_feat = True
+                if device_val is None:
+                    device_val = dev_feats.get(
+                        "VkPhysicalDeviceDescriptorIndexingFeatures", {}
+                    ).get(field)
+                    has_dev_feat = True
 
                 if device_val is None:
                     for s_name, f_dict in dev_feats.items():
