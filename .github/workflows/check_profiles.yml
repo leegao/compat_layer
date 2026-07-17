@@ -1,8 +1,10 @@
-name: Check Vulkan Profiles for vkd3d 2.14.1
+name: Check Vulkan Profiles
 
 on:
     push:
-        branches-ignore: ["compatibility-vkd3d-2.14.1"]
+        branches-ignore:
+            - "compatibility-vkd3d-2.14.1"
+            - "compatibility-dxvk-2.7.1"
         tags: ["*"]
         paths:
             - "VP_*.json"
@@ -18,6 +20,10 @@ permissions:
 jobs:
     build:
         runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                target: [vkd3d-2.14.1, dxvk-2.7.1]
+            fail-fast: false
 
         steps:
             - name: Checkout repository
@@ -52,21 +58,27 @@ jobs:
                     TARGET_DIR="$OUTPUT_DIR/$gpu/$driver_version"
                     mkdir -p "$TARGET_DIR"
 
-                    python3 vkd3d_check.py "$file" > "$TARGET_DIR/$device_id.txt"
+                    # Conditional argument execution based on matrix target
+                    if [ "${{ matrix.target }}" = "dxvk-2.7.1" ]; then
+                      python3 vkd3d_check.py "$file" "VP_DXVK_requirements_2.7.1.json" > "$TARGET_DIR/$device_id.txt"
+                    else
+                      python3 vkd3d_check.py "$file" > "$TARGET_DIR/$device_id.txt"
+                    fi
                   done
+
             - name: Aggregate Missing Unknown [???] Tags
               run: |
                   python summarize.py
 
-            - name: Deploy Checks to compatibility-vkd3d-2.14.1
+            - name: Deploy Checks to GitHub Pages Branch
               uses: JamesIves/github-pages-deploy-action@v4
               with:
                   folder: evaluation_results
-                  branch: compatibility-vkd3d-2.14.1
+                  branch: compatibility-${{ matrix.target }}
                   single-commit: false
 
             - name: Upload evaluation results
               uses: actions/upload-artifact@v4
               with:
-                  name: vkd3d-profile-reports
+                  name: ${{ matrix.target }}-profile-reports
                   path: evaluation_results/

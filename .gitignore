@@ -74,3 +74,5 @@ game*.sh
 vkd3d.py
 wine*.sh
 evaluation_results/
+diff*.txt
+winlator_*.txt

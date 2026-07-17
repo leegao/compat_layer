@@ -45,12 +45,12 @@ for driver in sorted(data.keys(), reverse=True):
 
 final_text = "\n".join(text_output)
 
-markdown_output = ["### Vulkan Profiles Aggregated Unknown `[???]` Tags\n"]
+markdown_output = ["### Vulkan Profiles Potentially Missing Features/Extensions\n"]
 for driver in sorted(data.keys(), reverse=True):
     total_profiles = len(profile_counts[driver])
     sorted_issues = sorted(data[driver].items(), key=lambda x: x[1], reverse=True)
     markdown_output.append(
-        f"#### Driver `{driver}` ({total_profiles} profiles, {len(sorted_issues)} issues)"
+        f"#### Driver `{driver}` ({total_profiles} gpu profiles, {len(sorted_issues)} issues)"
     )
     markdown_output.append("```text")
 
@@ -58,10 +58,10 @@ for driver in sorted(data.keys(), reverse=True):
         for issue, count in sorted_issues:
             sorted_gpus = sorted(gpus[driver][issue])
             markdown_output.append(
-                f"{issue} - {count} profiles ({', '.join(sorted_gpus)})"
+                f"{issue} - {count} gpu profiles ({', '.join(sorted_gpus)})"
             )
     else:
-        markdown_output.append("No unknown [???] tags detected.")
+        markdown_output.append("No potential issues.")
     markdown_output.append("```\n")
 
 final_markdown = "\n".join(markdown_output)

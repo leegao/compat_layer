@@ -507,7 +507,11 @@ def main():
         sys.exit(1)
 
     hw_path = sys.argv[1]
-    req_path = "VP_D3D12_VKD3D_PROTON_profile_2.14.1.json"
+    req_path = (
+        "VP_D3D12_VKD3D_PROTON_profile_2.14.1.json"
+        if len(sys.argv) == 2
+        else sys.argv[2]
+    )
 
     for path in [hw_path, req_path]:
         if not os.path.exists(path):
@@ -536,8 +540,15 @@ def main():
     print()
 
     # profiles = req_data.get("profiles", {})
-    to_check = ["VP_D3D12_FL_12_0_baseline"]
+    to_check = [
+        "VP_D3D12_FL_12_0_baseline",
+        "VP_DXVK_d3d11_level_11_1_baseline",
+        # "VP_DXVK_d3d11_level_11_1_optimal",
+    ]
     for profile_name in to_check:
+        if profile_name not in matcher.req_root.get("profiles", {}):
+            continue
+
         result = matcher.evaluate_profile(profile_name)
         status = "PASSED" if result["passed"] else "FAILED"
 
