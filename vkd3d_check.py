@@ -39,12 +39,8 @@ WRAPPER_SPOOFED_DEVICE_FEATURES = {
     "dualSrcBlend",
     "multiDrawIndirect",
     # Extension features
-    "robustBufferAccess2",
-    "robustImageAccess2",
     "extendedDynamicState",
     "extendedDynamicState2",
-    "vertexAttributeInstanceRateDivisor",
-    "vertexAttributeInstanceRateZeroDivisor",
 }
 
 WRAPPER_SPOOFED_DEVICE_PROPERTIES = {
@@ -86,7 +82,10 @@ CAN_BE_SPOOFED = (
         "depthClipEnable",
         # TODO(leegao): look into if this needs to be emulated
         "maintenance5",  # DXVK: No adapters found. Please check your device filter settings
-        "robustBufferAccess2",  # already spoofed in the wrapper
+        "robustBufferAccess2",  # part of robustness2
+        "robustImageAccess2",  # part of robustness2
+        "vertexAttributeInstanceRateDivisor",  # part of VK_EXT_vertex_attribute_divisor
+        "vertexAttributeInstanceRateZeroDivisor",  # part of VK_EXT_vertex_attribute_divisor
         "vertexPipelineStoresAndAtomics",  # fails to reach FL_12_0 (nor FL_11_1 even) in d3d12_device_caps_init_feature_level (vertexPipelineStoresAndAtomics needed for FL_11)
         "storageTexelBufferOffsetSingleTexelAlignment",  # E_INVALIDARG in vkd3d_init_device_caps
         "uniformTexelBufferOffsetSingleTexelAlignment",  # E_INVALIDARG in vkd3d_init_device_caps
