@@ -46,7 +46,7 @@ configure_file(
     @ONLY
 )
 
-file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS "src/*.cpp")
+file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS "src/*.cpp" "src/spirv_reflect/*.c")
 
 add_library(dxvk_mali_compat_layer SHARED ${SOURCES})
 
