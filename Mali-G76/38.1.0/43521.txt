@@ -22,10 +22,10 @@ Supported API: 1.1.213
       * [ W ] VkPhysicalDeviceFeatures -> shaderCullDistance 
       * [ ✓ ] VkPhysicalDeviceFeatures -> vertexPipelineStoresAndAtomics 
       * [ ✓ ] VkPhysicalDeviceFeatures -> logicOp 
-      * [???] VkPhysicalDeviceFeatures -> sparseBinding 
-      * [???] VkPhysicalDeviceFeatures -> sparseResidencyAliased 
-      * [???] VkPhysicalDeviceFeatures -> sparseResidencyBuffer 
-      * [???] VkPhysicalDeviceFeatures -> sparseResidencyImage2D 
+      * [ ✓(emulated) ] VkPhysicalDeviceFeatures -> sparseBinding 
+      * [ ✓ ] VkPhysicalDeviceFeatures -> sparseResidencyAliased 
+      * [ ✓ ] VkPhysicalDeviceFeatures -> sparseResidencyBuffer 
+      * [ ✓ ] VkPhysicalDeviceFeatures -> sparseResidencyImage2D 
       * [ ✓ ] VkPhysicalDeviceFeatures -> shaderResourceResidency 
       * [ ✓ ] VkPhysicalDeviceFeatures -> shaderResourceMinLod 
       * [ ✓ ] VkPhysicalDeviceRobustness2FeaturesEXT -> robustBufferAccess2 
@@ -54,8 +54,8 @@ Supported API: 1.1.213
       * [???] VkPhysicalDeviceVulkan12Features -> runtimeDescriptorArray 
       * [ ✓ ] VkPhysicalDeviceVulkan13Features -> dynamicRendering 
   - Failed Properties or Limits Constraints:
-      * [???] VkPhysicalDeviceProperties -> sparseProperties -> residencyStandard2DBlockShape: Device value is False (Expected True)
-      * [???] VkPhysicalDeviceProperties -> sparseProperties -> residencyNonResidentStrict: Device value is False (Expected True)
+      * [ ✓ ] VkPhysicalDeviceProperties -> sparseProperties -> residencyStandard2DBlockShape: Device value is False (Expected True)
+      * [ ✓ ] VkPhysicalDeviceProperties -> sparseProperties -> residencyNonResidentStrict: Device value is False (Expected True)
       * [ ✓(emulated) ] VkPhysicalDevicePushDescriptorPropertiesKHR -> maxPushDescriptors: Not specified/supported by device (Requires 32)
       * [ W ] VkPhysicalDeviceVulkan11Properties -> subgroupSupportedOperations: Not specified/supported by device (Requires ['VK_SUBGROUP_FEATURE_BALLOT_BIT', 'VK_SUBGROUP_FEATURE_BASIC_BIT', 'VK_SUBGROUP_FEATURE_VOTE_BIT', 'VK_SUBGROUP_FEATURE_SHUFFLE_BIT', 'VK_SUBGROUP_FEATURE_QUAD_BIT', 'VK_SUBGROUP_FEATURE_ARITHMETIC_BIT'])
       * [ W ] VkPhysicalDeviceVulkan11Properties -> subgroupSupportedStages: Not specified/supported by device (Requires ['VK_SHADER_STAGE_COMPUTE_BIT', 'VK_SHADER_STAGE_FRAGMENT_BIT'])
@@ -67,6 +67,6 @@ Supported API: 1.1.213
       * [ ✓ ] VkPhysicalDeviceVulkan13Properties -> storageTexelBufferOffsetSingleTexelAlignment: Not specified/supported by device (Requires True)
       * [ ✓ ] VkPhysicalDeviceVulkan13Properties -> uniformTexelBufferOffsetSingleTexelAlignment: Not specified/supported by device (Requires True)
   - Failed Queue Family Constraints:
-      * [???] Requires queue family with flags: ['VK_QUEUE_SPARSE_BINDING_BIT'] (Minimum Count: 1)
+      * [ ✓ ] Requires queue family with flags: ['VK_QUEUE_SPARSE_BINDING_BIT'] (Minimum Count: 1)
 -----------------------------------------------------------------
 

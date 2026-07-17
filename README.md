@@ -1,91 +1,7 @@
 ### Vulkan Profiles Aggregated Unknown `[???]` Tags
 
-#### Driver `54.3.0` (10 profiles, 7 issues)
+#### Driver `49.1.0` (28 profiles, 17 issues)
 ```text
-* [???] VkPhysicalDeviceFeatures -> sparseBinding - 10 profiles (Mali-G710, Mali-G715, Mali-G78)
-* [???] VkPhysicalDeviceFeatures -> sparseResidencyAliased - 10 profiles (Mali-G710, Mali-G715, Mali-G78)
-* [???] VkPhysicalDeviceFeatures -> sparseResidencyBuffer - 10 profiles (Mali-G710, Mali-G715, Mali-G78)
-* [???] VkPhysicalDeviceFeatures -> sparseResidencyImage2D - 10 profiles (Mali-G710, Mali-G715, Mali-G78)
-* [???] VkPhysicalDeviceProperties -> sparseProperties -> residencyStandard2DBlockShape: Device value is False (Expected True) - 10 profiles (Mali-G710, Mali-G715, Mali-G78)
-* [???] VkPhysicalDeviceProperties -> sparseProperties -> residencyNonResidentStrict: Device value is False (Expected True) - 10 profiles (Mali-G710, Mali-G715, Mali-G78)
-* [???] Requires queue family with flags: ['VK_QUEUE_SPARSE_BINDING_BIT'] (Minimum Count: 1) - 10 profiles (Mali-G710, Mali-G715, Mali-G78)
-```
-
-#### Driver `54.2.0` (10 profiles, 7 issues)
-```text
-* [???] VkPhysicalDeviceFeatures -> sparseBinding - 10 profiles (Mali-G610, Mali-G710, Mali-G715, Mali-G78)
-* [???] VkPhysicalDeviceFeatures -> sparseResidencyAliased - 10 profiles (Mali-G610, Mali-G710, Mali-G715, Mali-G78)
-* [???] VkPhysicalDeviceFeatures -> sparseResidencyBuffer - 10 profiles (Mali-G610, Mali-G710, Mali-G715, Mali-G78)
-* [???] VkPhysicalDeviceFeatures -> sparseResidencyImage2D - 10 profiles (Mali-G610, Mali-G710, Mali-G715, Mali-G78)
-* [???] VkPhysicalDeviceProperties -> sparseProperties -> residencyStandard2DBlockShape: Device value is False (Expected True) - 10 profiles (Mali-G610, Mali-G710, Mali-G715, Mali-G78)
-* [???] VkPhysicalDeviceProperties -> sparseProperties -> residencyNonResidentStrict: Device value is False (Expected True) - 10 profiles (Mali-G610, Mali-G710, Mali-G715, Mali-G78)
-* [???] Requires queue family with flags: ['VK_QUEUE_SPARSE_BINDING_BIT'] (Minimum Count: 1) - 10 profiles (Mali-G610, Mali-G710, Mali-G715, Mali-G78)
-```
-
-#### Driver `54.1.0` (27 profiles, 7 issues)
-```text
-* [???] VkPhysicalDeviceFeatures -> sparseBinding - 27 profiles (Mali-G1-Ultra_MC11, Mali-G1-Ultra_MC12, Mali-G57_MC2, Mali-G610_MC2, Mali-G610_MC6, Mali-G710, Mali-G715, Mali-G77, Mali-G78)
-* [???] VkPhysicalDeviceFeatures -> sparseResidencyAliased - 27 profiles (Mali-G1-Ultra_MC11, Mali-G1-Ultra_MC12, Mali-G57_MC2, Mali-G610_MC2, Mali-G610_MC6, Mali-G710, Mali-G715, Mali-G77, Mali-G78)
-* [???] VkPhysicalDeviceFeatures -> sparseResidencyBuffer - 27 profiles (Mali-G1-Ultra_MC11, Mali-G1-Ultra_MC12, Mali-G57_MC2, Mali-G610_MC2, Mali-G610_MC6, Mali-G710, Mali-G715, Mali-G77, Mali-G78)
-* [???] VkPhysicalDeviceFeatures -> sparseResidencyImage2D - 27 profiles (Mali-G1-Ultra_MC11, Mali-G1-Ultra_MC12, Mali-G57_MC2, Mali-G610_MC2, Mali-G610_MC6, Mali-G710, Mali-G715, Mali-G77, Mali-G78)
-* [???] VkPhysicalDeviceProperties -> sparseProperties -> residencyStandard2DBlockShape: Device value is False (Expected True) - 27 profiles (Mali-G1-Ultra_MC11, Mali-G1-Ultra_MC12, Mali-G57_MC2, Mali-G610_MC2, Mali-G610_MC6, Mali-G710, Mali-G715, Mali-G77, Mali-G78)
-* [???] VkPhysicalDeviceProperties -> sparseProperties -> residencyNonResidentStrict: Device value is False (Expected True) - 27 profiles (Mali-G1-Ultra_MC11, Mali-G1-Ultra_MC12, Mali-G57_MC2, Mali-G610_MC2, Mali-G610_MC6, Mali-G710, Mali-G715, Mali-G77, Mali-G78)
-* [???] Requires queue family with flags: ['VK_QUEUE_SPARSE_BINDING_BIT'] (Minimum Count: 1) - 27 profiles (Mali-G1-Ultra_MC11, Mali-G1-Ultra_MC12, Mali-G57_MC2, Mali-G610_MC2, Mali-G610_MC6, Mali-G710, Mali-G715, Mali-G77, Mali-G78)
-```
-
-#### Driver `54.0.0` (10 profiles, 7 issues)
-```text
-* [???] VkPhysicalDeviceFeatures -> sparseBinding - 10 profiles (Mali-G710, Mali-G715)
-* [???] VkPhysicalDeviceFeatures -> sparseResidencyAliased - 10 profiles (Mali-G710, Mali-G715)
-* [???] VkPhysicalDeviceFeatures -> sparseResidencyBuffer - 10 profiles (Mali-G710, Mali-G715)
-* [???] VkPhysicalDeviceFeatures -> sparseResidencyImage2D - 10 profiles (Mali-G710, Mali-G715)
-* [???] VkPhysicalDeviceProperties -> sparseProperties -> residencyStandard2DBlockShape: Device value is False (Expected True) - 10 profiles (Mali-G710, Mali-G715)
-* [???] VkPhysicalDeviceProperties -> sparseProperties -> residencyNonResidentStrict: Device value is False (Expected True) - 10 profiles (Mali-G710, Mali-G715)
-* [???] Requires queue family with flags: ['VK_QUEUE_SPARSE_BINDING_BIT'] (Minimum Count: 1) - 10 profiles (Mali-G710, Mali-G715)
-```
-
-#### Driver `53.0.0` (10 profiles, 7 issues)
-```text
-* [???] VkPhysicalDeviceFeatures -> sparseBinding - 10 profiles (Mali-G710, Mali-G715)
-* [???] VkPhysicalDeviceFeatures -> sparseResidencyAliased - 10 profiles (Mali-G710, Mali-G715)
-* [???] VkPhysicalDeviceFeatures -> sparseResidencyBuffer - 10 profiles (Mali-G710, Mali-G715)
-* [???] VkPhysicalDeviceFeatures -> sparseResidencyImage2D - 10 profiles (Mali-G710, Mali-G715)
-* [???] VkPhysicalDeviceProperties -> sparseProperties -> residencyStandard2DBlockShape: Device value is False (Expected True) - 10 profiles (Mali-G710, Mali-G715)
-* [???] VkPhysicalDeviceProperties -> sparseProperties -> residencyNonResidentStrict: Device value is False (Expected True) - 10 profiles (Mali-G710, Mali-G715)
-* [???] Requires queue family with flags: ['VK_QUEUE_SPARSE_BINDING_BIT'] (Minimum Count: 1) - 10 profiles (Mali-G710, Mali-G715)
-```
-
-#### Driver `51.0.0` (16 profiles, 7 issues)
-```text
-* [???] VkPhysicalDeviceFeatures -> sparseBinding - 16 profiles (Mali-G57, Mali-G710, Mali-G715, Mali-G78)
-* [???] VkPhysicalDeviceFeatures -> sparseResidencyAliased - 16 profiles (Mali-G57, Mali-G710, Mali-G715, Mali-G78)
-* [???] VkPhysicalDeviceFeatures -> sparseResidencyBuffer - 16 profiles (Mali-G57, Mali-G710, Mali-G715, Mali-G78)
-* [???] VkPhysicalDeviceFeatures -> sparseResidencyImage2D - 16 profiles (Mali-G57, Mali-G710, Mali-G715, Mali-G78)
-* [???] VkPhysicalDeviceProperties -> sparseProperties -> residencyStandard2DBlockShape: Device value is False (Expected True) - 16 profiles (Mali-G57, Mali-G710, Mali-G715, Mali-G78)
-* [???] VkPhysicalDeviceProperties -> sparseProperties -> residencyNonResidentStrict: Device value is False (Expected True) - 16 profiles (Mali-G57, Mali-G710, Mali-G715, Mali-G78)
-* [???] Requires queue family with flags: ['VK_QUEUE_SPARSE_BINDING_BIT'] (Minimum Count: 1) - 16 profiles (Mali-G57, Mali-G710, Mali-G715, Mali-G78)
-```
-
-#### Driver `50.0.0` (11 profiles, 7 issues)
-```text
-* [???] VkPhysicalDeviceFeatures -> sparseBinding - 11 profiles (Mali-G710, Mali-G715, Mali-G78)
-* [???] VkPhysicalDeviceFeatures -> sparseResidencyAliased - 11 profiles (Mali-G710, Mali-G715, Mali-G78)
-* [???] VkPhysicalDeviceFeatures -> sparseResidencyBuffer - 11 profiles (Mali-G710, Mali-G715, Mali-G78)
-* [???] VkPhysicalDeviceFeatures -> sparseResidencyImage2D - 11 profiles (Mali-G710, Mali-G715, Mali-G78)
-* [???] VkPhysicalDeviceProperties -> sparseProperties -> residencyStandard2DBlockShape: Device value is False (Expected True) - 11 profiles (Mali-G710, Mali-G715, Mali-G78)
-* [???] VkPhysicalDeviceProperties -> sparseProperties -> residencyNonResidentStrict: Device value is False (Expected True) - 11 profiles (Mali-G710, Mali-G715, Mali-G78)
-* [???] Requires queue family with flags: ['VK_QUEUE_SPARSE_BINDING_BIT'] (Minimum Count: 1) - 11 profiles (Mali-G710, Mali-G715, Mali-G78)
-```
-
-#### Driver `49.1.0` (28 profiles, 24 issues)
-```text
-* [???] VkPhysicalDeviceFeatures -> sparseBinding - 28 profiles (Mali-G52, Mali-G52_MC2, Mali-G57, Mali-G68_MC4, Mali-G720_MC7, Mali-G720_MC8, Mali-G77_MC9, Mali-G78, Mali-G925-Immortalis_MC11, Mali-G925-Immortalis_MC12)
-* [???] VkPhysicalDeviceFeatures -> sparseResidencyAliased - 28 profiles (Mali-G52, Mali-G52_MC2, Mali-G57, Mali-G68_MC4, Mali-G720_MC7, Mali-G720_MC8, Mali-G77_MC9, Mali-G78, Mali-G925-Immortalis_MC11, Mali-G925-Immortalis_MC12)
-* [???] VkPhysicalDeviceFeatures -> sparseResidencyBuffer - 28 profiles (Mali-G52, Mali-G52_MC2, Mali-G57, Mali-G68_MC4, Mali-G720_MC7, Mali-G720_MC8, Mali-G77_MC9, Mali-G78, Mali-G925-Immortalis_MC11, Mali-G925-Immortalis_MC12)
-* [???] VkPhysicalDeviceFeatures -> sparseResidencyImage2D - 28 profiles (Mali-G52, Mali-G52_MC2, Mali-G57, Mali-G68_MC4, Mali-G720_MC7, Mali-G720_MC8, Mali-G77_MC9, Mali-G78, Mali-G925-Immortalis_MC11, Mali-G925-Immortalis_MC12)
-* [???] VkPhysicalDeviceProperties -> sparseProperties -> residencyStandard2DBlockShape: Device value is False (Expected True) - 28 profiles (Mali-G52, Mali-G52_MC2, Mali-G57, Mali-G68_MC4, Mali-G720_MC7, Mali-G720_MC8, Mali-G77_MC9, Mali-G78, Mali-G925-Immortalis_MC11, Mali-G925-Immortalis_MC12)
-* [???] VkPhysicalDeviceProperties -> sparseProperties -> residencyNonResidentStrict: Device value is False (Expected True) - 28 profiles (Mali-G52, Mali-G52_MC2, Mali-G57, Mali-G68_MC4, Mali-G720_MC7, Mali-G720_MC8, Mali-G77_MC9, Mali-G78, Mali-G925-Immortalis_MC11, Mali-G925-Immortalis_MC12)
-* [???] Requires queue family with flags: ['VK_QUEUE_SPARSE_BINDING_BIT'] (Minimum Count: 1) - 28 profiles (Mali-G52, Mali-G52_MC2, Mali-G57, Mali-G68_MC4, Mali-G720_MC7, Mali-G720_MC8, Mali-G77_MC9, Mali-G78, Mali-G925-Immortalis_MC11, Mali-G925-Immortalis_MC12)
 * [???] VkPhysicalDeviceVulkan12Features -> descriptorIndexing - 5 profiles (Mali-G52, Mali-G52_MC2)
 * [???] VkPhysicalDeviceVulkan12Features -> shaderUniformTexelBufferArrayDynamicIndexing - 5 profiles (Mali-G52, Mali-G52_MC2)
 * [???] VkPhysicalDeviceVulkan12Features -> shaderStorageTexelBufferArrayDynamicIndexing - 5 profiles (Mali-G52, Mali-G52_MC2)
@@ -105,81 +21,8 @@
 * [???] VkPhysicalDeviceVulkan12Features -> runtimeDescriptorArray - 5 profiles (Mali-G52, Mali-G52_MC2)
 ```
 
-#### Driver `48.0.0` (14 profiles, 7 issues)
+#### Driver `38.1.0` (50 profiles, 18 issues)
 ```text
-* [???] VkPhysicalDeviceFeatures -> sparseBinding - 14 profiles (Mali-G57_MC2, Mali-G710, Mali-G715, Mali-G78)
-* [???] VkPhysicalDeviceFeatures -> sparseResidencyAliased - 14 profiles (Mali-G57_MC2, Mali-G710, Mali-G715, Mali-G78)
-* [???] VkPhysicalDeviceFeatures -> sparseResidencyBuffer - 14 profiles (Mali-G57_MC2, Mali-G710, Mali-G715, Mali-G78)
-* [???] VkPhysicalDeviceFeatures -> sparseResidencyImage2D - 14 profiles (Mali-G57_MC2, Mali-G710, Mali-G715, Mali-G78)
-* [???] VkPhysicalDeviceProperties -> sparseProperties -> residencyStandard2DBlockShape: Device value is False (Expected True) - 14 profiles (Mali-G57_MC2, Mali-G710, Mali-G715, Mali-G78)
-* [???] VkPhysicalDeviceProperties -> sparseProperties -> residencyNonResidentStrict: Device value is False (Expected True) - 14 profiles (Mali-G57_MC2, Mali-G710, Mali-G715, Mali-G78)
-* [???] Requires queue family with flags: ['VK_QUEUE_SPARSE_BINDING_BIT'] (Minimum Count: 1) - 14 profiles (Mali-G57_MC2, Mali-G710, Mali-G715, Mali-G78)
-```
-
-#### Driver `47.0.0` (11 profiles, 7 issues)
-```text
-* [???] VkPhysicalDeviceFeatures -> sparseBinding - 11 profiles (Mali-G710, Mali-G715, Mali-G78)
-* [???] VkPhysicalDeviceFeatures -> sparseResidencyAliased - 11 profiles (Mali-G710, Mali-G715, Mali-G78)
-* [???] VkPhysicalDeviceFeatures -> sparseResidencyBuffer - 11 profiles (Mali-G710, Mali-G715, Mali-G78)
-* [???] VkPhysicalDeviceFeatures -> sparseResidencyImage2D - 11 profiles (Mali-G710, Mali-G715, Mali-G78)
-* [???] VkPhysicalDeviceProperties -> sparseProperties -> residencyStandard2DBlockShape: Device value is False (Expected True) - 11 profiles (Mali-G710, Mali-G715, Mali-G78)
-* [???] VkPhysicalDeviceProperties -> sparseProperties -> residencyNonResidentStrict: Device value is False (Expected True) - 11 profiles (Mali-G710, Mali-G715, Mali-G78)
-* [???] Requires queue family with flags: ['VK_QUEUE_SPARSE_BINDING_BIT'] (Minimum Count: 1) - 11 profiles (Mali-G710, Mali-G715, Mali-G78)
-```
-
-#### Driver `44.1.0` (12 profiles, 7 issues)
-```text
-* [???] VkPhysicalDeviceFeatures -> sparseBinding - 12 profiles (Mali-G310, Mali-G57, Mali-G615_MC2, Mali-G615_MC6, Mali-G720-Immortalis_MC12)
-* [???] VkPhysicalDeviceFeatures -> sparseResidencyAliased - 12 profiles (Mali-G310, Mali-G57, Mali-G615_MC2, Mali-G615_MC6, Mali-G720-Immortalis_MC12)
-* [???] VkPhysicalDeviceFeatures -> sparseResidencyBuffer - 12 profiles (Mali-G310, Mali-G57, Mali-G615_MC2, Mali-G615_MC6, Mali-G720-Immortalis_MC12)
-* [???] VkPhysicalDeviceFeatures -> sparseResidencyImage2D - 12 profiles (Mali-G310, Mali-G57, Mali-G615_MC2, Mali-G615_MC6, Mali-G720-Immortalis_MC12)
-* [???] VkPhysicalDeviceProperties -> sparseProperties -> residencyStandard2DBlockShape: Device value is False (Expected True) - 12 profiles (Mali-G310, Mali-G57, Mali-G615_MC2, Mali-G615_MC6, Mali-G720-Immortalis_MC12)
-* [???] VkPhysicalDeviceProperties -> sparseProperties -> residencyNonResidentStrict: Device value is False (Expected True) - 12 profiles (Mali-G310, Mali-G57, Mali-G615_MC2, Mali-G615_MC6, Mali-G720-Immortalis_MC12)
-* [???] Requires queue family with flags: ['VK_QUEUE_SPARSE_BINDING_BIT'] (Minimum Count: 1) - 12 profiles (Mali-G310, Mali-G57, Mali-G615_MC2, Mali-G615_MC6, Mali-G720-Immortalis_MC12)
-```
-
-#### Driver `44.0.0` (10 profiles, 7 issues)
-```text
-* [???] VkPhysicalDeviceFeatures -> sparseBinding - 10 profiles (Mali-G310, Mali-G57, Mali-G710, Mali-G715, Mali-G78)
-* [???] VkPhysicalDeviceFeatures -> sparseResidencyAliased - 10 profiles (Mali-G310, Mali-G57, Mali-G710, Mali-G715, Mali-G78)
-* [???] VkPhysicalDeviceFeatures -> sparseResidencyBuffer - 10 profiles (Mali-G310, Mali-G57, Mali-G710, Mali-G715, Mali-G78)
-* [???] VkPhysicalDeviceFeatures -> sparseResidencyImage2D - 10 profiles (Mali-G310, Mali-G57, Mali-G710, Mali-G715, Mali-G78)
-* [???] VkPhysicalDeviceProperties -> sparseProperties -> residencyStandard2DBlockShape: Device value is False (Expected True) - 10 profiles (Mali-G310, Mali-G57, Mali-G710, Mali-G715, Mali-G78)
-* [???] VkPhysicalDeviceProperties -> sparseProperties -> residencyNonResidentStrict: Device value is False (Expected True) - 10 profiles (Mali-G310, Mali-G57, Mali-G710, Mali-G715, Mali-G78)
-* [???] Requires queue family with flags: ['VK_QUEUE_SPARSE_BINDING_BIT'] (Minimum Count: 1) - 10 profiles (Mali-G310, Mali-G57, Mali-G710, Mali-G715, Mali-G78)
-```
-
-#### Driver `41.0.0` (5 profiles, 7 issues)
-```text
-* [???] VkPhysicalDeviceFeatures -> sparseBinding - 5 profiles (Mali-G57)
-* [???] VkPhysicalDeviceFeatures -> sparseResidencyAliased - 5 profiles (Mali-G57)
-* [???] VkPhysicalDeviceFeatures -> sparseResidencyBuffer - 5 profiles (Mali-G57)
-* [???] VkPhysicalDeviceFeatures -> sparseResidencyImage2D - 5 profiles (Mali-G57)
-* [???] VkPhysicalDeviceProperties -> sparseProperties -> residencyStandard2DBlockShape: Device value is False (Expected True) - 5 profiles (Mali-G57)
-* [???] VkPhysicalDeviceProperties -> sparseProperties -> residencyNonResidentStrict: Device value is False (Expected True) - 5 profiles (Mali-G57)
-* [???] Requires queue family with flags: ['VK_QUEUE_SPARSE_BINDING_BIT'] (Minimum Count: 1) - 5 profiles (Mali-G57)
-```
-
-#### Driver `40.0.0` (7 profiles, 7 issues)
-```text
-* [???] VkPhysicalDeviceFeatures -> sparseBinding - 7 profiles (Mali-G57, Mali-G710, Mali-G78)
-* [???] VkPhysicalDeviceFeatures -> sparseResidencyAliased - 7 profiles (Mali-G57, Mali-G710, Mali-G78)
-* [???] VkPhysicalDeviceFeatures -> sparseResidencyBuffer - 7 profiles (Mali-G57, Mali-G710, Mali-G78)
-* [???] VkPhysicalDeviceFeatures -> sparseResidencyImage2D - 7 profiles (Mali-G57, Mali-G710, Mali-G78)
-* [???] VkPhysicalDeviceProperties -> sparseProperties -> residencyStandard2DBlockShape: Device value is False (Expected True) - 7 profiles (Mali-G57, Mali-G710, Mali-G78)
-* [???] VkPhysicalDeviceProperties -> sparseProperties -> residencyNonResidentStrict: Device value is False (Expected True) - 7 profiles (Mali-G57, Mali-G710, Mali-G78)
-* [???] Requires queue family with flags: ['VK_QUEUE_SPARSE_BINDING_BIT'] (Minimum Count: 1) - 7 profiles (Mali-G57, Mali-G710, Mali-G78)
-```
-
-#### Driver `38.1.0` (50 profiles, 25 issues)
-```text
-* [???] VkPhysicalDeviceFeatures -> sparseBinding - 50 profiles (Mali-G52, Mali-G57_MC2, Mali-G610_MC4, Mali-G610_MC6, Mali-G68, Mali-G710, Mali-G710_MC10, Mali-G715-Immortalis_MC11, Mali-G72, Mali-G76, Mali-G77, Mali-G78)
-* [???] VkPhysicalDeviceFeatures -> sparseResidencyAliased - 50 profiles (Mali-G52, Mali-G57_MC2, Mali-G610_MC4, Mali-G610_MC6, Mali-G68, Mali-G710, Mali-G710_MC10, Mali-G715-Immortalis_MC11, Mali-G72, Mali-G76, Mali-G77, Mali-G78)
-* [???] VkPhysicalDeviceFeatures -> sparseResidencyBuffer - 50 profiles (Mali-G52, Mali-G57_MC2, Mali-G610_MC4, Mali-G610_MC6, Mali-G68, Mali-G710, Mali-G710_MC10, Mali-G715-Immortalis_MC11, Mali-G72, Mali-G76, Mali-G77, Mali-G78)
-* [???] VkPhysicalDeviceFeatures -> sparseResidencyImage2D - 50 profiles (Mali-G52, Mali-G57_MC2, Mali-G610_MC4, Mali-G610_MC6, Mali-G68, Mali-G710, Mali-G710_MC10, Mali-G715-Immortalis_MC11, Mali-G72, Mali-G76, Mali-G77, Mali-G78)
-* [???] VkPhysicalDeviceProperties -> sparseProperties -> residencyStandard2DBlockShape: Device value is False (Expected True) - 50 profiles (Mali-G52, Mali-G57_MC2, Mali-G610_MC4, Mali-G610_MC6, Mali-G68, Mali-G710, Mali-G710_MC10, Mali-G715-Immortalis_MC11, Mali-G72, Mali-G76, Mali-G77, Mali-G78)
-* [???] VkPhysicalDeviceProperties -> sparseProperties -> residencyNonResidentStrict: Device value is False (Expected True) - 50 profiles (Mali-G52, Mali-G57_MC2, Mali-G610_MC4, Mali-G610_MC6, Mali-G68, Mali-G710, Mali-G710_MC10, Mali-G715-Immortalis_MC11, Mali-G72, Mali-G76, Mali-G77, Mali-G78)
-* [???] Requires queue family with flags: ['VK_QUEUE_SPARSE_BINDING_BIT'] (Minimum Count: 1) - 50 profiles (Mali-G52, Mali-G57_MC2, Mali-G610_MC4, Mali-G610_MC6, Mali-G68, Mali-G710, Mali-G710_MC10, Mali-G715-Immortalis_MC11, Mali-G72, Mali-G76, Mali-G77, Mali-G78)
 * [???] VkPhysicalDeviceVulkan12Features -> descriptorIndexing - 15 profiles (Mali-G52, Mali-G72, Mali-G76)
 * [???] VkPhysicalDeviceVulkan12Features -> shaderUniformTexelBufferArrayDynamicIndexing - 15 profiles (Mali-G52, Mali-G72, Mali-G76)
 * [???] VkPhysicalDeviceVulkan12Features -> shaderStorageTexelBufferArrayDynamicIndexing - 15 profiles (Mali-G52, Mali-G72, Mali-G76)
@@ -200,26 +43,8 @@
 * [???] VkPhysicalDeviceFeatures -> samplerAnisotropy - 5 profiles (Mali-G72)
 ```
 
-#### Driver `38.0.0` (5 profiles, 7 issues)
+#### Driver `34.0.0` (22 profiles, 17 issues)
 ```text
-* [???] VkPhysicalDeviceFeatures -> sparseBinding - 5 profiles (Mali-G78)
-* [???] VkPhysicalDeviceFeatures -> sparseResidencyAliased - 5 profiles (Mali-G78)
-* [???] VkPhysicalDeviceFeatures -> sparseResidencyBuffer - 5 profiles (Mali-G78)
-* [???] VkPhysicalDeviceFeatures -> sparseResidencyImage2D - 5 profiles (Mali-G78)
-* [???] VkPhysicalDeviceProperties -> sparseProperties -> residencyStandard2DBlockShape: Device value is False (Expected True) - 5 profiles (Mali-G78)
-* [???] VkPhysicalDeviceProperties -> sparseProperties -> residencyNonResidentStrict: Device value is False (Expected True) - 5 profiles (Mali-G78)
-* [???] Requires queue family with flags: ['VK_QUEUE_SPARSE_BINDING_BIT'] (Minimum Count: 1) - 5 profiles (Mali-G78)
-```
-
-#### Driver `34.0.0` (22 profiles, 24 issues)
-```text
-* [???] VkPhysicalDeviceFeatures -> sparseBinding - 22 profiles (Mali-G52, Mali-G57, Mali-G76, Mali-G77, Mali-G78)
-* [???] VkPhysicalDeviceFeatures -> sparseResidencyAliased - 22 profiles (Mali-G52, Mali-G57, Mali-G76, Mali-G77, Mali-G78)
-* [???] VkPhysicalDeviceFeatures -> sparseResidencyBuffer - 22 profiles (Mali-G52, Mali-G57, Mali-G76, Mali-G77, Mali-G78)
-* [???] VkPhysicalDeviceFeatures -> sparseResidencyImage2D - 22 profiles (Mali-G52, Mali-G57, Mali-G76, Mali-G77, Mali-G78)
-* [???] VkPhysicalDeviceProperties -> sparseProperties -> residencyStandard2DBlockShape: Device value is False (Expected True) - 22 profiles (Mali-G52, Mali-G57, Mali-G76, Mali-G77, Mali-G78)
-* [???] VkPhysicalDeviceProperties -> sparseProperties -> residencyNonResidentStrict: Device value is False (Expected True) - 22 profiles (Mali-G52, Mali-G57, Mali-G76, Mali-G77, Mali-G78)
-* [???] Requires queue family with flags: ['VK_QUEUE_SPARSE_BINDING_BIT'] (Minimum Count: 1) - 22 profiles (Mali-G52, Mali-G57, Mali-G76, Mali-G77, Mali-G78)
 * [???] VkPhysicalDeviceVulkan12Features -> descriptorIndexing - 10 profiles (Mali-G52, Mali-G76)
 * [???] VkPhysicalDeviceVulkan12Features -> shaderUniformTexelBufferArrayDynamicIndexing - 10 profiles (Mali-G52, Mali-G76)
 * [???] VkPhysicalDeviceVulkan12Features -> shaderStorageTexelBufferArrayDynamicIndexing - 10 profiles (Mali-G52, Mali-G76)
@@ -239,15 +64,8 @@
 * [???] VkPhysicalDeviceVulkan12Features -> runtimeDescriptorArray - 10 profiles (Mali-G52, Mali-G76)
 ```
 
-#### Driver `32.1.0` (45 profiles, 30 issues)
+#### Driver `32.1.0` (45 profiles, 23 issues)
 ```text
-* [???] VkPhysicalDeviceFeatures -> sparseBinding - 45 profiles (Mali-G52_MC2, Mali-G57_MC2, Mali-G610_MC6, Mali-G68, Mali-G68_MC4, Mali-G710_MC10, Mali-G72, Mali-G76, Mali-G77_MC9, Mali-G78)
-* [???] VkPhysicalDeviceFeatures -> sparseResidencyAliased - 45 profiles (Mali-G52_MC2, Mali-G57_MC2, Mali-G610_MC6, Mali-G68, Mali-G68_MC4, Mali-G710_MC10, Mali-G72, Mali-G76, Mali-G77_MC9, Mali-G78)
-* [???] VkPhysicalDeviceFeatures -> sparseResidencyBuffer - 45 profiles (Mali-G52_MC2, Mali-G57_MC2, Mali-G610_MC6, Mali-G68, Mali-G68_MC4, Mali-G710_MC10, Mali-G72, Mali-G76, Mali-G77_MC9, Mali-G78)
-* [???] VkPhysicalDeviceFeatures -> sparseResidencyImage2D - 45 profiles (Mali-G52_MC2, Mali-G57_MC2, Mali-G610_MC6, Mali-G68, Mali-G68_MC4, Mali-G710_MC10, Mali-G72, Mali-G76, Mali-G77_MC9, Mali-G78)
-* [???] VkPhysicalDeviceProperties -> sparseProperties -> residencyStandard2DBlockShape: Device value is False (Expected True) - 45 profiles (Mali-G52_MC2, Mali-G57_MC2, Mali-G610_MC6, Mali-G68, Mali-G68_MC4, Mali-G710_MC10, Mali-G72, Mali-G76, Mali-G77_MC9, Mali-G78)
-* [???] VkPhysicalDeviceProperties -> sparseProperties -> residencyNonResidentStrict: Device value is False (Expected True) - 45 profiles (Mali-G52_MC2, Mali-G57_MC2, Mali-G610_MC6, Mali-G68, Mali-G68_MC4, Mali-G710_MC10, Mali-G72, Mali-G76, Mali-G77_MC9, Mali-G78)
-* [???] Requires queue family with flags: ['VK_QUEUE_SPARSE_BINDING_BIT'] (Minimum Count: 1) - 45 profiles (Mali-G52_MC2, Mali-G57_MC2, Mali-G610_MC6, Mali-G68, Mali-G68_MC4, Mali-G710_MC10, Mali-G72, Mali-G76, Mali-G77_MC9, Mali-G78)
 * [???] VkPhysicalDeviceVulkan12Features -> descriptorIndexing - 15 profiles (Mali-G52_MC2, Mali-G72, Mali-G76)
 * [???] VkPhysicalDeviceVulkan12Features -> shaderUniformTexelBufferArrayDynamicIndexing - 15 profiles (Mali-G52_MC2, Mali-G72, Mali-G76)
 * [???] VkPhysicalDeviceVulkan12Features -> shaderStorageTexelBufferArrayDynamicIndexing - 15 profiles (Mali-G52_MC2, Mali-G72, Mali-G76)
@@ -273,19 +91,12 @@
 * [???] VkPhysicalDeviceTransformFeedbackPropertiesEXT -> transformFeedbackDraw: Not specified/supported by device (Requires False) - 1 profiles (Mali-G78)
 ```
 
-#### Driver `28.0.0` (12 profiles, 42 issues)
+#### Driver `28.0.0` (12 profiles, 35 issues)
 ```text
 * [???] VK_EXT_custom_border_color (Required version: 1) - 12 profiles (Mali-G57, Mali-T830, Mali-T880)
 * [???] VkPhysicalDeviceCustomBorderColorFeaturesEXT -> customBorderColors - 12 profiles (Mali-G57, Mali-T830, Mali-T880)
 * [???] VkPhysicalDeviceCustomBorderColorFeaturesEXT -> customBorderColorWithoutFormat - 12 profiles (Mali-G57, Mali-T830, Mali-T880)
-* [???] VkPhysicalDeviceFeatures -> sparseBinding - 12 profiles (Mali-G57, Mali-T830, Mali-T880)
-* [???] VkPhysicalDeviceFeatures -> sparseResidencyAliased - 12 profiles (Mali-G57, Mali-T830, Mali-T880)
-* [???] VkPhysicalDeviceFeatures -> sparseResidencyBuffer - 12 profiles (Mali-G57, Mali-T830, Mali-T880)
-* [???] VkPhysicalDeviceFeatures -> sparseResidencyImage2D - 12 profiles (Mali-G57, Mali-T830, Mali-T880)
 * [???] VkPhysicalDeviceCustomBorderColorPropertiesEXT -> maxCustomBorderColorSamplers: Not specified/supported by device (Requires 2048) - 12 profiles (Mali-G57, Mali-T830, Mali-T880)
-* [???] VkPhysicalDeviceProperties -> sparseProperties -> residencyStandard2DBlockShape: Device value is False (Expected True) - 12 profiles (Mali-G57, Mali-T830, Mali-T880)
-* [???] VkPhysicalDeviceProperties -> sparseProperties -> residencyNonResidentStrict: Device value is False (Expected True) - 12 profiles (Mali-G57, Mali-T830, Mali-T880)
-* [???] Requires queue family with flags: ['VK_QUEUE_SPARSE_BINDING_BIT'] (Minimum Count: 1) - 12 profiles (Mali-G57, Mali-T830, Mali-T880)
 * [???] VK_EXT_transform_feedback (Required version: 1) - 10 profiles (Mali-T830, Mali-T880)
 * [???] VkPhysicalDeviceFeatures -> samplerAnisotropy - 10 profiles (Mali-T830, Mali-T880)
 * [???] VkPhysicalDeviceTransformFeedbackFeaturesEXT -> transformFeedback - 10 profiles (Mali-T830, Mali-T880)
@@ -319,15 +130,11 @@
 * [???] VkPhysicalDeviceTransformFeedbackPropertiesEXT -> transformFeedbackDraw: Not specified/supported by device (Requires False) - 10 profiles (Mali-T830, Mali-T880)
 ```
 
-#### Driver `27.0.0` (5 profiles, 28 issues)
+#### Driver `27.0.0` (5 profiles, 21 issues)
 ```text
 * [???] VK_EXT_custom_border_color (Required version: 1) - 5 profiles (Mali-G52)
 * [???] VkPhysicalDeviceCustomBorderColorFeaturesEXT -> customBorderColors - 5 profiles (Mali-G52)
 * [???] VkPhysicalDeviceCustomBorderColorFeaturesEXT -> customBorderColorWithoutFormat - 5 profiles (Mali-G52)
-* [???] VkPhysicalDeviceFeatures -> sparseBinding - 5 profiles (Mali-G52)
-* [???] VkPhysicalDeviceFeatures -> sparseResidencyAliased - 5 profiles (Mali-G52)
-* [???] VkPhysicalDeviceFeatures -> sparseResidencyBuffer - 5 profiles (Mali-G52)
-* [???] VkPhysicalDeviceFeatures -> sparseResidencyImage2D - 5 profiles (Mali-G52)
 * [???] VkPhysicalDeviceVulkan12Features -> descriptorIndexing - 5 profiles (Mali-G52)
 * [???] VkPhysicalDeviceVulkan12Features -> shaderUniformTexelBufferArrayDynamicIndexing - 5 profiles (Mali-G52)
 * [???] VkPhysicalDeviceVulkan12Features -> shaderStorageTexelBufferArrayDynamicIndexing - 5 profiles (Mali-G52)
@@ -346,24 +153,14 @@
 * [???] VkPhysicalDeviceVulkan12Features -> descriptorBindingVariableDescriptorCount - 5 profiles (Mali-G52)
 * [???] VkPhysicalDeviceVulkan12Features -> runtimeDescriptorArray - 5 profiles (Mali-G52)
 * [???] VkPhysicalDeviceCustomBorderColorPropertiesEXT -> maxCustomBorderColorSamplers: Not specified/supported by device (Requires 2048) - 5 profiles (Mali-G52)
-* [???] VkPhysicalDeviceProperties -> sparseProperties -> residencyStandard2DBlockShape: Device value is False (Expected True) - 5 profiles (Mali-G52)
-* [???] VkPhysicalDeviceProperties -> sparseProperties -> residencyNonResidentStrict: Device value is False (Expected True) - 5 profiles (Mali-G52)
-* [???] Requires queue family with flags: ['VK_QUEUE_SPARSE_BINDING_BIT'] (Minimum Count: 1) - 5 profiles (Mali-G52)
 ```
 
-#### Driver `26.0.0` (37 profiles, 37 issues)
+#### Driver `26.0.0` (37 profiles, 30 issues)
 ```text
-* [???] VkPhysicalDeviceFeatures -> sparseResidencyAliased - 37 profiles (Mali-G52, Mali-G52_MC2, Mali-G57_MC2, Mali-G610, Mali-G68_MC4, Mali-G71, Mali-G72, Mali-G72_MP3, Mali-G76, Mali-G76_MC4, Mali-G77, Mali-G77_MC9, Mali-G78)
-* [???] VkPhysicalDeviceFeatures -> sparseResidencyImage2D - 37 profiles (Mali-G52, Mali-G52_MC2, Mali-G57_MC2, Mali-G610, Mali-G68_MC4, Mali-G71, Mali-G72, Mali-G72_MP3, Mali-G76, Mali-G76_MC4, Mali-G77, Mali-G77_MC9, Mali-G78)
-* [???] VkPhysicalDeviceProperties -> sparseProperties -> residencyStandard2DBlockShape: Device value is False (Expected True) - 37 profiles (Mali-G52, Mali-G52_MC2, Mali-G57_MC2, Mali-G610, Mali-G68_MC4, Mali-G71, Mali-G72, Mali-G72_MP3, Mali-G76, Mali-G76_MC4, Mali-G77, Mali-G77_MC9, Mali-G78)
-* [???] VkPhysicalDeviceProperties -> sparseProperties -> residencyNonResidentStrict: Device value is False (Expected True) - 37 profiles (Mali-G52, Mali-G52_MC2, Mali-G57_MC2, Mali-G610, Mali-G68_MC4, Mali-G71, Mali-G72, Mali-G72_MP3, Mali-G76, Mali-G76_MC4, Mali-G77, Mali-G77_MC9, Mali-G78)
 * [???] VK_EXT_custom_border_color (Required version: 1) - 36 profiles (Mali-G52, Mali-G52_MC2, Mali-G57_MC2, Mali-G68_MC4, Mali-G71, Mali-G72, Mali-G72_MP3, Mali-G76, Mali-G76_MC4, Mali-G77, Mali-G77_MC9, Mali-G78)
 * [???] VkPhysicalDeviceCustomBorderColorFeaturesEXT -> customBorderColors - 36 profiles (Mali-G52, Mali-G52_MC2, Mali-G57_MC2, Mali-G68_MC4, Mali-G71, Mali-G72, Mali-G72_MP3, Mali-G76, Mali-G76_MC4, Mali-G77, Mali-G77_MC9, Mali-G78)
 * [???] VkPhysicalDeviceCustomBorderColorFeaturesEXT -> customBorderColorWithoutFormat - 36 profiles (Mali-G52, Mali-G52_MC2, Mali-G57_MC2, Mali-G68_MC4, Mali-G71, Mali-G72, Mali-G72_MP3, Mali-G76, Mali-G76_MC4, Mali-G77, Mali-G77_MC9, Mali-G78)
-* [???] VkPhysicalDeviceFeatures -> sparseBinding - 36 profiles (Mali-G52, Mali-G52_MC2, Mali-G57_MC2, Mali-G68_MC4, Mali-G71, Mali-G72, Mali-G72_MP3, Mali-G76, Mali-G76_MC4, Mali-G77, Mali-G77_MC9, Mali-G78)
-* [???] VkPhysicalDeviceFeatures -> sparseResidencyBuffer - 36 profiles (Mali-G52, Mali-G52_MC2, Mali-G57_MC2, Mali-G68_MC4, Mali-G71, Mali-G72, Mali-G72_MP3, Mali-G76, Mali-G76_MC4, Mali-G77, Mali-G77_MC9, Mali-G78)
 * [???] VkPhysicalDeviceCustomBorderColorPropertiesEXT -> maxCustomBorderColorSamplers: Not specified/supported by device (Requires 2048) - 36 profiles (Mali-G52, Mali-G52_MC2, Mali-G57_MC2, Mali-G68_MC4, Mali-G71, Mali-G72, Mali-G72_MP3, Mali-G76, Mali-G76_MC4, Mali-G77, Mali-G77_MC9, Mali-G78)
-* [???] Requires queue family with flags: ['VK_QUEUE_SPARSE_BINDING_BIT'] (Minimum Count: 1) - 36 profiles (Mali-G52, Mali-G52_MC2, Mali-G57_MC2, Mali-G68_MC4, Mali-G71, Mali-G72, Mali-G72_MP3, Mali-G76, Mali-G76_MC4, Mali-G77, Mali-G77_MC9, Mali-G78)
 * [???] VkPhysicalDeviceVulkan12Features -> descriptorIndexing - 20 profiles (Mali-G52, Mali-G52_MC2, Mali-G71, Mali-G72, Mali-G72_MP3, Mali-G76, Mali-G76_MC4)
 * [???] VkPhysicalDeviceVulkan12Features -> shaderUniformTexelBufferArrayDynamicIndexing - 20 profiles (Mali-G52, Mali-G52_MC2, Mali-G71, Mali-G72, Mali-G72_MP3, Mali-G76, Mali-G76_MC4)
 * [???] VkPhysicalDeviceVulkan12Features -> shaderStorageTexelBufferArrayDynamicIndexing - 20 profiles (Mali-G52, Mali-G52_MC2, Mali-G71, Mali-G72, Mali-G72_MP3, Mali-G76, Mali-G76_MC4)
@@ -392,16 +189,12 @@
 * [???] VkPhysicalDeviceTransformFeedbackFeaturesEXT -> transformFeedback - 1 profiles (Mali-G610)
 ```
 
-#### Driver `21.0.0` (13 profiles, 40 issues)
+#### Driver `21.0.0` (13 profiles, 33 issues)
 ```text
 * [???] VK_EXT_custom_border_color (Required version: 1) - 13 profiles (Mali-G31, Mali-G52, Mali-G57, Mali-G57_MC3, Mali-G57_MC4, Mali-G77)
 * [???] VK_EXT_transform_feedback (Required version: 1) - 13 profiles (Mali-G31, Mali-G52, Mali-G57, Mali-G57_MC3, Mali-G57_MC4, Mali-G77)
 * [???] VkPhysicalDeviceCustomBorderColorFeaturesEXT -> customBorderColors - 13 profiles (Mali-G31, Mali-G52, Mali-G57, Mali-G57_MC3, Mali-G57_MC4, Mali-G77)
 * [???] VkPhysicalDeviceCustomBorderColorFeaturesEXT -> customBorderColorWithoutFormat - 13 profiles (Mali-G31, Mali-G52, Mali-G57, Mali-G57_MC3, Mali-G57_MC4, Mali-G77)
-* [???] VkPhysicalDeviceFeatures -> sparseBinding - 13 profiles (Mali-G31, Mali-G52, Mali-G57, Mali-G57_MC3, Mali-G57_MC4, Mali-G77)
-* [???] VkPhysicalDeviceFeatures -> sparseResidencyAliased - 13 profiles (Mali-G31, Mali-G52, Mali-G57, Mali-G57_MC3, Mali-G57_MC4, Mali-G77)
-* [???] VkPhysicalDeviceFeatures -> sparseResidencyBuffer - 13 profiles (Mali-G31, Mali-G52, Mali-G57, Mali-G57_MC3, Mali-G57_MC4, Mali-G77)
-* [???] VkPhysicalDeviceFeatures -> sparseResidencyImage2D - 13 profiles (Mali-G31, Mali-G52, Mali-G57, Mali-G57_MC3, Mali-G57_MC4, Mali-G77)
 * [???] VkPhysicalDeviceTransformFeedbackFeaturesEXT -> transformFeedback - 13 profiles (Mali-G31, Mali-G52, Mali-G57, Mali-G57_MC3, Mali-G57_MC4, Mali-G77)
 * [???] VkPhysicalDeviceVulkan12Features -> separateDepthStencilLayouts - 13 profiles (Mali-G31, Mali-G52, Mali-G57, Mali-G57_MC3, Mali-G57_MC4, Mali-G77)
 * [???] VkPhysicalDeviceVulkan12Features -> timelineSemaphore - 13 profiles (Mali-G31, Mali-G52, Mali-G57, Mali-G57_MC3, Mali-G57_MC4, Mali-G77)
@@ -410,13 +203,10 @@
 * [???] VkPhysicalDeviceVulkan12Features -> vulkanMemoryModelDeviceScope - 13 profiles (Mali-G31, Mali-G52, Mali-G57, Mali-G57_MC3, Mali-G57_MC4, Mali-G77)
 * [???] VkPhysicalDeviceVulkan12Features -> uniformBufferStandardLayout - 13 profiles (Mali-G31, Mali-G52, Mali-G57, Mali-G57_MC3, Mali-G57_MC4, Mali-G77)
 * [???] VkPhysicalDeviceCustomBorderColorPropertiesEXT -> maxCustomBorderColorSamplers: Not specified/supported by device (Requires 2048) - 13 profiles (Mali-G31, Mali-G52, Mali-G57, Mali-G57_MC3, Mali-G57_MC4, Mali-G77)
-* [???] VkPhysicalDeviceProperties -> sparseProperties -> residencyStandard2DBlockShape: Device value is False (Expected True) - 13 profiles (Mali-G31, Mali-G52, Mali-G57, Mali-G57_MC3, Mali-G57_MC4, Mali-G77)
-* [???] VkPhysicalDeviceProperties -> sparseProperties -> residencyNonResidentStrict: Device value is False (Expected True) - 13 profiles (Mali-G31, Mali-G52, Mali-G57, Mali-G57_MC3, Mali-G57_MC4, Mali-G77)
 * [???] VkPhysicalDeviceTransformFeedbackPropertiesEXT -> transformFeedbackQueries: Not specified/supported by device (Requires True) - 13 profiles (Mali-G31, Mali-G52, Mali-G57, Mali-G57_MC3, Mali-G57_MC4, Mali-G77)
 * [???] VkPhysicalDeviceTransformFeedbackPropertiesEXT -> transformFeedbackRasterizationStreamSelect: Not specified/supported by device (Requires False) - 13 profiles (Mali-G31, Mali-G52, Mali-G57, Mali-G57_MC3, Mali-G57_MC4, Mali-G77)
 * [???] VkPhysicalDeviceTransformFeedbackPropertiesEXT -> transformFeedbackStreamsLinesTriangles: Not specified/supported by device (Requires False) - 13 profiles (Mali-G31, Mali-G52, Mali-G57, Mali-G57_MC3, Mali-G57_MC4, Mali-G77)
 * [???] VkPhysicalDeviceTransformFeedbackPropertiesEXT -> transformFeedbackDraw: Not specified/supported by device (Requires False) - 13 profiles (Mali-G31, Mali-G52, Mali-G57, Mali-G57_MC3, Mali-G57_MC4, Mali-G77)
-* [???] Requires queue family with flags: ['VK_QUEUE_SPARSE_BINDING_BIT'] (Minimum Count: 1) - 13 profiles (Mali-G31, Mali-G52, Mali-G57, Mali-G57_MC3, Mali-G57_MC4, Mali-G77)
 * [???] VkPhysicalDeviceVulkan12Features -> descriptorIndexing - 5 profiles (Mali-G31, Mali-G52)
 * [???] VkPhysicalDeviceVulkan12Features -> shaderUniformTexelBufferArrayDynamicIndexing - 5 profiles (Mali-G31, Mali-G52)
 * [???] VkPhysicalDeviceVulkan12Features -> shaderStorageTexelBufferArrayDynamicIndexing - 5 profiles (Mali-G31, Mali-G52)
@@ -436,16 +226,12 @@
 * [???] VkPhysicalDeviceVulkan12Features -> runtimeDescriptorArray - 5 profiles (Mali-G31, Mali-G52)
 ```
 
-#### Driver `20.0.0` (19 profiles, 41 issues)
+#### Driver `20.0.0` (19 profiles, 34 issues)
 ```text
 * [???] VK_EXT_custom_border_color (Required version: 1) - 19 profiles (Mali-G52_MC2, Mali-G71_MP2, Mali-G72_MP3, Mali-G76_MC4, Mali-G77)
 * [???] VK_EXT_transform_feedback (Required version: 1) - 19 profiles (Mali-G52_MC2, Mali-G71_MP2, Mali-G72_MP3, Mali-G76_MC4, Mali-G77)
 * [???] VkPhysicalDeviceCustomBorderColorFeaturesEXT -> customBorderColors - 19 profiles (Mali-G52_MC2, Mali-G71_MP2, Mali-G72_MP3, Mali-G76_MC4, Mali-G77)
 * [???] VkPhysicalDeviceCustomBorderColorFeaturesEXT -> customBorderColorWithoutFormat - 19 profiles (Mali-G52_MC2, Mali-G71_MP2, Mali-G72_MP3, Mali-G76_MC4, Mali-G77)
-* [???] VkPhysicalDeviceFeatures -> sparseBinding - 19 profiles (Mali-G52_MC2, Mali-G71_MP2, Mali-G72_MP3, Mali-G76_MC4, Mali-G77)
-* [???] VkPhysicalDeviceFeatures -> sparseResidencyAliased - 19 profiles (Mali-G52_MC2, Mali-G71_MP2, Mali-G72_MP3, Mali-G76_MC4, Mali-G77)
-* [???] VkPhysicalDeviceFeatures -> sparseResidencyBuffer - 19 profiles (Mali-G52_MC2, Mali-G71_MP2, Mali-G72_MP3, Mali-G76_MC4, Mali-G77)
-* [???] VkPhysicalDeviceFeatures -> sparseResidencyImage2D - 19 profiles (Mali-G52_MC2, Mali-G71_MP2, Mali-G72_MP3, Mali-G76_MC4, Mali-G77)
 * [???] VkPhysicalDeviceTransformFeedbackFeaturesEXT -> transformFeedback - 19 profiles (Mali-G52_MC2, Mali-G71_MP2, Mali-G72_MP3, Mali-G76_MC4, Mali-G77)
 * [???] VkPhysicalDeviceVulkan12Features -> separateDepthStencilLayouts - 19 profiles (Mali-G52_MC2, Mali-G71_MP2, Mali-G72_MP3, Mali-G76_MC4, Mali-G77)
 * [???] VkPhysicalDeviceVulkan12Features -> timelineSemaphore - 19 profiles (Mali-G52_MC2, Mali-G71_MP2, Mali-G72_MP3, Mali-G76_MC4, Mali-G77)
@@ -454,13 +240,10 @@
 * [???] VkPhysicalDeviceVulkan12Features -> vulkanMemoryModelDeviceScope - 19 profiles (Mali-G52_MC2, Mali-G71_MP2, Mali-G72_MP3, Mali-G76_MC4, Mali-G77)
 * [???] VkPhysicalDeviceVulkan12Features -> uniformBufferStandardLayout - 19 profiles (Mali-G52_MC2, Mali-G71_MP2, Mali-G72_MP3, Mali-G76_MC4, Mali-G77)
 * [???] VkPhysicalDeviceCustomBorderColorPropertiesEXT -> maxCustomBorderColorSamplers: Not specified/supported by device (Requires 2048) - 19 profiles (Mali-G52_MC2, Mali-G71_MP2, Mali-G72_MP3, Mali-G76_MC4, Mali-G77)
-* [???] VkPhysicalDeviceProperties -> sparseProperties -> residencyStandard2DBlockShape: Device value is False (Expected True) - 19 profiles (Mali-G52_MC2, Mali-G71_MP2, Mali-G72_MP3, Mali-G76_MC4, Mali-G77)
-* [???] VkPhysicalDeviceProperties -> sparseProperties -> residencyNonResidentStrict: Device value is False (Expected True) - 19 profiles (Mali-G52_MC2, Mali-G71_MP2, Mali-G72_MP3, Mali-G76_MC4, Mali-G77)
 * [???] VkPhysicalDeviceTransformFeedbackPropertiesEXT -> transformFeedbackQueries: Not specified/supported by device (Requires True) - 19 profiles (Mali-G52_MC2, Mali-G71_MP2, Mali-G72_MP3, Mali-G76_MC4, Mali-G77)
 * [???] VkPhysicalDeviceTransformFeedbackPropertiesEXT -> transformFeedbackRasterizationStreamSelect: Not specified/supported by device (Requires False) - 19 profiles (Mali-G52_MC2, Mali-G71_MP2, Mali-G72_MP3, Mali-G76_MC4, Mali-G77)
 * [???] VkPhysicalDeviceTransformFeedbackPropertiesEXT -> transformFeedbackStreamsLinesTriangles: Not specified/supported by device (Requires False) - 19 profiles (Mali-G52_MC2, Mali-G71_MP2, Mali-G72_MP3, Mali-G76_MC4, Mali-G77)
 * [???] VkPhysicalDeviceTransformFeedbackPropertiesEXT -> transformFeedbackDraw: Not specified/supported by device (Requires False) - 19 profiles (Mali-G52_MC2, Mali-G71_MP2, Mali-G72_MP3, Mali-G76_MC4, Mali-G77)
-* [???] Requires queue family with flags: ['VK_QUEUE_SPARSE_BINDING_BIT'] (Minimum Count: 1) - 19 profiles (Mali-G52_MC2, Mali-G71_MP2, Mali-G72_MP3, Mali-G76_MC4, Mali-G77)
 * [???] VkPhysicalDeviceVulkan12Features -> descriptorIndexing - 16 profiles (Mali-G52_MC2, Mali-G71_MP2, Mali-G72_MP3, Mali-G76_MC4)
 * [???] VkPhysicalDeviceVulkan12Features -> shaderUniformTexelBufferArrayDynamicIndexing - 16 profiles (Mali-G52_MC2, Mali-G71_MP2, Mali-G72_MP3, Mali-G76_MC4)
 * [???] VkPhysicalDeviceVulkan12Features -> shaderStorageTexelBufferArrayDynamicIndexing - 16 profiles (Mali-G52_MC2, Mali-G71_MP2, Mali-G72_MP3, Mali-G76_MC4)
@@ -481,16 +264,12 @@
 * [???] VkPhysicalDeviceFeatures -> samplerAnisotropy - 1 profiles (Mali-G71_MP2)
 ```
 
-#### Driver `19.0.0` (17 profiles, 42 issues)
+#### Driver `19.0.0` (17 profiles, 35 issues)
 ```text
 * [???] VK_EXT_custom_border_color (Required version: 1) - 17 profiles (Mali-G52, Mali-G71, Mali-G72, Mali-G76)
 * [???] VK_EXT_transform_feedback (Required version: 1) - 17 profiles (Mali-G52, Mali-G71, Mali-G72, Mali-G76)
 * [???] VkPhysicalDeviceCustomBorderColorFeaturesEXT -> customBorderColors - 17 profiles (Mali-G52, Mali-G71, Mali-G72, Mali-G76)
 * [???] VkPhysicalDeviceCustomBorderColorFeaturesEXT -> customBorderColorWithoutFormat - 17 profiles (Mali-G52, Mali-G71, Mali-G72, Mali-G76)
-* [???] VkPhysicalDeviceFeatures -> sparseBinding - 17 profiles (Mali-G52, Mali-G71, Mali-G72, Mali-G76)
-* [???] VkPhysicalDeviceFeatures -> sparseResidencyAliased - 17 profiles (Mali-G52, Mali-G71, Mali-G72, Mali-G76)
-* [???] VkPhysicalDeviceFeatures -> sparseResidencyBuffer - 17 profiles (Mali-G52, Mali-G71, Mali-G72, Mali-G76)
-* [???] VkPhysicalDeviceFeatures -> sparseResidencyImage2D - 17 profiles (Mali-G52, Mali-G71, Mali-G72, Mali-G76)
 * [???] VkPhysicalDeviceTransformFeedbackFeaturesEXT -> transformFeedback - 17 profiles (Mali-G52, Mali-G71, Mali-G72, Mali-G76)
 * [???] VkPhysicalDeviceVulkan12Features -> descriptorIndexing - 17 profiles (Mali-G52, Mali-G71, Mali-G72, Mali-G76)
 * [???] VkPhysicalDeviceVulkan12Features -> shaderUniformTexelBufferArrayDynamicIndexing - 17 profiles (Mali-G52, Mali-G71, Mali-G72, Mali-G76)
@@ -517,25 +296,15 @@
 * [???] VkPhysicalDeviceVulkan12Features -> hostQueryReset - 17 profiles (Mali-G52, Mali-G71, Mali-G72, Mali-G76)
 * [???] VkPhysicalDeviceVulkan12Features -> uniformBufferStandardLayout - 17 profiles (Mali-G52, Mali-G71, Mali-G72, Mali-G76)
 * [???] VkPhysicalDeviceCustomBorderColorPropertiesEXT -> maxCustomBorderColorSamplers: Not specified/supported by device (Requires 2048) - 17 profiles (Mali-G52, Mali-G71, Mali-G72, Mali-G76)
-* [???] VkPhysicalDeviceProperties -> sparseProperties -> residencyStandard2DBlockShape: Device value is False (Expected True) - 17 profiles (Mali-G52, Mali-G71, Mali-G72, Mali-G76)
-* [???] VkPhysicalDeviceProperties -> sparseProperties -> residencyNonResidentStrict: Device value is False (Expected True) - 17 profiles (Mali-G52, Mali-G71, Mali-G72, Mali-G76)
 * [???] VkPhysicalDeviceTransformFeedbackPropertiesEXT -> transformFeedbackQueries: Not specified/supported by device (Requires True) - 17 profiles (Mali-G52, Mali-G71, Mali-G72, Mali-G76)
 * [???] VkPhysicalDeviceTransformFeedbackPropertiesEXT -> transformFeedbackRasterizationStreamSelect: Not specified/supported by device (Requires False) - 17 profiles (Mali-G52, Mali-G71, Mali-G72, Mali-G76)
 * [???] VkPhysicalDeviceTransformFeedbackPropertiesEXT -> transformFeedbackStreamsLinesTriangles: Not specified/supported by device (Requires False) - 17 profiles (Mali-G52, Mali-G71, Mali-G72, Mali-G76)
 * [???] VkPhysicalDeviceTransformFeedbackPropertiesEXT -> transformFeedbackDraw: Not specified/supported by device (Requires False) - 17 profiles (Mali-G52, Mali-G71, Mali-G72, Mali-G76)
-* [???] Requires queue family with flags: ['VK_QUEUE_SPARSE_BINDING_BIT'] (Minimum Count: 1) - 17 profiles (Mali-G52, Mali-G71, Mali-G72, Mali-G76)
 * [???] VkPhysicalDeviceFeatures -> samplerAnisotropy - 10 profiles (Mali-G71, Mali-G72)
 ```
 
-#### Driver `18.0.0` (23 profiles, 42 issues)
+#### Driver `18.0.0` (23 profiles, 35 issues)
 ```text
-* [???] VkPhysicalDeviceFeatures -> sparseBinding - 23 profiles (Mali-G51, Mali-G52, Mali-G610, Mali-G72, Mali-G76)
-* [???] VkPhysicalDeviceFeatures -> sparseResidencyAliased - 23 profiles (Mali-G51, Mali-G52, Mali-G610, Mali-G72, Mali-G76)
-* [???] VkPhysicalDeviceFeatures -> sparseResidencyBuffer - 23 profiles (Mali-G51, Mali-G52, Mali-G610, Mali-G72, Mali-G76)
-* [???] VkPhysicalDeviceFeatures -> sparseResidencyImage2D - 23 profiles (Mali-G51, Mali-G52, Mali-G610, Mali-G72, Mali-G76)
-* [???] VkPhysicalDeviceProperties -> sparseProperties -> residencyStandard2DBlockShape: Device value is False (Expected True) - 23 profiles (Mali-G51, Mali-G52, Mali-G610, Mali-G72, Mali-G76)
-* [???] VkPhysicalDeviceProperties -> sparseProperties -> residencyNonResidentStrict: Device value is False (Expected True) - 23 profiles (Mali-G51, Mali-G52, Mali-G610, Mali-G72, Mali-G76)
-* [???] Requires queue family with flags: ['VK_QUEUE_SPARSE_BINDING_BIT'] (Minimum Count: 1) - 23 profiles (Mali-G51, Mali-G52, Mali-G610, Mali-G72, Mali-G76)
 * [???] VK_EXT_custom_border_color (Required version: 1) - 18 profiles (Mali-G51, Mali-G52, Mali-G72, Mali-G76)
 * [???] VK_EXT_transform_feedback (Required version: 1) - 18 profiles (Mali-G51, Mali-G52, Mali-G72, Mali-G76)
 * [???] VkPhysicalDeviceCustomBorderColorFeaturesEXT -> customBorderColors - 18 profiles (Mali-G51, Mali-G52, Mali-G72, Mali-G76)
@@ -573,17 +342,13 @@
 * [???] VkPhysicalDeviceFeatures -> samplerAnisotropy - 5 profiles (Mali-G72)
 ```
 
-#### Driver `16.0.0` (5 profiles, 42 issues)
+#### Driver `16.0.0` (5 profiles, 35 issues)
 ```text
 * [???] VK_EXT_custom_border_color (Required version: 1) - 5 profiles (Mali-G71)
 * [???] VK_EXT_transform_feedback (Required version: 1) - 5 profiles (Mali-G71)
 * [???] VkPhysicalDeviceCustomBorderColorFeaturesEXT -> customBorderColors - 5 profiles (Mali-G71)
 * [???] VkPhysicalDeviceCustomBorderColorFeaturesEXT -> customBorderColorWithoutFormat - 5 profiles (Mali-G71)
 * [???] VkPhysicalDeviceFeatures -> samplerAnisotropy - 5 profiles (Mali-G71)
-* [???] VkPhysicalDeviceFeatures -> sparseBinding - 5 profiles (Mali-G71)
-* [???] VkPhysicalDeviceFeatures -> sparseResidencyAliased - 5 profiles (Mali-G71)
-* [???] VkPhysicalDeviceFeatures -> sparseResidencyBuffer - 5 profiles (Mali-G71)
-* [???] VkPhysicalDeviceFeatures -> sparseResidencyImage2D - 5 profiles (Mali-G71)
 * [???] VkPhysicalDeviceTransformFeedbackFeaturesEXT -> transformFeedback - 5 profiles (Mali-G71)
 * [???] VkPhysicalDeviceVulkan12Features -> descriptorIndexing - 5 profiles (Mali-G71)
 * [???] VkPhysicalDeviceVulkan12Features -> shaderUniformTexelBufferArrayDynamicIndexing - 5 profiles (Mali-G71)
@@ -610,11 +375,8 @@
 * [???] VkPhysicalDeviceVulkan12Features -> hostQueryReset - 5 profiles (Mali-G71)
 * [???] VkPhysicalDeviceVulkan12Features -> uniformBufferStandardLayout - 5 profiles (Mali-G71)
 * [???] VkPhysicalDeviceCustomBorderColorPropertiesEXT -> maxCustomBorderColorSamplers: Not specified/supported by device (Requires 2048) - 5 profiles (Mali-G71)
-* [???] VkPhysicalDeviceProperties -> sparseProperties -> residencyStandard2DBlockShape: Device value is False (Expected True) - 5 profiles (Mali-G71)
-* [???] VkPhysicalDeviceProperties -> sparseProperties -> residencyNonResidentStrict: Device value is False (Expected True) - 5 profiles (Mali-G71)
 * [???] VkPhysicalDeviceTransformFeedbackPropertiesEXT -> transformFeedbackQueries: Not specified/supported by device (Requires True) - 5 profiles (Mali-G71)
 * [???] VkPhysicalDeviceTransformFeedbackPropertiesEXT -> transformFeedbackRasterizationStreamSelect: Not specified/supported by device (Requires False) - 5 profiles (Mali-G71)
 * [???] VkPhysicalDeviceTransformFeedbackPropertiesEXT -> transformFeedbackStreamsLinesTriangles: Not specified/supported by device (Requires False) - 5 profiles (Mali-G71)
 * [???] VkPhysicalDeviceTransformFeedbackPropertiesEXT -> transformFeedbackDraw: Not specified/supported by device (Requires False) - 5 profiles (Mali-G71)
-* [???] Requires queue family with flags: ['VK_QUEUE_SPARSE_BINDING_BIT'] (Minimum Count: 1) - 5 profiles (Mali-G71)
 ```

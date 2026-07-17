@@ -21,10 +21,10 @@ Supported API: 1.3.237
       * [ W ] VkPhysicalDeviceFeatures -> shaderCullDistance 
       * [ ✓ ] VkPhysicalDeviceFeatures -> vertexPipelineStoresAndAtomics 
       * [ ✓ ] VkPhysicalDeviceFeatures -> logicOp 
-      * [???] VkPhysicalDeviceFeatures -> sparseBinding 
-      * [???] VkPhysicalDeviceFeatures -> sparseResidencyAliased 
-      * [???] VkPhysicalDeviceFeatures -> sparseResidencyBuffer 
-      * [???] VkPhysicalDeviceFeatures -> sparseResidencyImage2D 
+      * [ ✓(emulated) ] VkPhysicalDeviceFeatures -> sparseBinding 
+      * [ ✓ ] VkPhysicalDeviceFeatures -> sparseResidencyAliased 
+      * [ ✓ ] VkPhysicalDeviceFeatures -> sparseResidencyBuffer 
+      * [ ✓ ] VkPhysicalDeviceFeatures -> sparseResidencyImage2D 
       * [ ✓ ] VkPhysicalDeviceFeatures -> shaderResourceResidency 
       * [ ✓ ] VkPhysicalDeviceFeatures -> shaderResourceMinLod 
       * [ ✓ ] VkPhysicalDeviceRobustness2FeaturesEXT -> robustBufferAccess2 
@@ -33,8 +33,8 @@ Supported API: 1.3.237
       * [ ✓ ] VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT -> vertexAttributeInstanceRateDivisor 
       * [ ✓ ] VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT -> vertexAttributeInstanceRateZeroDivisor 
   - Failed Properties or Limits Constraints:
-      * [???] VkPhysicalDeviceProperties -> sparseProperties -> residencyStandard2DBlockShape: Device value is False (Expected True)
-      * [???] VkPhysicalDeviceProperties -> sparseProperties -> residencyNonResidentStrict: Device value is False (Expected True)
+      * [ ✓ ] VkPhysicalDeviceProperties -> sparseProperties -> residencyStandard2DBlockShape: Device value is False (Expected True)
+      * [ ✓ ] VkPhysicalDeviceProperties -> sparseProperties -> residencyNonResidentStrict: Device value is False (Expected True)
       * [ ✓(emulated) ] VkPhysicalDevicePushDescriptorPropertiesKHR -> maxPushDescriptors: Not specified/supported by device (Requires 32)
       * [ ✓ ] VkPhysicalDeviceVulkan12Properties -> maxPerStageDescriptorUpdateAfterBindStorageBuffers: Device value 500000 is less than required minimum of 1000000
       * [ ✓ ] VkPhysicalDeviceVulkan12Properties -> maxPerStageDescriptorUpdateAfterBindSampledImages: Device value 500000 is less than required minimum of 1000000
@@ -42,6 +42,6 @@ Supported API: 1.3.237
       * [ ✓ ] VkPhysicalDeviceVulkan12Properties -> filterMinmaxSingleComponentFormats: Device value is False (Expected True)
       * [ ✓ ] VkPhysicalDeviceVulkan13Properties -> storageTexelBufferOffsetSingleTexelAlignment: Device value is False (Expected True)
   - Failed Queue Family Constraints:
-      * [???] Requires queue family with flags: ['VK_QUEUE_SPARSE_BINDING_BIT'] (Minimum Count: 1)
+      * [ ✓ ] Requires queue family with flags: ['VK_QUEUE_SPARSE_BINDING_BIT'] (Minimum Count: 1)
 -----------------------------------------------------------------
 

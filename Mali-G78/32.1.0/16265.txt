@@ -21,10 +21,10 @@ Supported API: 1.1.177
       * [ W ] VkPhysicalDeviceFeatures -> shaderCullDistance 
       * [ ✓ ] VkPhysicalDeviceFeatures -> vertexPipelineStoresAndAtomics 
       * [ ✓ ] VkPhysicalDeviceFeatures -> logicOp 
-      * [???] VkPhysicalDeviceFeatures -> sparseBinding 
-      * [???] VkPhysicalDeviceFeatures -> sparseResidencyAliased 
-      * [???] VkPhysicalDeviceFeatures -> sparseResidencyBuffer 
-      * [???] VkPhysicalDeviceFeatures -> sparseResidencyImage2D 
+      * [ ✓(emulated) ] VkPhysicalDeviceFeatures -> sparseBinding 
+      * [ ✓ ] VkPhysicalDeviceFeatures -> sparseResidencyAliased 
+      * [ ✓ ] VkPhysicalDeviceFeatures -> sparseResidencyBuffer 
+      * [ ✓ ] VkPhysicalDeviceFeatures -> sparseResidencyImage2D 
       * [ ✓ ] VkPhysicalDeviceFeatures -> shaderResourceResidency 
       * [ ✓ ] VkPhysicalDeviceFeatures -> shaderResourceMinLod 
       * [ ✓ ] VkPhysicalDeviceRobustness2FeaturesEXT -> robustBufferAccess2 
@@ -40,8 +40,8 @@ Supported API: 1.1.177
       * [ ✓ ] VkPhysicalDeviceVulkan13Features -> maintenance4 
   - Failed Properties or Limits Constraints:
       * [???] VkPhysicalDeviceCustomBorderColorPropertiesEXT -> maxCustomBorderColorSamplers: Not specified/supported by device (Requires 2048)
-      * [???] VkPhysicalDeviceProperties -> sparseProperties -> residencyStandard2DBlockShape: Device value is False (Expected True)
-      * [???] VkPhysicalDeviceProperties -> sparseProperties -> residencyNonResidentStrict: Device value is False (Expected True)
+      * [ ✓ ] VkPhysicalDeviceProperties -> sparseProperties -> residencyStandard2DBlockShape: Device value is False (Expected True)
+      * [ ✓ ] VkPhysicalDeviceProperties -> sparseProperties -> residencyNonResidentStrict: Device value is False (Expected True)
       * [ ✓(emulated) ] VkPhysicalDevicePushDescriptorPropertiesKHR -> maxPushDescriptors: Not specified/supported by device (Requires 32)
       * [???] VkPhysicalDeviceTransformFeedbackPropertiesEXT -> transformFeedbackQueries: Not specified/supported by device (Requires True)
       * [???] VkPhysicalDeviceTransformFeedbackPropertiesEXT -> transformFeedbackRasterizationStreamSelect: Not specified/supported by device (Requires False)
@@ -57,6 +57,6 @@ Supported API: 1.1.177
       * [ ✓ ] VkPhysicalDeviceVulkan13Properties -> storageTexelBufferOffsetSingleTexelAlignment: Not specified/supported by device (Requires True)
       * [ ✓ ] VkPhysicalDeviceVulkan13Properties -> uniformTexelBufferOffsetSingleTexelAlignment: Not specified/supported by device (Requires True)
   - Failed Queue Family Constraints:
-      * [???] Requires queue family with flags: ['VK_QUEUE_SPARSE_BINDING_BIT'] (Minimum Count: 1)
+      * [ ✓ ] Requires queue family with flags: ['VK_QUEUE_SPARSE_BINDING_BIT'] (Minimum Count: 1)
 -----------------------------------------------------------------
 

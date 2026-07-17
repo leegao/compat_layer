@@ -14,10 +14,10 @@ Supported API: 1.4.305
       * [ W ] VkPhysicalDeviceFeatures -> shaderClipDistance 
       * [ W ] VkPhysicalDeviceFeatures -> shaderCullDistance 
       * [ ✓ ] VkPhysicalDeviceFeatures -> vertexPipelineStoresAndAtomics 
-      * [???] VkPhysicalDeviceFeatures -> sparseBinding 
-      * [???] VkPhysicalDeviceFeatures -> sparseResidencyAliased 
-      * [???] VkPhysicalDeviceFeatures -> sparseResidencyBuffer 
-      * [???] VkPhysicalDeviceFeatures -> sparseResidencyImage2D 
+      * [ ✓(emulated) ] VkPhysicalDeviceFeatures -> sparseBinding 
+      * [ ✓ ] VkPhysicalDeviceFeatures -> sparseResidencyAliased 
+      * [ ✓ ] VkPhysicalDeviceFeatures -> sparseResidencyBuffer 
+      * [ ✓ ] VkPhysicalDeviceFeatures -> sparseResidencyImage2D 
       * [ ✓ ] VkPhysicalDeviceFeatures -> shaderResourceResidency 
       * [ ✓ ] VkPhysicalDeviceFeatures -> shaderResourceMinLod 
       * [ ✓ ] VkPhysicalDeviceRobustness2FeaturesEXT -> robustBufferAccess2 
@@ -25,10 +25,10 @@ Supported API: 1.4.305
       * [ ✓ ] VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT -> vertexAttributeInstanceRateDivisor 
       * [ ✓ ] VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT -> vertexAttributeInstanceRateZeroDivisor 
   - Failed Properties or Limits Constraints:
-      * [???] VkPhysicalDeviceProperties -> sparseProperties -> residencyStandard2DBlockShape: Device value is False (Expected True)
-      * [???] VkPhysicalDeviceProperties -> sparseProperties -> residencyNonResidentStrict: Device value is False (Expected True)
+      * [ ✓ ] VkPhysicalDeviceProperties -> sparseProperties -> residencyStandard2DBlockShape: Device value is False (Expected True)
+      * [ ✓ ] VkPhysicalDeviceProperties -> sparseProperties -> residencyNonResidentStrict: Device value is False (Expected True)
       * [ ✓ ] VkPhysicalDeviceVulkan13Properties -> storageTexelBufferOffsetSingleTexelAlignment: Device value is False (Expected True)
   - Failed Queue Family Constraints:
-      * [???] Requires queue family with flags: ['VK_QUEUE_SPARSE_BINDING_BIT'] (Minimum Count: 1)
+      * [ ✓ ] Requires queue family with flags: ['VK_QUEUE_SPARSE_BINDING_BIT'] (Minimum Count: 1)
 -----------------------------------------------------------------
 
