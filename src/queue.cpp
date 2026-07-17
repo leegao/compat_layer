@@ -3,6 +3,7 @@
 #include "command_buffer.hpp"
 #include "logger.hpp"
 #include "mali_gpu_profiler.hpp"
+#include "sparse_binding.hpp"
 #include "staging_resources.hpp"
 #include "vk_func.hpp"
 #include <vulkan/vulkan.h>
@@ -448,4 +449,28 @@ VK_LAYER_EXPORT VkResult VKAPI_CALL DxvkMaliCompatLayer_QueueSubmit2(
     }
 
     return result;
+}
+
+VK_LAYER_EXPORT VkResult VKAPI_CALL DxvkMaliCompatLayer_QueueBindSparse(
+    VkQueue queue, uint32_t bindInfoCount, const VkBindSparseInfo *pBindInfo,
+    VkFence fence) {
+    struct queue *q = ({
+        scoped_lock l(global_lock);
+        q = get_queue(queue);
+    });
+
+    if (!q)
+        return VK_ERROR_UNKNOWN;
+
+    if (q->device->emulate_sparse_binding) {
+        return EmulatevkQueueBindSparse(q, bindInfoCount, pBindInfo, fence);
+    }
+
+    if (q->device->table.QueueBindSparse) {
+        return q->device->table.QueueBindSparse(queue, bindInfoCount, pBindInfo,
+                                                fence);
+    } else {
+        Logger::log("error", "vkQueueBindSparse not supported on this device");
+        return VK_ERROR_UNKNOWN;
+    }
 }
