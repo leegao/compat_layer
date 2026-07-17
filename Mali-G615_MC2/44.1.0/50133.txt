@@ -1,0 +1,27 @@
+GPU: Mali-G615 MC2
+Driver: v1.r44p1-01eac0.148b774f93332d7e562320793fb6c4c9
+Supported API: 1.3.247
+
+[FAILED] Profile: VP_DXVK_d3d11_level_11_1_baseline
+  Description: DXVK for D3D11 Feature Level 11.1 minimum requirements
+  Vulkan API: 1.3.247, needs at least 1.3.204
+  - Missing/Insufficient Extensions:
+      * [ ✓(emulated) ] VK_EXT_robustness2 (Required version: 1)
+      * [ ✓ ] VK_KHR_maintenance5 (Required version: 1)
+  - Missing Required Feature Flags:
+      * [ W ] VkPhysicalDeviceFeatures -> dualSrcBlend 
+      * [ W ] VkPhysicalDeviceFeatures -> fillModeNonSolid 
+      * [ W ] VkPhysicalDeviceFeatures -> multiViewport 
+      * [ W ] VkPhysicalDeviceFeatures -> shaderClipDistance 
+      * [ W ] VkPhysicalDeviceFeatures -> shaderCullDistance 
+      * [ ✓(emulated) ] VkPhysicalDeviceFeatures -> textureCompressionBC 
+      * [ ✓ ] VkPhysicalDeviceFeatures -> logicOp 
+      * [ ✓ ] VkPhysicalDeviceFeatures -> vertexPipelineStoresAndAtomics 
+      * [ ✓ ] VkPhysicalDeviceMaintenance5FeaturesKHR -> maintenance5 
+      * [ ✓(emulated) ] VkPhysicalDeviceRobustness2FeaturesEXT -> nullDescriptor 
+      * [ ✓ ] VkPhysicalDeviceRobustness2FeaturesEXT -> robustBufferAccess2 
+      * [???] VkPhysicalDeviceTransformFeedbackFeaturesEXT -> geometryStreams 
+  - Failed Properties or Limits Constraints:
+      * [???] VkPhysicalDeviceProperties -> maxPushConstantsSize: Not specified/supported by device (Requires 256)
+-----------------------------------------------------------------
+

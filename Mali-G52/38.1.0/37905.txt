@@ -1,0 +1,34 @@
+GPU: Mali-G52
+Driver: v1.r38p1-01eac0-mbs2v41_0.69b511dae6b12ab709a3d18b9813be62
+Supported API: 1.3.219
+
+[FAILED] Profile: VP_DXVK_d3d11_level_11_1_baseline
+  Description: DXVK for D3D11 Feature Level 11.1 minimum requirements
+  Vulkan API: 1.3.219, needs at least 1.3.204
+  - Missing/Insufficient Extensions:
+      * [ ✓(emulated) ] VK_EXT_robustness2 (Required version: 1)
+      * [ ✓ ] VK_KHR_maintenance5 (Required version: 1)
+  - Missing Required Feature Flags:
+      * [ W ] VkPhysicalDeviceFeatures -> depthClamp 
+      * [ W ] VkPhysicalDeviceFeatures -> dualSrcBlend 
+      * [ W ] VkPhysicalDeviceFeatures -> fillModeNonSolid 
+      * [ W ] VkPhysicalDeviceFeatures -> multiViewport 
+      * [ W ] VkPhysicalDeviceFeatures -> shaderClipDistance 
+      * [ W ] VkPhysicalDeviceFeatures -> shaderCullDistance 
+      * [ ✓(emulated) ] VkPhysicalDeviceFeatures -> textureCompressionBC 
+      * [ W ] VkPhysicalDeviceFeatures -> multiDrawIndirect 
+      * [ ✓ ] VkPhysicalDeviceFeatures -> logicOp 
+      * [ ✓ ] VkPhysicalDeviceFeatures -> vertexPipelineStoresAndAtomics 
+      * [ ✓ ] VkPhysicalDeviceMaintenance5FeaturesKHR -> maintenance5 
+      * [ ✓(emulated) ] VkPhysicalDeviceRobustness2FeaturesEXT -> nullDescriptor 
+      * [ ✓ ] VkPhysicalDeviceRobustness2FeaturesEXT -> robustBufferAccess2 
+      * [???] VkPhysicalDeviceTransformFeedbackFeaturesEXT -> geometryStreams 
+      * [???] VkPhysicalDeviceVulkan12Features -> descriptorIndexing 
+      * [???] VkPhysicalDeviceVulkan12Features -> descriptorBindingSampledImageUpdateAfterBind 
+      * [???] VkPhysicalDeviceVulkan12Features -> descriptorBindingUpdateUnusedWhilePending 
+      * [???] VkPhysicalDeviceVulkan12Features -> descriptorBindingPartiallyBound 
+      * [???] VkPhysicalDeviceVulkan12Features -> runtimeDescriptorArray 
+  - Failed Properties or Limits Constraints:
+      * [???] VkPhysicalDeviceProperties -> maxPushConstantsSize: Not specified/supported by device (Requires 256)
+-----------------------------------------------------------------
+

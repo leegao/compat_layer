@@ -1,0 +1,18 @@
+GPU: Mali-G1-Ultra MC12
+Driver: v1.r54p1-11eac0.2b8fe62.15f36b8c6518df15cadf5aced2a1638a
+Supported API: 1.3.305
+
+[FAILED] Profile: VP_DXVK_d3d11_level_11_1_baseline
+  Description: DXVK for D3D11 Feature Level 11.1 minimum requirements
+  Vulkan API: 1.3.305, needs at least 1.3.204
+  - Missing Required Feature Flags:
+      * [ W ] VkPhysicalDeviceFeatures -> fillModeNonSolid 
+      * [ W ] VkPhysicalDeviceFeatures -> shaderClipDistance 
+      * [ W ] VkPhysicalDeviceFeatures -> shaderCullDistance 
+      * [ ✓(emulated) ] VkPhysicalDeviceFeatures -> textureCompressionBC 
+      * [ ✓ ] VkPhysicalDeviceFeatures -> vertexPipelineStoresAndAtomics 
+      * [???] VkPhysicalDeviceTransformFeedbackFeaturesEXT -> geometryStreams 
+  - Failed Properties or Limits Constraints:
+      * [???] VkPhysicalDeviceProperties -> maxPushConstantsSize: Not specified/supported by device (Requires 256)
+-----------------------------------------------------------------
+
