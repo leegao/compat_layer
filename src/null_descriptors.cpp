@@ -3,6 +3,7 @@
 #include "descriptors.hpp"
 #include "layer.hpp"
 #include "logger.hpp"
+#include "vk_func.hpp"
 #include <cstring>
 #include <deque>
 #include <functional>
@@ -296,8 +297,9 @@ void create_null_resources(struct device *dev) {
         .sharingMode = VK_SHARING_MODE_EXCLUSIVE,
     };
 
-    if (result = dev->table.CreateBuffer_(device, &bufferCreateInfo, dev->alloc,
-                                          &dev->null_descriptors.null_buffer);
+    if (result = DxvkMaliCompatLayer_CreateBuffer(
+            device, &bufferCreateInfo, dev->alloc,
+            &dev->null_descriptors.null_buffer);
         result != VK_SUCCESS) {
         Logger::log("error", "Failed to create null_buffer, result: %d",
                     result);
@@ -341,7 +343,7 @@ void create_null_resources(struct device *dev) {
         return;
     }
 
-    result = dev->table.BindBufferMemory(
+    result = DxvkMaliCompatLayer_BindBufferMemory(
         device, dev->null_descriptors.null_buffer,
         dev->null_descriptors.null_buffer_memory, 0);
     if (result != VK_SUCCESS) {
