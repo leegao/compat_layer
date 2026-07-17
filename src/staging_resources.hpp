@@ -106,7 +106,8 @@ struct StagingResources {
     bool IsEmpty() const {
         return stagingBuffers.empty() && stagingImageViews.empty() &&
                trackedQueries.empty() && descriptorSets.empty() &&
-               semaphore == VK_NULL_HANDLE && completed == VK_NULL_HANDLE;
+               stagingSemaphores.empty() && semaphore == VK_NULL_HANDLE &&
+               completed == VK_NULL_HANDLE;
     }
     void WaitForCompletion();
     void Cleanup();
@@ -116,6 +117,9 @@ struct StagingResources {
     }
     void AddDescriptorSet(VkDescriptorPool pool, VkDescriptorSet set) {
         descriptorSets.push_back({pool, set});
+    }
+    void AddStagingSemaphore(VkSemaphore sem) {
+        stagingSemaphores.push_back(sem);
     }
     int Size() const { return stagingBuffers.size(); }
     int MemoryUsage() const { return 0; }
@@ -143,6 +147,7 @@ struct StagingResources {
     std::vector<std::pair<VkDescriptorPool, VkDescriptorSet>> descriptorSets;
     std::vector<QueryPoolBlock> queryPools;
     std::vector<TimestampQuery> trackedQueries;
+    std::vector<VkSemaphore> stagingSemaphores;
 };
 
 #endif

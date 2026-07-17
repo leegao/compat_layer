@@ -209,7 +209,12 @@ VkResult EmulatevkQueueBindSparse(struct queue *q, uint32_t bindInfoCount,
         VkResult result = SubmitOneShotAsync(
             dev,
             [&](struct command_buffer *cb) {
-                // TODO(leegao): implement me
+                if (finalBind) {
+                    for (auto stagingSemaphore : stagingSemaphores) {
+                        cb->currentStagingResources->AddStagingSemaphore(
+                            stagingSemaphore);
+                    }
+                }
             },
             "sparse_binding_bind_op", q, waits, signals, signalFence);
 

@@ -340,6 +340,13 @@ void StagingResources::Cleanup() {
         }
     }
     queryPools.clear();
+
+    for (auto sem : stagingSemaphores) {
+        if (sem != VK_NULL_HANDLE) {
+            dev->table.DestroySemaphore(device, sem, nullptr);
+        }
+    }
+    stagingSemaphores.clear();
 }
 
 StagingResources::~StagingResources() { Cleanup(); }
