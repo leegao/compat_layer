@@ -5,6 +5,7 @@ on:
         branches-ignore:
             - "compatibility-vkd3d-2.14.1"
             - "compatibility-dxvk-2.7.1"
+            - "compatibility-dxvk-3.0.1"
         tags: ["*"]
         paths:
             - "VP_*.json"
@@ -22,7 +23,7 @@ jobs:
         runs-on: ubuntu-latest
         strategy:
             matrix:
-                target: [vkd3d-2.14.1, dxvk-2.7.1]
+                target: [vkd3d-2.14.1, dxvk-2.7.1, dxvk-3.0.1]
             fail-fast: false
 
         steps:
@@ -58,12 +59,18 @@ jobs:
                     TARGET_DIR="$OUTPUT_DIR/$gpu/$driver_version"
                     mkdir -p "$TARGET_DIR"
 
-                    # Conditional argument execution based on matrix target
-                    if [ "${{ matrix.target }}" = "dxvk-2.7.1" ]; then
-                      python3 vkd3d_check.py "$file" "VP_DXVK_requirements_2.7.1.json" > "$TARGET_DIR/$device_id.txt"
-                    else
-                      python3 vkd3d_check.py "$file" > "$TARGET_DIR/$device_id.txt"
-                    fi
+                    case "${{ matrix.target }}" in
+                      "dxvk-2.7.1")
+                        python3 vkd3d_check.py "$file" "VP_DXVK_requirements_2.7.1.json" > "$TARGET_DIR/$device_id.txt"
+                        ;;
+                      "dxvk-3.0.1")
+                        python3 vkd3d_check.py "$file" "VP_DXVK_requirements_3.0.1.json" > "$TARGET_DIR/$device_id.txt"
+                        ;;
+                      *)
+                        # vkd3d-2.14.1
+                        python3 vkd3d_check.py "$file" > "$TARGET_DIR/$device_id.txt"
+                        ;;
+                    esac
                   done
 
             - name: Aggregate Missing Unknown [???] Tags
