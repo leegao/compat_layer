@@ -1101,6 +1101,7 @@ VK_LAYER_EXPORT VkResult VKAPI_CALL DxvkMaliCompatLayer_CreateDevice(
     device->props2 = propertiesMap[GetKey(physicalDevice)];
     device->driverProps = driverPropertiesMap[GetKey(physicalDevice)];
     device->features = featuresMap[GetKey(physicalDevice)];
+    device->memoryProps = memoryProps;
     device->table = table;
     device->memoryIndex = memoryIndex;
     device->queue = queue;

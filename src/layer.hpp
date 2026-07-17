@@ -98,6 +98,7 @@ struct device {
     VkPhysicalDeviceProperties2 props2;
     VkPhysicalDeviceFeatures features;
     VkPhysicalDeviceDriverProperties driverProps;
+    VkPhysicalDeviceMemoryProperties memoryProps;
     VkLayerDispatchTable table;
     VkQueue queue;
     uint32_t queueFamilyIndex;
