@@ -1,7 +1,10 @@
 #include "layer.hpp"
 
+#include "buffer.hpp"
+#include "image.hpp"
 #include "logger.hpp"
 #include "null_descriptors.hpp"
+#include "sparse_binding.hpp"
 #include "spoof_profile.hpp"
 #include "vk_func.hpp"
 #include "vulkan/vk_layer.h"
@@ -279,6 +282,12 @@ VK_LAYER_EXPORT VkResult VKAPI_CALL DxvkMaliCompatLayer_CreateInstance(
     table.EnumerateDeviceExtensionProperties =
         (PFN_vkEnumerateDeviceExtensionProperties)gip(
             *pInstance, "vkEnumerateDeviceExtensionProperties");
+    table.GetPhysicalDeviceSparseImageFormatProperties2 =
+        (PFN_vkGetPhysicalDeviceSparseImageFormatProperties2)gip(
+            *pInstance, "vkGetPhysicalDeviceSparseImageFormatProperties2");
+    table.GetPhysicalDeviceQueueFamilyProperties2 =
+        (PFN_vkGetPhysicalDeviceQueueFamilyProperties2)gip(
+            *pInstance, "vkGetPhysicalDeviceQueueFamilyProperties2");
 
     {
         scoped_lock l(global_lock);
@@ -531,6 +540,129 @@ DxvkMaliCompatLayer_EnumerateDeviceExtensionProperties(
     return VK_SUCCESS;
 }
 
+VK_LAYER_EXPORT void VKAPI_CALL DxvkMaliCompatLayer_GetBufferMemoryRequirements(
+    VkDevice device, VkBuffer buffer,
+    VkMemoryRequirements *pMemoryRequirements) {
+    struct device *dev = get_device(device);
+    if (dev && dev->emulate_sparse_binding) {
+        if (auto *res = find_sparse_buffer(buffer)) {
+            GetSparseBufferMemoryRequirements(res, pMemoryRequirements);
+            return;
+        }
+    }
+    dev->table.GetBufferMemoryRequirements(device, buffer, pMemoryRequirements);
+}
+
+VK_LAYER_EXPORT void VKAPI_CALL
+DxvkMaliCompatLayer_GetBufferMemoryRequirements2(
+    VkDevice device, const VkBufferMemoryRequirementsInfo2 *pInfo,
+    VkMemoryRequirements2 *pMemoryRequirements) {
+    struct device *dev = get_device(device);
+    if (dev && dev->emulate_sparse_binding) {
+        if (auto *res = find_sparse_buffer(pInfo->buffer)) {
+            GetSparseBufferMemoryRequirements(
+                res, &pMemoryRequirements->memoryRequirements);
+            return;
+        }
+    }
+    dev->table.GetBufferMemoryRequirements2(device, pInfo, pMemoryRequirements);
+}
+
+VK_LAYER_EXPORT void VKAPI_CALL
+DxvkMaliCompatLayer_GetImageSparseMemoryRequirements(
+    VkDevice device, VkImage image, uint32_t *pSparseMemoryRequirementCount,
+    VkSparseImageMemoryRequirements *pSparseMemoryRequirements) {
+    struct device *dev = get_device(device);
+    if (dev && dev->emulate_sparse_binding) {
+        if (auto *res = find_sparse_image(image)) {
+            GetSparseImageMemoryRequirements(res, pSparseMemoryRequirementCount,
+                                             pSparseMemoryRequirements);
+            return;
+        }
+    }
+    dev->table.GetImageSparseMemoryRequirements(device, image,
+                                                pSparseMemoryRequirementCount,
+                                                pSparseMemoryRequirements);
+}
+
+VK_LAYER_EXPORT void VKAPI_CALL
+DxvkMaliCompatLayer_GetPhysicalDeviceSparseImageFormatProperties2(
+    VkPhysicalDevice physicalDevice,
+    const VkPhysicalDeviceSparseImageFormatInfo2 *pFormatInfo,
+    uint32_t *pPropertyCount, VkSparseImageFormatProperties2 *pProperties) {
+    if (pFormatInfo->type == VK_IMAGE_TYPE_2D &&
+        pFormatInfo->samples == VK_SAMPLE_COUNT_1_BIT) {
+        if (!pProperties) {
+            *pPropertyCount = 1;
+            return;
+        }
+
+        if (*pPropertyCount == 0) {
+            return;
+        }
+
+        VkImageAspectFlags aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+        if (pFormatInfo->usage & VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT) {
+            aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
+        }
+
+        *pPropertyCount = 1;
+        pProperties[0].sType =
+            VK_STRUCTURE_TYPE_SPARSE_IMAGE_FORMAT_PROPERTIES_2;
+        pProperties[0].properties.aspectMask = aspectMask;
+        pProperties[0].properties.imageGranularity =
+            GetBlockShape(pFormatInfo->format);
+        pProperties[0].properties.flags =
+            VK_SPARSE_IMAGE_FORMAT_SINGLE_MIPTAIL_BIT;
+        return;
+    }
+
+    instanceDispatch[GetInstanceKey(physicalDevice)]
+        .GetPhysicalDeviceSparseImageFormatProperties2(
+            physicalDevice, pFormatInfo, pPropertyCount, pProperties);
+}
+
+VK_LAYER_EXPORT void VKAPI_CALL
+DxvkMaliCompatLayer_GetPhysicalDeviceQueueFamilyProperties(
+    VkPhysicalDevice physicalDevice, uint32_t *pQueueFamilyPropertyCount,
+    VkQueueFamilyProperties *pQueueFamilyProperties) {
+    instanceDispatch[GetInstanceKey(physicalDevice)]
+        .GetPhysicalDeviceQueueFamilyProperties(
+            physicalDevice, pQueueFamilyPropertyCount, pQueueFamilyProperties);
+
+    if (!pQueueFamilyProperties)
+        return;
+
+    for (int i = 0; i < *pQueueFamilyPropertyCount; i++) {
+        auto &flags = pQueueFamilyProperties[i].queueFlags;
+        if (flags & VK_QUEUE_COMPUTE_BIT) {
+            flags |= VK_QUEUE_SPARSE_BINDING_BIT;
+            break;
+        }
+    }
+}
+
+VK_LAYER_EXPORT void VKAPI_CALL
+DxvkMaliCompatLayer_GetPhysicalDeviceQueueFamilyProperties2(
+    VkPhysicalDevice physicalDevice, uint32_t *pQueueFamilyPropertyCount,
+    VkQueueFamilyProperties2 *pQueueFamilyProperties) {
+    instanceDispatch[GetInstanceKey(physicalDevice)]
+        .GetPhysicalDeviceQueueFamilyProperties2(
+            physicalDevice, pQueueFamilyPropertyCount, pQueueFamilyProperties);
+
+    if (!pQueueFamilyProperties)
+        return;
+
+    for (int i = 0; i < *pQueueFamilyPropertyCount; i++) {
+        auto &flags =
+            pQueueFamilyProperties[i].queueFamilyProperties.queueFlags;
+        if (flags & VK_QUEUE_COMPUTE_BIT) {
+            flags |= VK_QUEUE_SPARSE_BINDING_BIT;
+            break;
+        }
+    }
+}
+
 void FinalizerThread(struct device *dev) {
     while (!dev->stop_thread) {
         {
@@ -709,6 +841,12 @@ VK_LAYER_EXPORT VkResult VKAPI_CALL DxvkMaliCompatLayer_CreateDevice(
     if (emulate_null_descriptor) {
         Logger::log("info", "Emulating VK_EXT_robustness2::nullDescriptor");
     }
+
+    // Make sparse binding a forced toggle instead of inferred
+    auto emulate_sparse_binding =
+        getenv("COMPAT_EMULATE_SPARSE_BINDING")
+            ? atoi(getenv("COMPAT_EMULATE_SPARSE_BINDING"))
+            : 0; // featuresMap[GetKey(physicalDevice)].sparseBinding
 
     VkBaseOutStructure *ext = (VkBaseOutStructure *)createInfo.pNext;
     VkPhysicalDeviceFeatures2 *appFeatures2 = nullptr;
@@ -909,6 +1047,13 @@ VK_LAYER_EXPORT VkResult VKAPI_CALL DxvkMaliCompatLayer_CreateDevice(
                              "VK_EXT_robustness2 emulation may be broken");
     }
 
+    if (emulate_sparse_binding) {
+        Logger::log("info", "Emulating (dense) sparse binding");
+        mutableCoreFeatures.sparseBinding = VK_TRUE;
+        if (appFeatures2)
+            appFeatures2->features.sparseBinding = VK_TRUE;
+    }
+
     mask_next_features(
         physicalDevice,
         const_cast<VkBaseOutStructure *>(
@@ -966,6 +1111,7 @@ VK_LAYER_EXPORT VkResult VKAPI_CALL DxvkMaliCompatLayer_CreateDevice(
     device->has_more_layers = has_more_layers;
     device->emulate_push_descriptors = emulate_push_descriptors;
     device->emulate_null_descriptor = emulate_null_descriptor;
+    device->emulate_sparse_binding = emulate_sparse_binding;
 
     device->syncPool = std::make_unique<SyncPool>(device->handle);
 
@@ -1051,6 +1197,9 @@ DxvkMaliCompatLayer_GetDeviceProcAddr(VkDevice device, const char *pName) {
     GETPROCADDR(BindBufferMemory2);
     GETPROCADDR(DestroyBuffer);
 #endif
+    GETPROCADDR(CreateImage);
+    GETPROCADDR(CreateImageView);
+    GETPROCADDR(DestroyImage);
 
     GETPROCADDR(AllocateCommandBuffers);
     GETPROCADDR(FreeCommandBuffers);
@@ -1093,10 +1242,15 @@ DxvkMaliCompatLayer_GetDeviceProcAddr(VkDevice device, const char *pName) {
             PFN_vkVoidFunction)&DxvkMaliCompatLayer_UpdateDescriptorSetWithTemplate;
     }
 
-    // if (!strcmp(pName, "vkBindBufferMemory2") ||
-    //     !strcmp(pName, "vkBindBufferMemory2KHR")) {
-    //     return (PFN_vkVoidFunction)&DxvkMaliCompatLayer_BindBufferMemory2;
-    // }
+    if (!strcmp(pName, "vkBindBufferMemory2") ||
+        !strcmp(pName, "vkBindBufferMemory2KHR")) {
+        return (PFN_vkVoidFunction)&DxvkMaliCompatLayer_BindBufferMemory2;
+    }
+
+    GETPROCADDR(GetBufferMemoryRequirements);
+    GETPROCADDR(GetBufferMemoryRequirements2);
+    GETPROCADDR(GetImageSparseMemoryRequirements);
+    GETPROCADDR(QueueBindSparse);
 
     {
         scoped_lock l(global_lock);
@@ -1130,6 +1284,9 @@ DxvkMaliCompatLayer_GetInstanceProcAddr(VkInstance instance,
     GETPROCADDR(EnumerateDeviceExtensionProperties);
     GETPROCADDR(DestroyInstance);
     GETPROCADDR(CreateDevice);
+    GETPROCADDR(GetPhysicalDeviceQueueFamilyProperties);
+    GETPROCADDR(GetPhysicalDeviceQueueFamilyProperties2);
+    GETPROCADDR(GetPhysicalDeviceSparseImageFormatProperties2);
 
     {
         scoped_lock l(global_lock);

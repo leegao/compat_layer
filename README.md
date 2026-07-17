@@ -4,16 +4,17 @@ Compatibility layer for Mali blob vulkan drivers to work with vkd3d 2.14.1, incl
 
 1. emulation of `VK_EXT_push_descriptor`
 2. emulation of `VK_EXT_robustness2` (specifically `nullDescriptor`)
-3. Generic spoofing of other missing features/extensions to get vkd3d to reach D3D feature level 12.0
+3. emulation of `sparseBinding` (`COMPAT_EMULATE_SPARSE_BINDING`, disabled by default) for D3D 12.0 games that use tiled resources (generically missing on Mali)
+4. Generic spoofing of other missing features/extensions to get vkd3d to reach D3D feature level 12.0
 
-Minimal supported profile: **driver must be at least `r32p1`**, except for:
+Minimal supported profile: **driver must be at least `r32p1`**, with the following exceptions:
 
 1. `Mali-G72` - requires `r44p1`+ (`r38p1` does not support `VK_EXT_descriptor_indexing` on these devices)
 2. `Mali-G52` and `Mali-G76` (Bifrost) - unsupported due to lack of hardware support for `VK_EXT_descriptor_indexing`, but can support Mina the Hollower on FL11 in vkd3d
 3. `Mali-G51` and `Mali-G71` (Bifrost) - unsupported due to lack of Vulkan 1.2 and 1.3
 4. `Mali-T830` and `Mali-T880` (Midgard) - unsupported due to lack of Vulkan 1.2 and 1.3
 
-Note that sparse bindings is not supported generically on Mali, so d3d12 games that use tiled textures may still be buggy.
+Note that sparse bindings is not supported generically on Mali, so d3d12 games that use tiled textures may need `COMPAT_EMULATE_SPARSE_BINDING=1` which is not enabled by default
 
 ---
 
@@ -21,7 +22,7 @@ Note that sparse bindings is not supported generically on Mali, so d3d12 games t
 
 ### **1. Mali-T830**
 
-- **Approximate Launch Date:** October 27, 2014 (Midgard Architecture)
+- **Approximate Launch Date:** October, 2014 (Midgard Architecture)
 - **Earliest Supported Driver:** **None**
 - **Problems:**
     - Does not support Vulkan 1.3
@@ -30,7 +31,7 @@ Note that sparse bindings is not supported generically on Mali, so d3d12 games t
 
 ### **2. Mali-T880**
 
-- **Approximate Launch Date:** February 3, 2015 (Midgard Architecture Flagship)
+- **Approximate Launch Date:** February, 2015 (Midgard Architecture Flagship)
 - **Earliest Supported Driver:** **None**
 - **Problems:**
     - Does not support Vulkan 1.3
@@ -39,7 +40,7 @@ Note that sparse bindings is not supported generically on Mali, so d3d12 games t
 
 ### **3. Mali-G71**
 
-- **Approximate Launch Date:** May 27, 2016 (Bifrost Architecture Flagship)
+- **Approximate Launch Date:** May, 2016 (Bifrost Architecture Flagship)
 - **Earliest Supported Driver:** **None**
 - **Problems:**
     - Does not support Vulkan 1.3
@@ -48,7 +49,7 @@ Note that sparse bindings is not supported generically on Mali, so d3d12 games t
 
 ### **4. Mali-G51**
 
-- **Approximate Launch Date:** October 31, 2016 (Bifrost Architecture Mid-range)
+- **Approximate Launch Date:** October, 2016 (Bifrost Architecture Mid-range)
 - **Earliest Supported Driver:** **None**
 - **Problems:**
     - Does not support Vulkan 1.3
@@ -57,7 +58,7 @@ Note that sparse bindings is not supported generically on Mali, so d3d12 games t
 
 ### **5. Mali-G72**
 
-- **Approximate Launch Date:** May 29, 2017 (Bifrost Architecture Flagship)
+- **Approximate Launch Date:** May, 2017 (Bifrost Architecture Flagship)
 - **Earliest Supported Driver:** **44.1.0** (first to support descriptor indexing)
 - **Problems:**
     - **Driver 38.1.0:**: Lacks support for `VK_EXT_descriptor_indexing`
@@ -66,7 +67,7 @@ Note that sparse bindings is not supported generically on Mali, so d3d12 games t
 
 ### **6. Mali-G31**
 
-- **Approximate Launch Date:** March 6, 2018 (Bifrost Architecture Entry-level)
+- **Approximate Launch Date:** March, 2018 (Bifrost Architecture Entry-level)
 - **Earliest Supported Driver:** **None**
 - **Problems:**
     - Does not support Vulkan 1.3
@@ -75,7 +76,7 @@ Note that sparse bindings is not supported generically on Mali, so d3d12 games t
 
 ### **7. Mali-G52**
 
-- **Approximate Launch Date:** March 6, 2018 (Bifrost Architecture Mid-range)
+- **Approximate Launch Date:** March, 2018 (Bifrost Architecture Mid-range)
 - **Earliest Supported Driver:** **None**
 - **Problems:**
     - **Driver 49.1.0:** Lacks support for `VK_EXT_descriptor_indexing`
@@ -84,7 +85,7 @@ Note that sparse bindings is not supported generically on Mali, so d3d12 games t
 
 ### **8. Mali-G76**
 
-- **Approximate Launch Date:** May 31, 2018 (Bifrost Architecture Flagship)
+- **Approximate Launch Date:** May, 2018 (Bifrost Architecture Flagship)
 - **Earliest Supported Driver:** **None**
 - **Problems:**
     - **Driver 38.1.0:**: Lacks support for `VK_EXT_descriptor_indexing`
@@ -93,7 +94,7 @@ Note that sparse bindings is not supported generically on Mali, so d3d12 games t
 
 ### **9. Mali-G77**
 
-- **Approximate Launch Date:** May 27, 2019 (Valhall Architecture Flagship)
+- **Approximate Launch Date:** May, 2019 (Valhall Architecture Flagship)
 - **Earliest Supported Driver:** **32.1.0**
 - **Problems:**
     - **Driver 26.0.0:** Lacks Custom Border Color and Transform Feedback.
@@ -103,7 +104,7 @@ Note that sparse bindings is not supported generically on Mali, so d3d12 games t
 
 ### **10. Mali-G57**
 
-- **Approximate Launch Date:** October 23, 2019 (Valhall Architecture Mid-range)
+- **Approximate Launch Date:** October, 2019 (Valhall Architecture Mid-range)
 - **Earliest Supported Driver:** **32.1.0** (likely 28.0.0)
 - **Problems:**
     - **Driver 28.0.0:** Lacks Custom Border Color.
@@ -113,7 +114,7 @@ Note that sparse bindings is not supported generically on Mali, so d3d12 games t
 
 ### **11. Mali-G68**
 
-- **Approximate Launch Date:** May 26, 2020 (Valhall Architecture Sub-premium)
+- **Approximate Launch Date:** May, 2020 (Valhall Architecture Sub-premium)
 - **Earliest Supported Driver:** **32.1.0**
 - **Problems:**
     - **Driver 26.0.0:** Lacks Custom Border Color.
@@ -122,7 +123,7 @@ Note that sparse bindings is not supported generically on Mali, so d3d12 games t
 
 ### **12. Mali-G78**
 
-- **Approximate Launch Date:** May 26, 2020 (Valhall Architecture Flagship)
+- **Approximate Launch Date:** May, 2020 (Valhall Architecture Flagship)
 - **Earliest Supported Driver:** **32.1.0**
 - **Problems:**
     - **Driver 32.1.0:** [1 device](http://vulkan.gpuinfo.org/api/v2/getreport.php?id=16265) Lacks Custom Border Color and Transform Feedback, but not seen on other profiles
@@ -131,7 +132,7 @@ Note that sparse bindings is not supported generically on Mali, so d3d12 games t
 
 ### **13. Mali-G310**
 
-- **Approximate Launch Date:** May 25, 2021 (Valhall Architecture - hardkernel ODROID only)
+- **Approximate Launch Date:** May, 2021 (Valhall Architecture - hardkernel ODROID only)
 - **Earliest Supported Driver:** **44.0.0** (initial shipped driver)
 - **Problems:** None.
 
@@ -139,7 +140,7 @@ Note that sparse bindings is not supported generically on Mali, so d3d12 games t
 
 ### **14. Mali-G610**
 
-- **Approximate Launch Date:** May 25, 2021 (Valhall Architecture Sub-premium)
+- **Approximate Launch Date:** May, 2021 (Valhall Architecture Sub-premium)
 - **Earliest Supported Driver:** **32.1.0**
 - **Problems:** None.
 
@@ -147,7 +148,7 @@ Note that sparse bindings is not supported generically on Mali, so d3d12 games t
 
 ### **15. Mali-G710**
 
-- **Approximate Launch Date:** May 25, 2021 (Valhall Architecture Flagship)
+- **Approximate Launch Date:** May, 2021 (Valhall Architecture Flagship)
 - **Earliest Supported Driver:** **32.1.0**
 - **Problems:** None.
 
@@ -155,7 +156,7 @@ Note that sparse bindings is not supported generically on Mali, so d3d12 games t
 
 ### **16. Mali-G615**
 
-- **Approximate Launch Date:** June 28, 2022 (Valhall Architecture Sub-premium)
+- **Approximate Launch Date:** June, 2022 (Valhall Architecture Sub-premium)
 - **Earliest Supported Driver:** **44.1.0** (initial shipped driver)
 - **Problems:** None.
 
@@ -163,7 +164,7 @@ Note that sparse bindings is not supported generically on Mali, so d3d12 games t
 
 ### **17. Mali-G715**
 
-- **Approximate Launch Date:** June 28, 2022 (Valhall Architecture Flagship)
+- **Approximate Launch Date:** June, 2022 (Valhall Architecture Flagship)
 - **Earliest Supported Driver:** **38.1.0** (initial shipped driver)
 - **Problems:** None.
 
@@ -171,7 +172,7 @@ Note that sparse bindings is not supported generically on Mali, so d3d12 games t
 
 ### **18. Mali-G720**
 
-- **Approximate Launch Date:** May 29, 2023 (5th Generation Architecture Flagship)
+- **Approximate Launch Date:** May, 2023 (5th Generation Architecture Flagship)
 - **Earliest Supported Driver:** **44.1.0** (initial shipped driver)
 - **Problems:** None.
 
@@ -179,7 +180,7 @@ Note that sparse bindings is not supported generically on Mali, so d3d12 games t
 
 ### **19. Mali-G925**
 
-- **Approximate Launch Date:** May 29, 2024 (5th Generation Architecture Flagship)
+- **Approximate Launch Date:** May, 2024 (5th Generation Architecture Flagship)
 - **Earliest Supported Driver:** **49.1.0** (initial shipped driver)
 - **Problems:** None.
 
@@ -187,7 +188,7 @@ Note that sparse bindings is not supported generically on Mali, so d3d12 games t
 
 ### **20. Mali-G1-Ultra**
 
-- **Approximate Launch Date:** September 10, 2025 (Lumex CSS Generation flagship)
+- **Approximate Launch Date:** September, 2025 (Lumex CSS Generation flagship)
 - **Earliest Supported Driver:** **54.1.0** (initial shipped driver)
 - **Problems:** None.
 
@@ -211,7 +212,7 @@ Supported API: 1.3.219
       * [ W ] VK_EXT_vertex_attribute_divisor (Required version: 3)
       * [ ✓(emulated) ] VK_KHR_push_descriptor (Required version: 1)
   - Missing Required Feature Flags:
-      * [ ✓ ] VkPhysicalDeviceDepthClipEnableFeaturesEXT (missing feature struct) -> depthClipEnable
+      * [ ✓ ] VkPhysicalDeviceDepthClipEnableFeaturesEXT -> depthClipEnable
       * [ W ] VkPhysicalDeviceFeatures -> dualSrcBlend
       * [ W ] VkPhysicalDeviceFeatures -> multiDrawIndirect
       * [ W ] VkPhysicalDeviceFeatures -> fillModeNonSolid
@@ -221,20 +222,20 @@ Supported API: 1.3.219
       * [ W ] VkPhysicalDeviceFeatures -> shaderCullDistance
       * [ ✓ ] VkPhysicalDeviceFeatures -> vertexPipelineStoresAndAtomics
       * [ ✓ ] VkPhysicalDeviceFeatures -> logicOp
-      * [???] VkPhysicalDeviceFeatures -> sparseBinding
-      * [???] VkPhysicalDeviceFeatures -> sparseResidencyAliased
-      * [???] VkPhysicalDeviceFeatures -> sparseResidencyBuffer
-      * [???] VkPhysicalDeviceFeatures -> sparseResidencyImage2D
+      * [ ✓(emulated) ] VkPhysicalDeviceFeatures -> sparseBinding
+      * [ ✓ ] VkPhysicalDeviceFeatures -> sparseResidencyAliased
+      * [ ✓ ] VkPhysicalDeviceFeatures -> sparseResidencyBuffer
+      * [ ✓ ] VkPhysicalDeviceFeatures -> sparseResidencyImage2D
       * [ ✓ ] VkPhysicalDeviceFeatures -> shaderResourceResidency
       * [ ✓ ] VkPhysicalDeviceFeatures -> shaderResourceMinLod
-      * [ W ] VkPhysicalDeviceRobustness2FeaturesEXT (missing feature struct) -> robustBufferAccess2
-      * [ W ] VkPhysicalDeviceRobustness2FeaturesEXT (missing feature struct) -> robustImageAccess2
-      * [ ✓(emulated) ] VkPhysicalDeviceRobustness2FeaturesEXT (missing feature struct) -> nullDescriptor
-      * [ W ] VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT (missing feature struct) -> vertexAttributeInstanceRateDivisor
-      * [ W ] VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT (missing feature struct) -> vertexAttributeInstanceRateZeroDivisor
+      * [ ✓ ] VkPhysicalDeviceRobustness2FeaturesEXT -> robustBufferAccess2
+      * [ ✓ ] VkPhysicalDeviceRobustness2FeaturesEXT -> robustImageAccess2
+      * [ ✓(emulated) ] VkPhysicalDeviceRobustness2FeaturesEXT -> nullDescriptor
+      * [ ✓ ] VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT -> vertexAttributeInstanceRateDivisor
+      * [ ✓ ] VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT -> vertexAttributeInstanceRateZeroDivisor
   - Failed Properties or Limits Constraints:
-      * [???] VkPhysicalDeviceProperties -> sparseProperties -> residencyStandard2DBlockShape: Device value is False (Expected True)
-      * [???] VkPhysicalDeviceProperties -> sparseProperties -> residencyNonResidentStrict: Device value is False (Expected True)
+      * [ ✓ ] VkPhysicalDeviceProperties -> sparseProperties -> residencyStandard2DBlockShape: Device value is False (Expected True)
+      * [ ✓ ] VkPhysicalDeviceProperties -> sparseProperties -> residencyNonResidentStrict: Device value is False (Expected True)
       * [ ✓(emulated) ] VkPhysicalDevicePushDescriptorPropertiesKHR -> maxPushDescriptors: Not specified/supported by device (Requires 32)
       * [ ✓ ] VkPhysicalDeviceVulkan12Properties -> maxPerStageDescriptorUpdateAfterBindStorageBuffers: Device value 500000 is less than required minimum of 1000000
       * [ ✓ ] VkPhysicalDeviceVulkan12Properties -> maxPerStageDescriptorUpdateAfterBindSampledImages: Device value 500000 is less than required minimum of 1000000
@@ -242,5 +243,5 @@ Supported API: 1.3.219
       * [ ✓ ] VkPhysicalDeviceVulkan12Properties -> filterMinmaxSingleComponentFormats: Device value is False (Expected True)
       * [ ✓ ] VkPhysicalDeviceVulkan13Properties -> storageTexelBufferOffsetSingleTexelAlignment: Device value is False (Expected True)
   - Failed Queue Family Constraints:
-      * [???] Requires queue family with flags: ['VK_QUEUE_SPARSE_BINDING_BIT'] (Minimum Count: 1)
+      * [ ✓ ] Requires queue family with flags: ['VK_QUEUE_SPARSE_BINDING_BIT'] (Minimum Count: 1)
 ```

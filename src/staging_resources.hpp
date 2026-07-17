@@ -106,30 +106,26 @@ struct StagingResources {
     bool IsEmpty() const {
         return stagingBuffers.empty() && stagingImageViews.empty() &&
                trackedQueries.empty() && descriptorSets.empty() &&
-               semaphore == VK_NULL_HANDLE && completed == VK_NULL_HANDLE;
+               stagingSemaphores.empty() && semaphore == VK_NULL_HANDLE &&
+               completed == VK_NULL_HANDLE;
     }
     void WaitForCompletion();
     void Cleanup();
-    void AddStagingBuffer(std::unique_ptr<struct buffer> buf) {
-        stagingBuffers.push_back(std::move(buf));
-    }
+    void AddStagingBuffer(VkBuffer buf) { stagingBuffers.push_back(buf); }
     void AddStagingImageView(VkImageView view) {
         stagingImageViews.push_back(view);
     }
     void AddDescriptorSet(VkDescriptorPool pool, VkDescriptorSet set) {
         descriptorSets.push_back({pool, set});
     }
-    int Size() const { return stagingBuffers.size(); }
-    int MemoryUsage() const {
-        int usage = 0;
-        for (const auto &buf : stagingBuffers) {
-            usage += buf->size;
-        }
-        return usage;
+    void AddStagingSemaphore(VkSemaphore sem) {
+        stagingSemaphores.push_back(sem);
     }
+    int Size() const { return stagingBuffers.size(); }
+    int MemoryUsage() const { return 0; }
     ScopedTimestampQuery MakeScopedTimestampQuery(
-        struct command_buffer *cb, const std::string &label, VkFormat format,
-        uint64_t texture_size,
+        struct command_buffer *cb, const std::string &label,
+        VkFormat format = VK_FORMAT_UNDEFINED, uint64_t texture_size = 0,
         VkPipelineStageFlagBits startStage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
         VkPipelineStageFlagBits endStage =
             VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT);
@@ -146,11 +142,12 @@ struct StagingResources {
 
     bool freed = false;
     bool has_completed = false;
-    std::vector<std::unique_ptr<struct buffer>> stagingBuffers;
+    std::vector<VkBuffer> stagingBuffers;
     std::vector<VkImageView> stagingImageViews;
     std::vector<std::pair<VkDescriptorPool, VkDescriptorSet>> descriptorSets;
     std::vector<QueryPoolBlock> queryPools;
     std::vector<TimestampQuery> trackedQueries;
+    std::vector<VkSemaphore> stagingSemaphores;
 };
 
 #endif

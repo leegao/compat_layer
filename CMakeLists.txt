@@ -93,7 +93,7 @@ add_library(dxvk_mali_compat_layer SHARED ${SOURCES})
 # target_compile_definitions(dxvk_mali_compat_layer PRIVATE ENABLE_COMPUTE_TRACKING=1)
 
 # Enable if the layer needs to track VkBuffers
-# target_compile_definitions(dxvk_mali_compat_layer PRIVATE ENABLE_BUFFER_TRACKING=1)
+target_compile_definitions(dxvk_mali_compat_layer PRIVATE ENABLE_BUFFER_TRACKING=1)
 
 set_target_properties(dxvk_mali_compat_layer PROPERTIES
     PREFIX "lib"

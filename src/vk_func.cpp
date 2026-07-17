@@ -194,6 +194,7 @@ void init_dispatch_table(PFN_vkGetDeviceProcAddr gdpa, VkDevice device,
             reinterpret_cast<decltype(table.CmdBindVertexBuffers2)>(
                 gdpa(device, "vkCmdBindVertexBuffers2EXT"));
     }
+    GET_DEVICE_PROC(GetBufferMemoryRequirements2);
 
 #undef GET_DEVICE_PROC
 }

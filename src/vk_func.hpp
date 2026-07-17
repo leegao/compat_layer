@@ -258,5 +258,9 @@ void VKAPI_CALL DxvkMaliCompatLayer_UpdateDescriptorSets(
     const VkWriteDescriptorSet *pDescriptorWrites, uint32_t descriptorCopyCount,
     const VkCopyDescriptorSet *pDescriptorCopies);
 
+VkResult VKAPI_CALL DxvkMaliCompatLayer_QueueBindSparse(
+    VkQueue queue, uint32_t bindInfoCount, const VkBindSparseInfo *pBindInfo,
+    VkFence fence);
+
 } // extern "C"
 #endif

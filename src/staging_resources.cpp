@@ -4,6 +4,7 @@
 #include "command_buffer.hpp"
 #include "layer.hpp"
 #include "logger.hpp"
+#include "vk_func.hpp"
 
 #include <cstdint>
 #include <map>
@@ -309,15 +310,16 @@ void StagingResources::Cleanup() {
         }
     }
 
-    for (auto it = stagingBuffers.begin(); it != stagingBuffers.end();) {
-        auto buf = std::move(*it);
-        it = stagingBuffers.erase(it);
+    for (auto buffer : stagingBuffers) {
+        auto buf = find_buffer(buffer);
         if (!buf)
             continue;
 
-        dev->table.DestroyBuffer(device, buf->handle, buf->alloc);
-        dev->table.FreeMemory(device, buf->memory, buf->alloc);
+        if (buf->owns_memory)
+            dev->table.FreeMemory(device, buf->memory, buf->alloc);
+        DxvkMaliCompatLayer_DestroyBuffer(device, buf->handle, buf->alloc);
     }
+    stagingBuffers.clear();
 
     for (auto imageView : stagingImageViews) {
         if (imageView != VK_NULL_HANDLE) {
@@ -338,6 +340,13 @@ void StagingResources::Cleanup() {
         }
     }
     queryPools.clear();
+
+    for (auto sem : stagingSemaphores) {
+        if (sem != VK_NULL_HANDLE) {
+            dev->table.DestroySemaphore(device, sem, nullptr);
+        }
+    }
+    stagingSemaphores.clear();
 }
 
 StagingResources::~StagingResources() { Cleanup(); }

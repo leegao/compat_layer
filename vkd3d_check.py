@@ -39,12 +39,8 @@ WRAPPER_SPOOFED_DEVICE_FEATURES = {
     "dualSrcBlend",
     "multiDrawIndirect",
     # Extension features
-    "robustBufferAccess2",
-    "robustImageAccess2",
     "extendedDynamicState",
     "extendedDynamicState2",
-    "vertexAttributeInstanceRateDivisor",
-    "vertexAttributeInstanceRateZeroDivisor",
 }
 
 WRAPPER_SPOOFED_DEVICE_PROPERTIES = {
@@ -86,7 +82,10 @@ CAN_BE_SPOOFED = (
         "depthClipEnable",
         # TODO(leegao): look into if this needs to be emulated
         "maintenance5",  # DXVK: No adapters found. Please check your device filter settings
-        "robustBufferAccess2",  # already spoofed in the wrapper
+        "robustBufferAccess2",  # part of robustness2
+        "robustImageAccess2",  # part of robustness2
+        "vertexAttributeInstanceRateDivisor",  # part of VK_EXT_vertex_attribute_divisor
+        "vertexAttributeInstanceRateZeroDivisor",  # part of VK_EXT_vertex_attribute_divisor
         "vertexPipelineStoresAndAtomics",  # fails to reach FL_12_0 (nor FL_11_1 even) in d3d12_device_caps_init_feature_level (vertexPipelineStoresAndAtomics needed for FL_11)
         "storageTexelBufferOffsetSingleTexelAlignment",  # E_INVALIDARG in vkd3d_init_device_caps
         "uniformTexelBufferOffsetSingleTexelAlignment",  # E_INVALIDARG in vkd3d_init_device_caps
@@ -125,8 +124,12 @@ CAN_BE_SPOOFED = (
         #     return;
         # }
         # "drawIndirectCount",
-        # TODO(leegao): look into if this needs to be emulated
-        # "sparseBinding", # fails to reach FL_12_0 - D3D12_TILED_RESOURCES_TIER_NOT_SUPPORTED in d3d12_device_determine_tiled_resources_tier - tier0
+        "sparseResidencyAliased",  # fails to reach FL_12_0 - D3D12_TILED_RESOURCES_TIER_NOT_SUPPORTED in d3d12_device_determine_tiled_resources_tier - tier0
+        "sparseResidencyBuffer",  # fails to reach FL_12_0 - D3D12_TILED_RESOURCES_TIER_NOT_SUPPORTED in d3d12_device_determine_tiled_resources_tier - tier0
+        "sparseResidencyImage2D",  # fails to reach FL_12_0 - D3D12_TILED_RESOURCES_TIER_NOT_SUPPORTED in d3d12_device_determine_tiled_resources_tier - tier0
+        "residencyStandard2DBlockShape",  # fails to reach FL_12_0 - D3D12_TILED_RESOURCES_TIER_NOT_SUPPORTED in d3d12_device_determine_tiled_resources_tier - tier0
+        "residencyNonResidentStrict",  # fails to reach FL_12_0 - D3D12_TILED_RESOURCES_TIER_NOT_SUPPORTED in d3d12_device_determine_tiled_resources_tier - tier0
+        "queueFamilies",  # for sparse queues
     }
 )
 
@@ -140,6 +143,7 @@ CAN_BE_EMULATED = (
         "VK_KHR_push_descriptor",  # Emulates nullDescriptor
         "nullDescriptor",  # Emulated
         "maxPushDescriptors",  # Emulation reports 32
+        "sparseBinding",  # Emulated - fails to reach FL_12_0 - D3D12_TILED_RESOURCES_TIER_NOT_SUPPORTED in d3d12_device_determine_tiled_resources_tier - tier0
     }
 )
 
