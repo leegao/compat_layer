@@ -30,11 +30,11 @@ Supported API: 1.1.213
       * [???] VkPhysicalDeviceFeatures -> sparseResidencyImage2D 
       * [ ✓ ] VkPhysicalDeviceFeatures -> shaderResourceResidency 
       * [ ✓ ] VkPhysicalDeviceFeatures -> shaderResourceMinLod 
-      * [ W ] VkPhysicalDeviceRobustness2FeaturesEXT -> robustBufferAccess2 
-      * [ W ] VkPhysicalDeviceRobustness2FeaturesEXT -> robustImageAccess2 
+      * [ ✓ ] VkPhysicalDeviceRobustness2FeaturesEXT -> robustBufferAccess2 
+      * [ ✓ ] VkPhysicalDeviceRobustness2FeaturesEXT -> robustImageAccess2 
       * [ ✓(emulated) ] VkPhysicalDeviceRobustness2FeaturesEXT -> nullDescriptor 
-      * [ W ] VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT -> vertexAttributeInstanceRateDivisor 
-      * [ W ] VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT -> vertexAttributeInstanceRateZeroDivisor 
+      * [ ✓ ] VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT -> vertexAttributeInstanceRateDivisor 
+      * [ ✓ ] VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT -> vertexAttributeInstanceRateZeroDivisor 
       * [ ✓ ] VkPhysicalDeviceVulkan11Features -> shaderDrawParameters 
       * [ ✓ ] VkPhysicalDeviceVulkan12Features -> samplerMirrorClampToEdge 
       * [???] VkPhysicalDeviceVulkan12Features -> descriptorIndexing 

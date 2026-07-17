@@ -26,11 +26,11 @@ Supported API: 1.3.225
       * [???] VkPhysicalDeviceFeatures -> sparseResidencyImage2D 
       * [ ✓ ] VkPhysicalDeviceFeatures -> shaderResourceResidency 
       * [ ✓ ] VkPhysicalDeviceFeatures -> shaderResourceMinLod 
-      * [ W ] VkPhysicalDeviceRobustness2FeaturesEXT -> robustBufferAccess2 
-      * [ W ] VkPhysicalDeviceRobustness2FeaturesEXT -> robustImageAccess2 
+      * [ ✓ ] VkPhysicalDeviceRobustness2FeaturesEXT -> robustBufferAccess2 
+      * [ ✓ ] VkPhysicalDeviceRobustness2FeaturesEXT -> robustImageAccess2 
       * [ ✓(emulated) ] VkPhysicalDeviceRobustness2FeaturesEXT -> nullDescriptor 
-      * [ W ] VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT -> vertexAttributeInstanceRateDivisor 
-      * [ W ] VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT -> vertexAttributeInstanceRateZeroDivisor 
+      * [ ✓ ] VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT -> vertexAttributeInstanceRateDivisor 
+      * [ ✓ ] VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT -> vertexAttributeInstanceRateZeroDivisor 
   - Failed Properties or Limits Constraints:
       * [???] VkPhysicalDeviceProperties -> sparseProperties -> residencyStandard2DBlockShape: Device value is False (Expected True)
       * [???] VkPhysicalDeviceProperties -> sparseProperties -> residencyNonResidentStrict: Device value is False (Expected True)

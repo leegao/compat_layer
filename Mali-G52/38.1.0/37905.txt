@@ -28,11 +28,11 @@ Supported API: 1.3.219
       * [???] VkPhysicalDeviceFeatures -> sparseResidencyImage2D 
       * [ ✓ ] VkPhysicalDeviceFeatures -> shaderResourceResidency 
       * [ ✓ ] VkPhysicalDeviceFeatures -> shaderResourceMinLod 
-      * [ W ] VkPhysicalDeviceRobustness2FeaturesEXT -> robustBufferAccess2 
-      * [ W ] VkPhysicalDeviceRobustness2FeaturesEXT -> robustImageAccess2 
+      * [ ✓ ] VkPhysicalDeviceRobustness2FeaturesEXT -> robustBufferAccess2 
+      * [ ✓ ] VkPhysicalDeviceRobustness2FeaturesEXT -> robustImageAccess2 
       * [ ✓(emulated) ] VkPhysicalDeviceRobustness2FeaturesEXT -> nullDescriptor 
-      * [ W ] VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT -> vertexAttributeInstanceRateDivisor 
-      * [ W ] VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT -> vertexAttributeInstanceRateZeroDivisor 
+      * [ ✓ ] VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT -> vertexAttributeInstanceRateDivisor 
+      * [ ✓ ] VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT -> vertexAttributeInstanceRateZeroDivisor 
       * [???] VkPhysicalDeviceVulkan12Features -> descriptorIndexing 
       * [???] VkPhysicalDeviceVulkan12Features -> shaderUniformTexelBufferArrayDynamicIndexing 
       * [???] VkPhysicalDeviceVulkan12Features -> shaderStorageTexelBufferArrayDynamicIndexing 
