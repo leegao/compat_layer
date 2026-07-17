@@ -2,9 +2,9 @@
 
 Compatibility layer for Mali blob vulkan drivers to work with vkd3d 2.14.1, including:
 
-1. emulation of `VK_EXT_push_descriptor`
-2. emulation of `VK_EXT_robustness2` (specifically `nullDescriptor`)
-3. emulation of `sparseBinding` (`COMPAT_EMULATE_SPARSE_BINDING`, disabled by default) for D3D 12.0 games that use tiled resources (generically missing on Mali)
+1. Emulation of `VK_EXT_push_descriptor`
+2. Emulation of `VK_EXT_robustness2` (specifically `nullDescriptor`)
+3. Emulation of `sparseBinding` (`COMPAT_EMULATE_SPARSE_BINDING`, disabled by default) for D3D 12.0 games that use tiled resources (completely missing on Mali)
 4. Generic spoofing of other missing features/extensions to get vkd3d to reach D3D feature level 12.0
 
 Minimal supported profile: **driver must be at least `r32p1`**, with the following exceptions:
@@ -15,6 +15,8 @@ Minimal supported profile: **driver must be at least `r32p1`**, with the followi
 4. `Mali-T830` and `Mali-T880` (Midgard) - unsupported due to lack of Vulkan 1.2 and 1.3
 
 Note that sparse bindings is not supported generically on Mali, so d3d12 games that use tiled textures may need `COMPAT_EMULATE_SPARSE_BINDING=1` which is not enabled by default
+
+See https://github.com/leegao/compat_layer/tree/compatibility-vkd3d-2.14.1 for a compatibility list of vkd3d support on all known Mali GPU and driver configurations
 
 ---
 
