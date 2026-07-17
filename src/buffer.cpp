@@ -38,7 +38,8 @@ struct buffer *find_buffer(VkBuffer buffer) {
 
 struct dense_sparse_resource *find_sparse_buffer(VkBuffer buffer) {
     auto buf = find_buffer(buffer);
-    return buf ? buf->sparse_resource.get() : nullptr;
+    return buf && buf->emulate_sparse_binding ? buf->sparse_resource.get()
+                                              : nullptr;
 }
 
 struct buffer *CreateStagingBuffer(device *dev, VkDeviceSize size,
@@ -145,7 +146,6 @@ VK_LAYER_EXPORT VkResult VKAPI_CALL DxvkMaliCompatLayer_CreateBuffer(
     buf->device = dev;
     buf->alloc = pAllocator;
     buf->id = 0;
-    buf->emulate_sparse_binding = emulate_sparse_binding;
 
     if (emulate_sparse_binding) {
         result = BindSparseBuffer(dev, pCreateInfo, pAllocator, buf.get());

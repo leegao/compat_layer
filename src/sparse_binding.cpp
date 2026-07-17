@@ -363,6 +363,7 @@ VkResult BindSparseBuffer(struct device *dev,
     res->alloc = pAllocator;
 
     buf->sparse_resource = std::move(res);
+    buf->emulate_sparse_binding = true;
     ClearResource(dev, buf->sparse_resource.get(), 0,
                   pCreateInfo->size); // queue operation
 
@@ -417,6 +418,7 @@ VkResult BindSparseImage(struct device *dev,
     res->alloc = pAllocator;
     res->imageResident = false;
     img->sparse_resource = std::move(res);
+    img->emulate_sparse_binding = true;
 
     Logger::log("info",
                 "sparse_binding: emulated sparse image, committed=%llu, "

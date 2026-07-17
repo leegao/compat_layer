@@ -14,7 +14,8 @@ struct image *find_image(VkImage image) {
 
 struct dense_sparse_resource *find_sparse_image(VkImage image) {
     auto img = find_image(image);
-    return img ? img->sparse_resource.get() : nullptr;
+    return img && img->emulate_sparse_binding ? img->sparse_resource.get()
+                                              : nullptr;
 }
 
 VK_LAYER_EXPORT VkResult VKAPI_CALL DxvkMaliCompatLayer_CreateImage(
@@ -51,7 +52,6 @@ VK_LAYER_EXPORT VkResult VKAPI_CALL DxvkMaliCompatLayer_CreateImage(
     image->format = pCreateInfo->format;
     image->device = dev;
     image->create_info = *pCreateInfo;
-    image->emulate_sparse_binding = emulate_sparse_binding;
 
     if (emulate_sparse_binding) {
         result = BindSparseImage(dev, &create_info, pAllocator, image.get());
