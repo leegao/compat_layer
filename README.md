@@ -1,5 +1,40 @@
 ### Vulkan Profiles Aggregated Unknown `[???]` Tags
 
+#### Driver `54.3.0` (10 profiles, 0 issues)
+```text
+No unknown [???] tags detected.
+```
+
+#### Driver `54.2.0` (10 profiles, 0 issues)
+```text
+No unknown [???] tags detected.
+```
+
+#### Driver `54.1.0` (27 profiles, 0 issues)
+```text
+No unknown [???] tags detected.
+```
+
+#### Driver `54.0.0` (10 profiles, 0 issues)
+```text
+No unknown [???] tags detected.
+```
+
+#### Driver `53.0.0` (10 profiles, 0 issues)
+```text
+No unknown [???] tags detected.
+```
+
+#### Driver `51.0.0` (16 profiles, 0 issues)
+```text
+No unknown [???] tags detected.
+```
+
+#### Driver `50.0.0` (11 profiles, 0 issues)
+```text
+No unknown [???] tags detected.
+```
+
 #### Driver `49.1.0` (28 profiles, 17 issues)
 ```text
 * [???] VkPhysicalDeviceVulkan12Features -> descriptorIndexing - 5 profiles (Mali-G52, Mali-G52_MC2)
@@ -19,6 +54,36 @@
 * [???] VkPhysicalDeviceVulkan12Features -> descriptorBindingPartiallyBound - 5 profiles (Mali-G52, Mali-G52_MC2)
 * [???] VkPhysicalDeviceVulkan12Features -> descriptorBindingVariableDescriptorCount - 5 profiles (Mali-G52, Mali-G52_MC2)
 * [???] VkPhysicalDeviceVulkan12Features -> runtimeDescriptorArray - 5 profiles (Mali-G52, Mali-G52_MC2)
+```
+
+#### Driver `48.0.0` (14 profiles, 0 issues)
+```text
+No unknown [???] tags detected.
+```
+
+#### Driver `47.0.0` (11 profiles, 0 issues)
+```text
+No unknown [???] tags detected.
+```
+
+#### Driver `44.1.0` (12 profiles, 0 issues)
+```text
+No unknown [???] tags detected.
+```
+
+#### Driver `44.0.0` (10 profiles, 0 issues)
+```text
+No unknown [???] tags detected.
+```
+
+#### Driver `41.0.0` (5 profiles, 0 issues)
+```text
+No unknown [???] tags detected.
+```
+
+#### Driver `40.0.0` (7 profiles, 0 issues)
+```text
+No unknown [???] tags detected.
 ```
 
 #### Driver `38.1.0` (50 profiles, 18 issues)
@@ -41,6 +106,11 @@
 * [???] VkPhysicalDeviceVulkan12Features -> descriptorBindingVariableDescriptorCount - 15 profiles (Mali-G52, Mali-G72, Mali-G76)
 * [???] VkPhysicalDeviceVulkan12Features -> runtimeDescriptorArray - 15 profiles (Mali-G52, Mali-G72, Mali-G76)
 * [???] VkPhysicalDeviceFeatures -> samplerAnisotropy - 5 profiles (Mali-G72)
+```
+
+#### Driver `38.0.0` (5 profiles, 0 issues)
+```text
+No unknown [???] tags detected.
 ```
 
 #### Driver `34.0.0` (22 profiles, 17 issues)
