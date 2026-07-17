@@ -117,6 +117,7 @@ struct device {
     std::string dump_buffers_path;
     bool has_more_layers = false;
     null_descriptor_emulation null_descriptors;
+    std::atomic<VkDeviceSize> sparseCommittedBytes{0};
 };
 
 struct device *get_device(VkDevice);

@@ -10,7 +10,42 @@
 #include "vk_func.hpp"
 
 #include <algorithm>
+#include <cstdlib>
 #include <vulkan/vulkan.h>
+
+namespace {
+
+VkDeviceSize GetSparseBudget() {
+    static VkDeviceSize budget = [] {
+        if (const char *env = getenv("COMPAT_SPARSE_COMMIT_BUDGET")) {
+            return static_cast<VkDeviceSize>(strtoull(env, nullptr, 10));
+        }
+        // Defaults to 8GB
+        return static_cast<VkDeviceSize>(8 * 1024ull * 1024 * 1024);
+    }();
+    return budget;
+}
+
+bool ReserveBudget(struct device *dev, VkDeviceSize size) {
+    VkDeviceSize budget = GetSparseBudget();
+    VkDeviceSize before = dev->sparseCommittedBytes.fetch_add(size);
+    if (before + size > budget) {
+        dev->sparseCommittedBytes.fetch_sub(size);
+        Logger::log("error",
+                    "sparse_binding: commit of %llu bytes would exceed "
+                    "budget (%llu already committed, budget %llu)",
+                    (unsigned long long)size, (unsigned long long)before,
+                    (unsigned long long)budget);
+        return false;
+    }
+    return true;
+}
+
+void ReleaseBudget(struct device *dev, VkDeviceSize size) {
+    dev->sparseCommittedBytes.fetch_sub(size);
+}
+
+} // namespace
 
 VkExtent3D GetBlockShape(VkFormat format) { return {128, 128, 1}; }
 
@@ -21,6 +56,11 @@ VkResult BindSparseBuffer(struct device *dev,
     VkMemoryRequirements reqs;
     dev->table.GetBufferMemoryRequirements(dev->handle, buf->handle, &reqs);
 
+    if (!ReserveBudget(dev, reqs.size)) {
+        dev->table.DestroyBuffer(dev->handle, buf->handle, pAllocator);
+        return VK_ERROR_OUT_OF_DEVICE_MEMORY;
+    }
+
     VkMemoryAllocateInfo allocInfo{
         .sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
         .allocationSize = reqs.size,
@@ -30,6 +70,7 @@ VkResult BindSparseBuffer(struct device *dev,
     VkResult result = dev->table.AllocateMemory(dev->handle, &allocInfo,
                                                 pAllocator, &shadowMemory);
     if (result != VK_SUCCESS) {
+        ReleaseBudget(dev, reqs.size);
         dev->table.DestroyBuffer(dev->handle, buf->handle, pAllocator);
         Logger::log("error", "sparse_binding: shadow allocation failed: %d",
                     result);
@@ -64,6 +105,11 @@ VkResult BindSparseImage(struct device *dev,
     VkMemoryRequirements reqs;
     dev->table.GetImageMemoryRequirements(dev->handle, img->handle, &reqs);
 
+    if (!ReserveBudget(dev, reqs.size)) {
+        dev->table.DestroyImage(dev->handle, img->handle, pAllocator);
+        return VK_ERROR_OUT_OF_DEVICE_MEMORY;
+    }
+
     VkMemoryAllocateInfo allocInfo{
         .sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
         .allocationSize = reqs.size,
@@ -73,6 +119,7 @@ VkResult BindSparseImage(struct device *dev,
     VkResult result = dev->table.AllocateMemory(dev->handle, &allocInfo,
                                                 pAllocator, &shadowMemory);
     if (result != VK_SUCCESS) {
+        ReleaseBudget(dev, reqs.size);
         dev->table.DestroyImage(dev->handle, img->handle, pAllocator);
         Logger::log("error", "sparse_binding: shadow allocation failed: %d",
                     result);
@@ -111,6 +158,7 @@ bool DestroySparseBuffer(struct device *dev, VkBuffer buffer,
         return false;
 
     dev->table.FreeMemory(dev->handle, res->shadowMemory, pAllocator);
+    ReleaseBudget(dev, res->virtualSize);
     return true;
 }
 
@@ -121,6 +169,7 @@ bool DestroySparseImage(struct device *dev, VkImage image,
         return false;
 
     dev->table.FreeMemory(dev->handle, res->shadowMemory, pAllocator);
+    ReleaseBudget(dev, res->virtualSize);
     return true;
 }
 
