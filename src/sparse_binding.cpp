@@ -162,6 +162,104 @@ void GetSparseImageMemoryRequirements(
     r.imageMipTailStride = 0;
 }
 
+namespace {
+
+void RecordClearResource(struct device *dev, VkCommandBuffer cb,
+                         dense_sparse_resource *res, VkDeviceSize offset,
+                         VkDeviceSize size) {
+    if (res->kind == sparse_resource_kind::buffer) {
+        dev->table.CmdFillBuffer(cb, res->buffer, offset, size, 0);
+    } else {
+        VkImageSubresourceRange range{res->imageAspect, 0,
+                                      VK_REMAINING_MIP_LEVELS, 0,
+                                      VK_REMAINING_ARRAY_LAYERS};
+        if (res->imageAspect & VK_IMAGE_ASPECT_COLOR_BIT) {
+            VkClearColorValue clear{};
+            dev->table.CmdClearColorImage(
+                cb, res->image, VK_IMAGE_LAYOUT_GENERAL, &clear, 1, &range);
+        } else {
+            VkClearDepthStencilValue clear{0.0f, 0};
+            dev->table.CmdClearDepthStencilImage(
+                cb, res->image, VK_IMAGE_LAYOUT_GENERAL, &clear, 1, &range);
+        }
+    }
+}
+
+void RecordBufferBinds(struct queue *q, struct command_buffer *cb,
+                       const VkSparseBufferMemoryBindInfo &info) {
+    struct device *dev = q->device;
+    dense_sparse_resource *res = find_sparse_buffer(info.buffer);
+    if (!res) {
+        Logger::log("error",
+                    "sparse_binding: vkQueueBindSparse on untracked buffer");
+        return;
+    }
+
+    for (uint32_t i = 0; i < info.bindCount; i++) {
+        const VkSparseMemoryBind &bind = info.pBinds[i];
+
+        if (bind.flags & VK_SPARSE_MEMORY_BIND_METADATA_BIT) {
+            continue;
+        }
+
+        if (bind.memory == VK_NULL_HANDLE) {
+            RecordClearResource(dev, cb->handle, res, bind.resourceOffset,
+                                bind.size);
+        } else {
+            auto *srcBuffer = CreateStagingBuffer(
+                dev, bind.size, "sparse_staging_buffer",
+                VK_BUFFER_USAGE_TRANSFER_SRC_BIT, bind.memory);
+            if (srcBuffer == nullptr) {
+                Logger::log("error",
+                            "sparse_binding: failed to create staging buffer");
+                continue;
+            }
+            VkBufferCopy copy{0, bind.resourceOffset, bind.size};
+            dev->table.CmdCopyBuffer(cb->handle, srcBuffer->handle, res->buffer,
+                                     1, &copy);
+
+            if (cb->currentStagingResources) {
+                cb->currentStagingResources->AddStagingBuffer(
+                    srcBuffer->handle);
+            }
+        }
+    }
+}
+
+void RecordImageOpaqueBinds(struct queue *q, struct command_buffer *cb,
+                            const VkSparseImageOpaqueMemoryBindInfo &info) {
+    struct device *dev = q->device;
+    dense_sparse_resource *res = find_sparse_image(info.image);
+    if (!res) {
+        Logger::log("error",
+                    "sparse_binding: vkQueueBindSparse on untracked image");
+        return;
+    }
+
+    for (uint32_t i = 0; i < info.bindCount; i++) {
+        const VkSparseMemoryBind &bind = info.pBinds[i];
+        if (bind.flags & VK_SPARSE_MEMORY_BIND_METADATA_BIT)
+            continue;
+
+        res->imageResident = bind.memory != VK_NULL_HANDLE;
+        if (!res->imageResident) {
+            RecordClearResource(dev, cb->handle, res, 0, res->virtualSize);
+        }
+    }
+}
+
+void RecordImageGranularBinds(struct queue *q, struct command_buffer *cb,
+                              const VkSparseImageMemoryBindInfo &info) {
+    static bool hasLogged = false;
+    if (!hasLogged) {
+        Logger::log("info", "WARN: vkQueueBindSparse with granular binds are "
+                            "no-op under emulation");
+        hasLogged = true;
+    }
+}
+
+} // namespace
+
 VkResult EmulatevkQueueBindSparse(struct queue *q, uint32_t bindInfoCount,
                                   const VkBindSparseInfo *pBindInfo,
                                   VkFence fence) {
@@ -213,6 +311,32 @@ VkResult EmulatevkQueueBindSparse(struct queue *q, uint32_t bindInfoCount,
                     for (auto stagingSemaphore : stagingSemaphores) {
                         cb->currentStagingResources->AddStagingSemaphore(
                             stagingSemaphore);
+                    }
+                }
+                {
+                    cb->currentStagingResources->MakeScopedTimestampQuery(
+                        cb, "emulate_all_bind_sparse");
+                    if (info.bufferBindCount > 0) {
+                        cb->currentStagingResources->MakeScopedTimestampQuery(
+                            cb, "emulate_buffer_binds_sparse");
+                        for (int i = 0; i < info.bufferBindCount; i++) {
+                            RecordBufferBinds(q, cb, info.pBufferBinds[i]);
+                        }
+                    }
+
+                    if (info.imageOpaqueBindCount > 0 ||
+                        info.imageBindCount > 0) {
+                        cb->currentStagingResources->MakeScopedTimestampQuery(
+                            cb, "emulate_image_binds_sparse");
+                        for (int i = 0; i < info.imageOpaqueBindCount; i++) {
+                            RecordImageOpaqueBinds(q, cb,
+                                                   info.pImageOpaqueBinds[i]);
+                        }
+
+                        for (int i = 0; i < info.imageBindCount; i++) {
+                            RecordImageGranularBinds(q, cb,
+                                                     info.pImageBinds[i]);
+                        }
                     }
                 }
             },
