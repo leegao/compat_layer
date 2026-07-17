@@ -124,8 +124,12 @@ CAN_BE_SPOOFED = (
         #     return;
         # }
         # "drawIndirectCount",
-        # TODO(leegao): look into if this needs to be emulated
-        # "sparseBinding", # fails to reach FL_12_0 - D3D12_TILED_RESOURCES_TIER_NOT_SUPPORTED in d3d12_device_determine_tiled_resources_tier - tier0
+        "sparseResidencyAliased",  # fails to reach FL_12_0 - D3D12_TILED_RESOURCES_TIER_NOT_SUPPORTED in d3d12_device_determine_tiled_resources_tier - tier0
+        "sparseResidencyBuffer",  # fails to reach FL_12_0 - D3D12_TILED_RESOURCES_TIER_NOT_SUPPORTED in d3d12_device_determine_tiled_resources_tier - tier0
+        "sparseResidencyImage2D",  # fails to reach FL_12_0 - D3D12_TILED_RESOURCES_TIER_NOT_SUPPORTED in d3d12_device_determine_tiled_resources_tier - tier0
+        "residencyStandard2DBlockShape",  # fails to reach FL_12_0 - D3D12_TILED_RESOURCES_TIER_NOT_SUPPORTED in d3d12_device_determine_tiled_resources_tier - tier0
+        "residencyNonResidentStrict",  # fails to reach FL_12_0 - D3D12_TILED_RESOURCES_TIER_NOT_SUPPORTED in d3d12_device_determine_tiled_resources_tier - tier0
+        "queueFamilies",  # for sparse queues
     }
 )
 
@@ -139,6 +143,7 @@ CAN_BE_EMULATED = (
         "VK_KHR_push_descriptor",  # Emulates nullDescriptor
         "nullDescriptor",  # Emulated
         "maxPushDescriptors",  # Emulation reports 32
+        "sparseBinding",  # Emulated - fails to reach FL_12_0 - D3D12_TILED_RESOURCES_TIER_NOT_SUPPORTED in d3d12_device_determine_tiled_resources_tier - tier0
     }
 )
 
