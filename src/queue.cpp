@@ -4,9 +4,11 @@
 #include "logger.hpp"
 #include "mali_gpu_profiler.hpp"
 #include "staging_resources.hpp"
+#include "vk_func.hpp"
 #include <vulkan/vulkan.h>
 
 #include <chrono>
+#include <vulkan/vulkan.h>
 
 std::unordered_map<VkQueue, std::shared_ptr<struct queue>> queuesMap;
 
@@ -16,6 +18,157 @@ struct queue *get_queue(VkQueue queue) {
         return nullptr;
 
     return it->second.get();
+}
+
+VkResult SubmitOneShot(struct device *dev,
+                       std::function<void(struct command_buffer *)> record_func,
+                       const std::string_view shader_label, struct queue *q,
+                       const std::vector<VkSemaphore> &waits,
+                       const std::vector<VkSemaphore> &signals,
+                       VkFence signal_fence, bool async) {
+    VkResult result;
+    const auto &table = dev->table;
+
+    VkCommandPoolCreateInfo pool_info = {
+        .sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
+        .flags = VK_COMMAND_POOL_CREATE_TRANSIENT_BIT,
+        .queueFamilyIndex = q ? q->queueFamilyIndex : dev->queueFamilyIndex,
+    };
+    VkCommandPool command_pool;
+    result = table.CreateCommandPool(dev->handle, &pool_info, nullptr,
+                                     &command_pool);
+    if (result != VK_SUCCESS) {
+        Logger::log("error", "one_shot: vkCreateCommandPool failed, result: %d",
+                    result);
+        return result;
+    }
+
+    VkCommandBufferAllocateInfo alloc_info = {
+        .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
+        .commandPool = command_pool,
+        .level = VK_COMMAND_BUFFER_LEVEL_PRIMARY,
+        .commandBufferCount = 1};
+    VkCommandBuffer commandBuffer;
+    result = DxvkMaliCompatLayer_AllocateCommandBuffers(
+        dev->handle, &alloc_info, &commandBuffer);
+    if (result != VK_SUCCESS) {
+        Logger::log("error",
+                    "one_shot: vkAllocateCommandBuffers failed, result: %d",
+                    result);
+        table.DestroyCommandPool(dev->handle, command_pool, nullptr);
+        return result;
+    }
+
+    auto cb = get_command_buffer(commandBuffer);
+    if (!cb) {
+        Logger::log("error", "one_shot: command buffer not found, handle: %p",
+                    commandBuffer);
+        return VK_ERROR_UNKNOWN;
+    }
+
+    VkCommandBufferBeginInfo begin_info = {
+        .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
+        .flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT};
+    result = DxvkMaliCompatLayer_BeginCommandBuffer(commandBuffer, &begin_info);
+    if (result != VK_SUCCESS) {
+        Logger::log("error",
+                    "one_shot: vkBeginCommandBuffer failed, result: %d",
+                    result);
+        goto cleanup_registry;
+    }
+
+    record_func(cb);
+
+    result = table.EndCommandBuffer(commandBuffer);
+    if (result != VK_SUCCESS) {
+        Logger::log("error", "one_shot: vkEndCommandBuffer failed, result: %d",
+                    result);
+        goto cleanup_registry;
+    }
+
+    {
+        VkQueue submitQueue = (q != nullptr) ? q->handle : dev->queue;
+        std::vector<VkPipelineStageFlags> waitDstStageMasks(
+            waits.size(), VK_PIPELINE_STAGE_ALL_COMMANDS_BIT);
+
+        VkSubmitInfo submit_info = {
+            .sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
+            .waitSemaphoreCount = static_cast<uint32_t>(waits.size()),
+            .pWaitSemaphores = waits.empty() ? nullptr : waits.data(),
+            .pWaitDstStageMask =
+                waits.empty() ? nullptr : waitDstStageMasks.data(),
+            .commandBufferCount = 1,
+            .pCommandBuffers = &commandBuffer,
+            .signalSemaphoreCount = static_cast<uint32_t>(signals.size()),
+            .pSignalSemaphores = signals.empty() ? nullptr : signals.data(),
+        };
+
+        VkFence fence;
+        if (async) {
+            // We don't need to wait for the submit to complete, so just signal
+            // directly
+            fence = signal_fence;
+        } else {
+            VkFenceCreateInfo fence_info = {
+                .sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO};
+            result =
+                table.CreateFence(dev->handle, &fence_info, nullptr, &fence);
+            if (result != VK_SUCCESS) {
+                Logger::log("error",
+                            "Failed to create one-shot fence, result: %d",
+                            result);
+                goto cleanup_registry;
+            }
+        }
+
+        result = DxvkMaliCompatLayer_QueueSubmit(submitQueue, 1, &submit_info,
+                                                 fence);
+        if (result != VK_SUCCESS) {
+            Logger::log("error", "one_shot: vkQueueSubmit failed, result: %d",
+                        result);
+            goto cleanup_registry;
+        }
+
+        if (!async) {
+            table.WaitForFences(dev->handle, 1, &fence, VK_TRUE, UINT64_MAX);
+        }
+
+        if (!async) {
+            table.DestroyFence(dev->handle, fence, nullptr);
+        }
+
+        if (!async && signal_fence) {
+            // Signal fence with an empty queue submit
+            submit_info = {
+                .sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
+            };
+            result =
+                table.QueueSubmit(submitQueue, 1, &submit_info, signal_fence);
+            if (result != VK_SUCCESS) {
+                Logger::log("error",
+                            "one_shot: vkQueueSubmit failed, result: %d",
+                            result);
+            }
+        }
+    }
+
+cleanup_registry:
+    DxvkMaliCompatLayer_FreeCommandBuffers(dev->handle, command_pool, 1,
+                                           &commandBuffer);
+    table.DestroyCommandPool(dev->handle, command_pool, nullptr);
+
+    return result;
+}
+
+VkResult
+SubmitOneShotAsync(struct device *dev,
+                   std::function<void(struct command_buffer *)> record_func,
+                   const std::string_view shader_label, struct queue *q,
+                   const std::vector<VkSemaphore> &waits,
+                   const std::vector<VkSemaphore> &signals,
+                   VkFence signal_fence) {
+    return SubmitOneShot(dev, record_func, shader_label, q, waits, signals,
+                         signal_fence);
 }
 
 #define COPY_INFOS(infos, count, vec)                                          \
@@ -128,6 +281,8 @@ DxvkMaliCompatLayer_GetDeviceQueue(VkDevice device, uint32_t queueFamilyIndex,
     auto queue = std::make_shared<struct queue>();
     queue->handle = *pQueue;
     queue->device = dev;
+    queue->queueFamilyIndex = queueFamilyIndex;
+    queue->queueIndex = queueIndex;
 
     queuesMap[*pQueue] = queue;
 }
@@ -142,7 +297,7 @@ VK_LAYER_EXPORT VkResult VKAPI_CALL DxvkMaliCompatLayer_QueueSubmit(
     // This must be scoped until the QueueSubmit call is made
     std::vector<VkSubmitInfoUpdater> updaters(submitInfoCount);
     std::vector<std::pair<VkSemaphore, VkFence>> staging_fences;
-    bool has_transcode = false;
+    bool needsCleanup = false;
     {
         scoped_lock l(global_lock);
         q = get_queue(queue);
@@ -163,7 +318,7 @@ VK_LAYER_EXPORT VkResult VKAPI_CALL DxvkMaliCompatLayer_QueueSubmit(
                 cb->reset_compute_state();
 
                 if (!stagingResources->IsEmpty()) {
-                    has_transcode = true;
+                    needsCleanup = true;
                 }
 
                 std::pair<VkSemaphore, VkFence> staging_fence =
@@ -188,7 +343,7 @@ VK_LAYER_EXPORT VkResult VKAPI_CALL DxvkMaliCompatLayer_QueueSubmit(
 
     q->device->hasCleanupWork.notify_one();
 
-    if (q->device->sample_gpu_counters && has_transcode) {
+    if (q->device->sample_gpu_counters && needsCleanup) {
         get_mali_gpu_profiler().Start();
     }
 
@@ -200,7 +355,7 @@ VK_LAYER_EXPORT VkResult VKAPI_CALL DxvkMaliCompatLayer_QueueSubmit(
         return result;
     }
 
-    if (q->device->sample_gpu_counters && has_transcode) {
+    if (q->device->sample_gpu_counters && needsCleanup) {
         q->device->table.QueueWaitIdle(queue);
         get_mali_gpu_profiler().StopAndProcess("QueueSubmit");
     }

@@ -3,15 +3,19 @@
 #include "descriptors.hpp"
 #include "layer.hpp"
 #include "logger.hpp"
-#include "mali_gpu_profiler.hpp"
 #include "pipeline_state.hpp"
 #include "pipelines.hpp"
 #include "staging_resources.hpp"
 #include <algorithm>
+#include <unordered_map>
 
-std::unordered_map<VkCommandBuffer, std::shared_ptr<struct command_buffer>>
-    commandBuffersMap;
-std::unordered_map<VkCommandPool, std::vector<VkCommandBuffer>> commandPoolsMap;
+using CommandBuffersMap =
+    std::unordered_map<VkCommandBuffer, std::shared_ptr<struct command_buffer>>;
+using CommandPoolsMap =
+    std::unordered_map<VkCommandPool, std::vector<VkCommandBuffer>>;
+
+CommandBuffersMap commandBuffersMap;
+CommandPoolsMap commandPoolsMap;
 
 struct command_buffer *get_command_buffer(VkCommandBuffer commandbuffer) {
     auto it = commandBuffersMap.find(commandbuffer);
@@ -30,137 +34,6 @@ void command_buffer::kill_descriptor_sets() {
         device->descriptorSetAllocator->free(pool, set);
     }
     liveDescriptorSets.clear();
-}
-
-VkResult DispatchOneShotAndSample(
-    struct device *dev,
-    std::function<void(struct command_buffer *)> record_func,
-    const std::string_view shader_label) {
-    VkResult result;
-    const auto &table = dev->table;
-
-    VkCommandPoolCreateInfo pool_info = {
-        .sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
-        .flags = VK_COMMAND_POOL_CREATE_TRANSIENT_BIT,
-        .queueFamilyIndex = dev->queueFamilyIndex};
-    VkCommandPool command_pool;
-    result = table.CreateCommandPool(dev->handle, &pool_info, nullptr,
-                                     &command_pool);
-    if (result != VK_SUCCESS) {
-        Logger::log("error", "one_shot: vkCreateCommandPool failed, result: %d",
-                    result);
-        return result;
-    }
-
-    VkCommandBufferAllocateInfo alloc_info = {
-        .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
-        .commandPool = command_pool,
-        .level = VK_COMMAND_BUFFER_LEVEL_PRIMARY,
-        .commandBufferCount = 1};
-    VkCommandBuffer commandBuffer;
-    result =
-        table.AllocateCommandBuffers(dev->handle, &alloc_info, &commandBuffer);
-    if (result != VK_SUCCESS) {
-        Logger::log("error",
-                    "one_shot: vkAllocateCommandBuffers failed, result: %d",
-                    result);
-        table.DestroyCommandPool(dev->handle, command_pool, nullptr);
-        return result;
-    }
-
-    // See
-    // https://vulkan.lunarg.com/doc/view/latest/linux/LoaderLayerInterface.html#creating-new-dispatchable-objects
-    // To fill in the dispatch table pointer in newly created dispatchable
-    // object, the layer should copy the dispatch pointer, which is always the
-    // first entry in the structure, from an existing parent object of the same
-    // level (instance versus device).
-    if (dev->has_more_layers) {
-        *reinterpret_cast<void **>(commandBuffer) =
-            *reinterpret_cast<void **>(dev->handle);
-    }
-
-    auto cb = std::make_shared<struct command_buffer>();
-    cb->handle = commandBuffer;
-    cb->device = dev;
-    cb->pool = command_pool;
-    cb->currentStagingResources =
-        std::make_unique<StagingResources>(dev->handle);
-    cb->reset_compute_state();
-
-    {
-        scoped_lock l(global_lock);
-        commandBuffersMap[commandBuffer] = cb;
-        commandPoolsMap[command_pool].push_back(cb->handle);
-    }
-
-    VkCommandBufferBeginInfo begin_info = {
-        .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
-        .flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT};
-    result = table.BeginCommandBuffer(commandBuffer, &begin_info);
-    if (result != VK_SUCCESS) {
-        Logger::log("error",
-                    "one_shot: vkBeginCommandBuffer failed, result: %d",
-                    result);
-        goto cleanup_registry;
-    }
-
-    record_func(cb.get());
-
-    result = table.EndCommandBuffer(commandBuffer);
-    if (result != VK_SUCCESS) {
-        Logger::log("error", "one_shot: vkEndCommandBuffer failed, result: %d",
-                    result);
-        goto cleanup_registry;
-    }
-
-    {
-        VkSubmitInfo submit_info = {.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
-                                    .commandBufferCount = 1,
-                                    .pCommandBuffers = &commandBuffer};
-
-        VkFenceCreateInfo fence_info = {
-            .sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO};
-        VkFence fence;
-        result = table.CreateFence(dev->handle, &fence_info, nullptr, &fence);
-        if (result != VK_SUCCESS)
-            goto cleanup_registry;
-
-        auto now = std::chrono::system_clock::now();
-        cb->currentStagingResources->timestamp =
-            std::chrono::time_point_cast<std::chrono::milliseconds>(now)
-                .time_since_epoch()
-                .count();
-
-        if (dev->sample_gpu_counters) {
-            get_mali_gpu_profiler().Start();
-        }
-
-        result = table.QueueSubmit(dev->queue, 1, &submit_info, fence);
-        if (result != VK_SUCCESS) {
-            Logger::log("error", "one_shot: vkQueueSubmit failed, result: %d",
-                        result);
-        }
-        table.WaitForFences(dev->handle, 1, &fence, VK_TRUE, UINT64_MAX);
-
-        if (dev->sample_gpu_counters) {
-            get_mali_gpu_profiler().StopAndProcess(shader_label);
-        }
-
-        table.DestroyFence(dev->handle, fence, nullptr);
-    }
-
-    if (cb->currentStagingResources) {
-        cb->currentStagingResources->Cleanup();
-    }
-
-cleanup_registry: {
-    scoped_lock l(global_lock);
-    commandBuffersMap.erase(commandBuffer);
-}
-    table.FreeCommandBuffers(dev->handle, command_pool, 1, &commandBuffer);
-    table.DestroyCommandPool(dev->handle, command_pool, nullptr);
-
-    return result;
 }
 
 VK_LAYER_EXPORT VkResult VKAPI_CALL DxvkMaliCompatLayer_AllocateCommandBuffers(
@@ -198,6 +71,8 @@ VK_LAYER_EXPORT VkResult VKAPI_CALL DxvkMaliCompatLayer_AllocateCommandBuffers(
                 pCommandBuffers[i]);
         }
 
+        // See
+        // https://vulkan.lunarg.com/doc/view/latest/linux/LoaderLayerInterface.html#creating-new-dispatchable-objects
         if (dev->has_more_layers) {
             *reinterpret_cast<void **>(pCommandBuffers[i]) =
                 *reinterpret_cast<void **>(device);
