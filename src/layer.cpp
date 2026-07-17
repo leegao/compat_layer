@@ -833,13 +833,21 @@ VK_LAYER_EXPORT VkResult VKAPI_CALL DxvkMaliCompatLayer_CreateDevice(
         Logger::log("info", "Emulating VK_KHR_push_descriptor");
     }
 
+    auto emulate_precise_null_descriptor =
+        getenv("COMPAT_EMULATE_PRECISE_NULL_DESCRIPTORS")
+            ? atoi(getenv("COMPAT_EMULATE_PRECISE_NULL_DESCRIPTORS"))
+            : 0;
+
     auto emulate_null_descriptor =
         getenv("COMPAT_EMULATE_NULL_DESCRIPTORS")
             ? atoi(getenv("COMPAT_EMULATE_NULL_DESCRIPTORS"))
-            : !hasNullDescriptorSupport;
+            : !hasNullDescriptorSupport || emulate_precise_null_descriptor;
 
     if (emulate_null_descriptor) {
-        Logger::log("info", "Emulating VK_EXT_robustness2::nullDescriptor");
+        Logger::log(
+            "info",
+            "Emulating VK_EXT_robustness2::nullDescriptor, precision = %d",
+            emulate_precise_null_descriptor);
     }
 
     // Make sparse binding a forced toggle instead of inferred
@@ -1112,6 +1120,7 @@ VK_LAYER_EXPORT VkResult VKAPI_CALL DxvkMaliCompatLayer_CreateDevice(
     device->has_more_layers = has_more_layers;
     device->emulate_push_descriptors = emulate_push_descriptors;
     device->emulate_null_descriptor = emulate_null_descriptor;
+    device->emulate_precise_null_descriptor = emulate_precise_null_descriptor;
     device->emulate_sparse_binding = emulate_sparse_binding;
 
     device->syncPool = std::make_unique<SyncPool>(device->handle);

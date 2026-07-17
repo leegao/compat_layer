@@ -107,7 +107,8 @@ struct device {
     int sample_gpu_counters = 0;
     int emulate_push_descriptors = 0;
     int emulate_null_descriptor = 0;
-    int emulate_sparse_binding = 1;
+    int emulate_precise_null_descriptor = 0;
+    int emulate_sparse_binding = 0;
     const VkAllocationCallbacks *alloc;
     std::unique_ptr<SyncPool> syncPool;
     std::unique_ptr<DescriptorSetAllocator> descriptorSetAllocator;
