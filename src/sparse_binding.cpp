@@ -45,9 +45,266 @@ void ReleaseBudget(struct device *dev, VkDeviceSize size) {
     dev->sparseCommittedBytes.fetch_sub(size);
 }
 
+void GetBlockDimensions(VkFormat format, uint32_t &blockWidth,
+                        uint32_t &blockHeight) {
+    blockWidth = 1;
+    blockHeight = 1;
+
+    switch (format) {
+    case VK_FORMAT_ASTC_4x4_UNORM_BLOCK:
+    case VK_FORMAT_ASTC_4x4_SRGB_BLOCK:
+    case VK_FORMAT_ASTC_4x4_SFLOAT_BLOCK_EXT:
+        blockWidth = 4;
+        blockHeight = 4;
+        return;
+    case VK_FORMAT_ASTC_5x4_UNORM_BLOCK:
+    case VK_FORMAT_ASTC_5x4_SRGB_BLOCK:
+    case VK_FORMAT_ASTC_5x4_SFLOAT_BLOCK_EXT:
+        blockWidth = 5;
+        blockHeight = 4;
+        return;
+    case VK_FORMAT_ASTC_5x5_UNORM_BLOCK:
+    case VK_FORMAT_ASTC_5x5_SRGB_BLOCK:
+    case VK_FORMAT_ASTC_5x5_SFLOAT_BLOCK_EXT:
+        blockWidth = 5;
+        blockHeight = 5;
+        return;
+    case VK_FORMAT_ASTC_6x5_UNORM_BLOCK:
+    case VK_FORMAT_ASTC_6x5_SRGB_BLOCK:
+    case VK_FORMAT_ASTC_6x5_SFLOAT_BLOCK_EXT:
+        blockWidth = 6;
+        blockHeight = 5;
+        return;
+    case VK_FORMAT_ASTC_6x6_UNORM_BLOCK:
+    case VK_FORMAT_ASTC_6x6_SRGB_BLOCK:
+    case VK_FORMAT_ASTC_6x6_SFLOAT_BLOCK_EXT:
+        blockWidth = 6;
+        blockHeight = 6;
+        return;
+    case VK_FORMAT_ASTC_8x5_UNORM_BLOCK:
+    case VK_FORMAT_ASTC_8x5_SRGB_BLOCK:
+    case VK_FORMAT_ASTC_8x5_SFLOAT_BLOCK_EXT:
+        blockWidth = 8;
+        blockHeight = 5;
+        return;
+    case VK_FORMAT_ASTC_8x6_UNORM_BLOCK:
+    case VK_FORMAT_ASTC_8x6_SRGB_BLOCK:
+    case VK_FORMAT_ASTC_8x6_SFLOAT_BLOCK_EXT:
+        blockWidth = 8;
+        blockHeight = 6;
+        return;
+    case VK_FORMAT_ASTC_8x8_UNORM_BLOCK:
+    case VK_FORMAT_ASTC_8x8_SRGB_BLOCK:
+    case VK_FORMAT_ASTC_8x8_SFLOAT_BLOCK_EXT:
+        blockWidth = 8;
+        blockHeight = 8;
+        return;
+    case VK_FORMAT_ASTC_10x5_UNORM_BLOCK:
+    case VK_FORMAT_ASTC_10x5_SRGB_BLOCK:
+    case VK_FORMAT_ASTC_10x5_SFLOAT_BLOCK_EXT:
+        blockWidth = 10;
+        blockHeight = 5;
+        return;
+    case VK_FORMAT_ASTC_10x6_UNORM_BLOCK:
+    case VK_FORMAT_ASTC_10x6_SRGB_BLOCK:
+    case VK_FORMAT_ASTC_10x6_SFLOAT_BLOCK_EXT:
+        blockWidth = 10;
+        blockHeight = 6;
+        return;
+    case VK_FORMAT_ASTC_10x8_UNORM_BLOCK:
+    case VK_FORMAT_ASTC_10x8_SRGB_BLOCK:
+    case VK_FORMAT_ASTC_10x8_SFLOAT_BLOCK_EXT:
+        blockWidth = 10;
+        blockHeight = 8;
+        return;
+    case VK_FORMAT_ASTC_10x10_UNORM_BLOCK:
+    case VK_FORMAT_ASTC_10x10_SRGB_BLOCK:
+    case VK_FORMAT_ASTC_10x10_SFLOAT_BLOCK_EXT:
+        blockWidth = 10;
+        blockHeight = 10;
+        return;
+    case VK_FORMAT_ASTC_12x10_UNORM_BLOCK:
+    case VK_FORMAT_ASTC_12x10_SRGB_BLOCK:
+    case VK_FORMAT_ASTC_12x10_SFLOAT_BLOCK_EXT:
+        blockWidth = 12;
+        blockHeight = 10;
+        return;
+    case VK_FORMAT_ASTC_12x12_UNORM_BLOCK:
+    case VK_FORMAT_ASTC_12x12_SRGB_BLOCK:
+    case VK_FORMAT_ASTC_12x12_SFLOAT_BLOCK_EXT:
+        blockWidth = 12;
+        blockHeight = 12;
+        return;
+    default:
+        break;
+    }
+
+    if ((format >= VK_FORMAT_BC1_RGB_UNORM_BLOCK &&
+         format <= VK_FORMAT_BC7_SRGB_BLOCK) ||
+        (format >= VK_FORMAT_ETC2_R8G8B8_UNORM_BLOCK &&
+         format <= VK_FORMAT_EAC_R11G11_SNORM_BLOCK)) {
+        blockWidth = 4;
+        blockHeight = 4;
+    }
+}
+
+uint32_t GetTexelBytes(VkFormat format) {
+    if ((format >= VK_FORMAT_ASTC_4x4_UNORM_BLOCK &&
+         format <= VK_FORMAT_ASTC_12x12_SRGB_BLOCK) ||
+        (format >= VK_FORMAT_ASTC_4x4_SFLOAT_BLOCK_EXT &&
+         format <= VK_FORMAT_ASTC_12x12_SFLOAT_BLOCK_EXT)) {
+        return 16;
+    }
+
+    switch (format) {
+    case VK_FORMAT_R8_UNORM:
+    case VK_FORMAT_R8_SNORM:
+    case VK_FORMAT_R8_USCALED:
+    case VK_FORMAT_R8_SSCALED:
+    case VK_FORMAT_R8_UINT:
+    case VK_FORMAT_R8_SINT:
+    case VK_FORMAT_R8_SRGB:
+    case VK_FORMAT_S8_UINT:
+        return 1;
+
+    case VK_FORMAT_R8G8_UNORM:
+    case VK_FORMAT_R8G8_SNORM:
+    case VK_FORMAT_R8G8_USCALED:
+    case VK_FORMAT_R8G8_SSCALED:
+    case VK_FORMAT_R8G8_UINT:
+    case VK_FORMAT_R8G8_SINT:
+    case VK_FORMAT_R8G8_SRGB:
+    case VK_FORMAT_R16_UNORM:
+    case VK_FORMAT_R16_SNORM:
+    case VK_FORMAT_R16_USCALED:
+    case VK_FORMAT_R16_SSCALED:
+    case VK_FORMAT_R16_UINT:
+    case VK_FORMAT_R16_SINT:
+    case VK_FORMAT_R16_SFLOAT:
+    case VK_FORMAT_D16_UNORM:
+        return 2;
+
+    case VK_FORMAT_R8G8B8A8_UNORM:
+    case VK_FORMAT_R8G8B8A8_SNORM:
+    case VK_FORMAT_R8G8B8A8_USCALED:
+    case VK_FORMAT_R8G8B8A8_SSCALED:
+    case VK_FORMAT_R8G8B8A8_UINT:
+    case VK_FORMAT_R8G8B8A8_SINT:
+    case VK_FORMAT_R8G8B8A8_SRGB:
+    case VK_FORMAT_B8G8R8A8_UNORM:
+    case VK_FORMAT_B8G8R8A8_SNORM:
+    case VK_FORMAT_B8G8R8A8_USCALED:
+    case VK_FORMAT_B8G8R8A8_SSCALED:
+    case VK_FORMAT_B8G8R8A8_UINT:
+    case VK_FORMAT_B8G8R8A8_SINT:
+    case VK_FORMAT_B8G8R8A8_SRGB:
+    case VK_FORMAT_R16G16_UNORM:
+    case VK_FORMAT_R16G16_SNORM:
+    case VK_FORMAT_R16G16_USCALED:
+    case VK_FORMAT_R16G16_SSCALED:
+    case VK_FORMAT_R16G16_UINT:
+    case VK_FORMAT_R16G16_SINT:
+    case VK_FORMAT_R16G16_SFLOAT:
+    case VK_FORMAT_R32_UINT:
+    case VK_FORMAT_R32_SINT:
+    case VK_FORMAT_R32_SFLOAT:
+    case VK_FORMAT_D32_SFLOAT:
+    case VK_FORMAT_D24_UNORM_S8_UINT:
+    case VK_FORMAT_D32_SFLOAT_S8_UINT:
+        return 4;
+
+    case VK_FORMAT_R16G16B16A16_UNORM:
+    case VK_FORMAT_R16G16B16A16_SNORM:
+    case VK_FORMAT_R16G16B16A16_USCALED:
+    case VK_FORMAT_R16G16B16A16_SSCALED:
+    case VK_FORMAT_R16G16B16A16_UINT:
+    case VK_FORMAT_R16G16B16A16_SINT:
+    case VK_FORMAT_R16G16B16A16_SFLOAT:
+    case VK_FORMAT_R32G32_UINT:
+    case VK_FORMAT_R32G32_SINT:
+    case VK_FORMAT_R32G32_SFLOAT:
+    case VK_FORMAT_R64_UINT:
+    case VK_FORMAT_R64_SINT:
+    case VK_FORMAT_R64_SFLOAT:
+    case VK_FORMAT_BC1_RGB_UNORM_BLOCK:
+    case VK_FORMAT_BC1_RGB_SRGB_BLOCK:
+    case VK_FORMAT_BC1_RGBA_UNORM_BLOCK:
+    case VK_FORMAT_BC1_RGBA_SRGB_BLOCK:
+    case VK_FORMAT_BC4_UNORM_BLOCK:
+    case VK_FORMAT_BC4_SNORM_BLOCK:
+    case VK_FORMAT_ETC2_R8G8B8_UNORM_BLOCK:
+    case VK_FORMAT_ETC2_R8G8B8_SRGB_BLOCK:
+    case VK_FORMAT_ETC2_R8G8B8A1_UNORM_BLOCK:
+    case VK_FORMAT_ETC2_R8G8B8A1_SRGB_BLOCK:
+    case VK_FORMAT_EAC_R11_UNORM_BLOCK:
+    case VK_FORMAT_EAC_R11_SNORM_BLOCK:
+        return 8;
+
+    case VK_FORMAT_R32G32B32A32_UINT:
+    case VK_FORMAT_R32G32B32A32_SINT:
+    case VK_FORMAT_R32G32B32A32_SFLOAT:
+    case VK_FORMAT_R64G64_UINT:
+    case VK_FORMAT_R64G64_SINT:
+    case VK_FORMAT_R64G64_SFLOAT:
+    case VK_FORMAT_BC2_UNORM_BLOCK:
+    case VK_FORMAT_BC2_SRGB_BLOCK:
+    case VK_FORMAT_BC3_UNORM_BLOCK:
+    case VK_FORMAT_BC3_SRGB_BLOCK:
+    case VK_FORMAT_BC5_UNORM_BLOCK:
+    case VK_FORMAT_BC5_SNORM_BLOCK:
+    case VK_FORMAT_BC6H_UFLOAT_BLOCK:
+    case VK_FORMAT_BC6H_SFLOAT_BLOCK:
+    case VK_FORMAT_BC7_UNORM_BLOCK:
+    case VK_FORMAT_BC7_SRGB_BLOCK:
+    case VK_FORMAT_ETC2_R8G8B8A8_UNORM_BLOCK:
+    case VK_FORMAT_ETC2_R8G8B8A8_SRGB_BLOCK:
+    case VK_FORMAT_EAC_R11G11_UNORM_BLOCK:
+    case VK_FORMAT_EAC_R11G11_SNORM_BLOCK:
+        return 16;
+
+    default:
+        Logger::log("info",
+                    "GetTexelBytes: format %d not found, "
+                    "defaulting to 4-byte block shape",
+                    static_cast<int>(format));
+        return 4;
+    }
+}
+
 } // namespace
 
-VkExtent3D GetBlockShape(VkFormat format) { return {128, 128, 1}; }
+VkExtent3D GetBlockShape(VkFormat format) {
+    uint32_t elementBytes = GetTexelBytes(format);
+    VkExtent3D blockShape = {128, 128, 1};
+
+    switch (elementBytes) {
+    case 1:
+        blockShape = {256, 256, 1};
+        break;
+    case 2:
+        blockShape = {256, 128, 1};
+        break;
+    case 4:
+        blockShape = {128, 128, 1};
+        break;
+    case 8:
+        blockShape = {128, 64, 1};
+        break;
+    case 16:
+        blockShape = {64, 64, 1};
+        break;
+    default:
+        break;
+    }
+
+    uint32_t blockWidth, blockHeight;
+    GetBlockDimensions(format, blockWidth, blockHeight);
+
+    blockShape.width *= blockWidth;
+    blockShape.height *= blockHeight;
+
+    return blockShape;
+}
 
 VkResult BindSparseBuffer(struct device *dev,
                           const VkBufferCreateInfo *pCreateInfo,
