@@ -23,6 +23,12 @@ if os.path.exists(base_dir):
                             if "[???]" in line:
                                 data[driver][line] += 1
                                 gpus[driver][line].add(parts[1])
+                            else:
+                                # initialize data/gpus[driver]
+                                if driver not in data:
+                                    data[driver] = defaultdict(int)
+                                if driver not in gpus:
+                                    gpus[driver] = defaultdict(set)
 
 text_output = []
 for driver in sorted(data.keys(), reverse=True):
