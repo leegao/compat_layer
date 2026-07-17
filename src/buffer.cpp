@@ -1,6 +1,7 @@
 #include "buffer.hpp"
 #include "layer.hpp"
 #include "logger.hpp"
+#include "sparse_binding.hpp"
 #include "vk_func.hpp"
 #include <atomic>
 #include <unordered_map>
@@ -30,11 +31,14 @@ uint32_t FindMemoryType(struct device *dev, uint32_t typeBits) {
 
 struct buffer *find_buffer(VkBuffer buffer) {
     auto it = buffersMap.find(buffer);
-
     if (it == buffersMap.end())
         return nullptr;
-
     return it->second.get();
+}
+
+struct dense_sparse_resource *find_sparse_buffer(VkBuffer buffer) {
+    auto buf = find_buffer(buffer);
+    return buf ? buf->sparse_resource.get() : nullptr;
 }
 
 struct buffer *CreateStagingBuffer(device *dev, VkDeviceSize size,
@@ -112,16 +116,24 @@ VK_LAYER_EXPORT VkResult VKAPI_CALL DxvkMaliCompatLayer_CreateBuffer(
     VkDevice device, const VkBufferCreateInfo *pCreateInfo,
     const VkAllocationCallbacks *pAllocator, VkBuffer *pBuffer) {
     VkResult result;
-    VkLayerDispatchTable table;
     VkBufferCreateInfo create_info = *pCreateInfo;
 
     struct device *dev = get_device(device);
     if (!dev)
-        return VK_ERROR_INITIALIZATION_FAILED;
+        return VK_ERROR_UNKNOWN;
 
-    table = dev->table;
+    static constexpr VkBufferCreateFlags kSparseFlags =
+        VK_BUFFER_CREATE_SPARSE_BINDING_BIT |
+        VK_BUFFER_CREATE_SPARSE_RESIDENCY_BIT |
+        VK_BUFFER_CREATE_SPARSE_ALIASED_BIT;
 
-    result = table.CreateBuffer(device, &create_info, pAllocator, pBuffer);
+    bool emulate_sparse_binding =
+        dev->emulate_sparse_binding && (pCreateInfo->flags & kSparseFlags);
+    if (emulate_sparse_binding) {
+        create_info.flags &= ~kSparseFlags;
+    }
+
+    result = dev->table.CreateBuffer(device, &create_info, pAllocator, pBuffer);
     if (result != VK_SUCCESS) {
         Logger::log("error", "Failed to create buffer, res %d", result);
         return result;
@@ -133,6 +145,16 @@ VK_LAYER_EXPORT VkResult VKAPI_CALL DxvkMaliCompatLayer_CreateBuffer(
     buf->device = dev;
     buf->alloc = pAllocator;
     buf->id = 0;
+    buf->emulate_sparse_binding = emulate_sparse_binding;
+
+    if (emulate_sparse_binding) {
+        result = BindSparseBuffer(dev, pCreateInfo, pAllocator, buf.get());
+        if (result != VK_SUCCESS) {
+            Logger::log("error", "Failed to bind sparse buffer, res %d",
+                        result);
+            return result;
+        }
+    }
 
     {
         scoped_lock l(global_lock);
@@ -220,6 +242,9 @@ VK_LAYER_EXPORT void VKAPI_CALL DxvkMaliCompatLayer_DestroyBuffer(
         return;
 
     dev->table.DestroyBuffer(device, buffer, pAllocator);
+    if (buf->emulate_sparse_binding) {
+        DestroySparseBuffer(dev, buffer, pAllocator);
+    }
     buffersMap.erase(buffer);
 }
 
