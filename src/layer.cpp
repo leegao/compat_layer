@@ -710,6 +710,12 @@ VK_LAYER_EXPORT VkResult VKAPI_CALL DxvkMaliCompatLayer_CreateDevice(
         Logger::log("info", "Emulating VK_EXT_robustness2::nullDescriptor");
     }
 
+    // Make sparse binding a forced toggle instead of inferred
+    auto emulate_sparse_binding =
+        getenv("COMPAT_EMULATE_SPARSE_BINDING")
+            ? atoi(getenv("COMPAT_EMULATE_SPARSE_BINDING"))
+            : 0; // featuresMap[GetKey(physicalDevice)].sparseBinding
+
     VkBaseOutStructure *ext = (VkBaseOutStructure *)createInfo.pNext;
     VkPhysicalDeviceFeatures2 *appFeatures2 = nullptr;
     VkPhysicalDeviceFaultFeaturesEXT *appFaultFeatures = nullptr;
@@ -909,6 +915,13 @@ VK_LAYER_EXPORT VkResult VKAPI_CALL DxvkMaliCompatLayer_CreateDevice(
                              "VK_EXT_robustness2 emulation may be broken");
     }
 
+    if (emulate_sparse_binding) {
+        Logger::log("info", "Emulating (dense) sparse binding");
+        mutableCoreFeatures.sparseBinding = VK_TRUE;
+        if (appFeatures2)
+            appFeatures2->features.sparseBinding = VK_TRUE;
+    }
+
     mask_next_features(
         physicalDevice,
         const_cast<VkBaseOutStructure *>(
@@ -966,6 +979,7 @@ VK_LAYER_EXPORT VkResult VKAPI_CALL DxvkMaliCompatLayer_CreateDevice(
     device->has_more_layers = has_more_layers;
     device->emulate_push_descriptors = emulate_push_descriptors;
     device->emulate_null_descriptor = emulate_null_descriptor;
+    device->emulate_sparse_binding = emulate_sparse_binding;
 
     device->syncPool = std::make_unique<SyncPool>(device->handle);
 
