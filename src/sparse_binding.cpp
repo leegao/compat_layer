@@ -45,6 +45,22 @@ void ReleaseBudget(struct device *dev, VkDeviceSize size) {
     dev->sparseCommittedBytes.fetch_sub(size);
 }
 
+void RecordClearResource(struct device *dev, VkCommandBuffer cb,
+                         dense_sparse_resource *res, VkDeviceSize offset,
+                         VkDeviceSize size);
+
+void ClearResource(struct device *dev, dense_sparse_resource *res,
+                   VkDeviceSize offset, VkDeviceSize size) {
+    SubmitOneShot(
+        dev,
+        [&](struct command_buffer *cb) {
+            cb->currentStagingResources->MakeScopedTimestampQuery(
+                cb, "clear_resource_sparse");
+            RecordClearResource(dev, cb->handle, res, offset, size);
+        },
+        "clear_resource_sparse");
+}
+
 void GetBlockDimensions(VkFormat format, uint32_t &blockWidth,
                         uint32_t &blockHeight) {
     blockWidth = 1;
@@ -347,6 +363,8 @@ VkResult BindSparseBuffer(struct device *dev,
     res->alloc = pAllocator;
 
     buf->sparse_resource = std::move(res);
+    ClearResource(dev, buf->sparse_resource.get(), 0,
+                  pCreateInfo->size); // queue operation
 
     Logger::log("info",
                 "sparse_binding: emulated sparse buffer, virtualSize=%llu "
