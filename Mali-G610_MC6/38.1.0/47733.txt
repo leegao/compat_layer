@@ -1,0 +1,46 @@
+GPU: Mali-G610 MC6
+Driver: v1.r38p1-01eac0.df50a4daf764b64f6889c30ef568789d
+Supported API: 1.1.219
+
+[FAILED] Profile: VP_DXVK_d3d11_level_11_1_baseline
+  Description: DXVK for D3D11 Feature Level 11.1 minimum requirements
+  Vulkan API: 1.1.219, needs at least 1.3.204
+  - Missing/Insufficient Extensions:
+      * [ ✓ ] VK_EXT_depth_clip_enable (Required version: 1)
+      * [ ✓(emulated) ] VK_EXT_robustness2 (Required version: 1)
+      * [???] VK_KHR_load_store_op_none (Required version: 1)
+      * [ ✓ ] VK_KHR_maintenance5 (Required version: 1)
+      * [???] VK_KHR_maintenance6 (Required version: 1)
+  - Missing Required Feature Flags:
+      * [ ✓ ] VkPhysicalDeviceDepthClipEnableFeaturesEXT -> depthClipEnable 
+      * [ W ] VkPhysicalDeviceFeatures -> dualSrcBlend 
+      * [ W ] VkPhysicalDeviceFeatures -> fillModeNonSolid 
+      * [ W ] VkPhysicalDeviceFeatures -> multiViewport 
+      * [ W ] VkPhysicalDeviceFeatures -> shaderClipDistance 
+      * [ W ] VkPhysicalDeviceFeatures -> shaderCullDistance 
+      * [ ✓(emulated) ] VkPhysicalDeviceFeatures -> textureCompressionBC 
+      * [ ✓ ] VkPhysicalDeviceFeatures -> logicOp 
+      * [ ✓ ] VkPhysicalDeviceFeatures -> vertexPipelineStoresAndAtomics 
+      * [ ✓ ] VkPhysicalDeviceMaintenance5FeaturesKHR -> maintenance5 
+      * [???] VkPhysicalDeviceMaintenance6FeaturesKHR -> maintenance6 
+      * [ ✓(emulated) ] VkPhysicalDeviceRobustness2FeaturesEXT -> nullDescriptor 
+      * [ ✓ ] VkPhysicalDeviceRobustness2FeaturesEXT -> robustBufferAccess2 
+      * [???] VkPhysicalDeviceTransformFeedbackFeaturesEXT -> geometryStreams 
+      * [ ✓ ] VkPhysicalDeviceVulkan11Features -> shaderDrawParameters 
+      * [???] VkPhysicalDeviceVulkan12Features -> subgroupBroadcastDynamicId 
+      * [ ✓ ] VkPhysicalDeviceVulkan12Features -> samplerMirrorClampToEdge 
+      * [ ✓ ] VkPhysicalDeviceVulkan13Features -> maintenance4 
+      * [ ✓ ] VkPhysicalDeviceVulkan13Features -> dynamicRendering 
+  - Failed Properties or Limits Constraints:
+      * [???] VkPhysicalDeviceVulkan11Properties -> maxMultiviewViewCount: Not specified/supported by device (Requires 6)
+      * [???] VkPhysicalDeviceVulkan11Properties -> maxMultiviewInstanceIndex: Not specified/supported by device (Requires 134217727)
+      * [???] VkPhysicalDeviceVulkan12Properties -> maxTimelineSemaphoreValueDifference: Not specified/supported by device (Requires 2147483647)
+      * [???] VkPhysicalDeviceVulkan13Properties -> maxBufferSize: Not specified/supported by device (Requires 1073741824)
+      * [???] VkPhysicalDeviceVulkan13Properties -> maxInlineUniformBlockSize: Not specified/supported by device (Requires 256)
+      * [???] VkPhysicalDeviceVulkan13Properties -> maxPerStageDescriptorInlineUniformBlocks: Not specified/supported by device (Requires 4)
+      * [???] VkPhysicalDeviceVulkan13Properties -> maxPerStageDescriptorUpdateAfterBindInlineUniformBlocks: Not specified/supported by device (Requires 4)
+      * [???] VkPhysicalDeviceVulkan13Properties -> maxDescriptorSetInlineUniformBlocks: Not specified/supported by device (Requires 4)
+      * [???] VkPhysicalDeviceVulkan13Properties -> maxDescriptorSetUpdateAfterBindInlineUniformBlocks: Not specified/supported by device (Requires 4)
+      * [???] VkPhysicalDeviceVulkan13Properties -> maxInlineUniformTotalSize: Not specified/supported by device (Requires 4)
+-----------------------------------------------------------------
+
