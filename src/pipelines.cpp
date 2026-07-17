@@ -1,6 +1,7 @@
 #include "layer.hpp"
 #include "logger.hpp"
 #include "pipelines.hpp"
+#include "shader_reflector.hpp"
 #include <vulkan/vulkan.h>
 
 std::shared_mutex pipelineLayoutsLock;
@@ -13,6 +14,37 @@ pipeline_layout *get_pipeline_layout(VkPipelineLayout layout) {
         return it->second.get();
     }
     return nullptr;
+}
+
+VK_LAYER_EXPORT VkResult VKAPI_CALL DxvkMaliCompatLayer_CreateShaderModule(
+    VkDevice device, const VkShaderModuleCreateInfo *pCreateInfo,
+    const VkAllocationCallbacks *pAllocator, VkShaderModule *pShaderModule) {
+    struct device *dev = get_device(device);
+    if (!dev)
+        return VK_ERROR_UNKNOWN;
+
+    VkResult result = dev->table.CreateShaderModule(device, pCreateInfo,
+                                                    pAllocator, pShaderModule);
+    if (result != VK_SUCCESS) {
+        Logger::log("error", "vkCreateShaderModule failed: %d", result);
+        return result;
+    }
+
+    if (dev->emulate_precise_null_descriptor)
+        TrackShader(dev, *pShaderModule, pCreateInfo);
+    return VK_SUCCESS;
+}
+
+VK_LAYER_EXPORT void VKAPI_CALL DxvkMaliCompatLayer_DestroyShaderModule(
+    VkDevice device, VkShaderModule shaderModule,
+    const VkAllocationCallbacks *pAllocator) {
+    struct device *dev = get_device(device);
+    if (!dev)
+        return;
+
+    if (dev->emulate_precise_null_descriptor)
+        UntrackShader(shaderModule);
+    dev->table.DestroyShaderModule(device, shaderModule, pAllocator);
 }
 
 VK_LAYER_EXPORT VkResult VKAPI_CALL DxvkMaliCompatLayer_CreatePipelineLayout(
@@ -75,6 +107,14 @@ VK_LAYER_EXPORT VkResult VKAPI_CALL DxvkMaliCompatLayer_CreateGraphicsPipelines(
         return result;
     }
 
+    if (result == VK_SUCCESS && dev->emulate_precise_null_descriptor) {
+        for (int i = 0; i < createInfoCount; i++) {
+            TrackPipelineDescriptorLayoutBindingTypes(
+                dev, pCreateInfos[i].layout, pCreateInfos[i].stageCount,
+                pCreateInfos[i].pStages);
+        }
+    }
+
     return result;
 }
 
@@ -94,6 +134,13 @@ VK_LAYER_EXPORT VkResult VKAPI_CALL DxvkMaliCompatLayer_CreateComputePipelines(
         Logger::log("error", "vkCreateComputePipelines failed, result: %d",
                     result);
         return result;
+    }
+
+    if (result == VK_SUCCESS && dev->emulate_precise_null_descriptor) {
+        for (uint32_t i = 0; i < createInfoCount; ++i) {
+            TrackPipelineDescriptorLayoutBindingTypes(
+                dev, pCreateInfos[i].layout, 1, &pCreateInfos[i].stage);
+        }
     }
 
     return result;

@@ -262,5 +262,13 @@ VkResult VKAPI_CALL DxvkMaliCompatLayer_QueueBindSparse(
     VkQueue queue, uint32_t bindInfoCount, const VkBindSparseInfo *pBindInfo,
     VkFence fence);
 
+VkResult VKAPI_CALL DxvkMaliCompatLayer_CreateShaderModule(
+    VkDevice device, const VkShaderModuleCreateInfo *pCreateInfo,
+    const VkAllocationCallbacks *pAllocator, VkShaderModule *pShaderModule);
+
+void VKAPI_CALL DxvkMaliCompatLayer_DestroyShaderModule(
+    VkDevice device, VkShaderModule shaderModule,
+    const VkAllocationCallbacks *pAllocator);
+
 } // extern "C"
 #endif

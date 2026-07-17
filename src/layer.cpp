@@ -1232,6 +1232,8 @@ DxvkMaliCompatLayer_GetDeviceProcAddr(VkDevice device, const char *pName) {
     GETPROCADDR(GetDeviceQueue);
     GETPROCADDR(QueueSubmit);
     GETPROCADDR(QueueSubmit2);
+    GETPROCADDR(CreateShaderModule);
+    GETPROCADDR(DestroyShaderModule);
 
     GETPROCADDR(CmdPushDescriptorSetKHR);
     GETPROCADDR(CmdPushDescriptorSetWithTemplateKHR);
