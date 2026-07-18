@@ -1181,14 +1181,16 @@ VK_LAYER_EXPORT void VKAPI_CALL DxvkMaliCompatLayer_DestroyDevice(
         dev->finalizer_thread.join();
     }
 
-    scoped_lock l(global_lock);
-    for (auto &stagingResources : dev->stagingResourcesQueue) {
-        stagingResources->Cleanup();
+    {
+        scoped_lock l(global_lock);
+        for (auto &stagingResources : dev->stagingResourcesQueue) {
+            stagingResources->Cleanup();
+        }
+        dev->stagingResourcesQueue.clear();
+        dev->syncPool.reset();
+        dev->descriptorSetAllocator->cleanup();
+        dev->descriptorSetAllocator.reset();
     }
-    dev->stagingResourcesQueue.clear();
-    dev->syncPool.reset();
-    dev->descriptorSetAllocator->cleanup();
-    dev->descriptorSetAllocator.reset();
     destroy_null_resources(dev);
 
     if (device != VK_NULL_HANDLE)
