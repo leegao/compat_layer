@@ -270,5 +270,21 @@ void VKAPI_CALL DxvkMaliCompatLayer_DestroyShaderModule(
     VkDevice device, VkShaderModule shaderModule,
     const VkAllocationCallbacks *pAllocator);
 
+VkResult VKAPI_CALL DxvkMaliCompatLayer_AllocateDescriptorSets(
+    VkDevice device, const VkDescriptorSetAllocateInfo *pAllocateInfo,
+    VkDescriptorSet *pDescriptorSets);
+
+VkResult VKAPI_CALL DxvkMaliCompatLayer_FreeDescriptorSets(
+    VkDevice device, VkDescriptorPool descriptorPool,
+    uint32_t descriptorSetCount, const VkDescriptorSet *pDescriptorSets);
+
+VkResult VKAPI_CALL DxvkMaliCompatLayer_ResetDescriptorPool(
+    VkDevice device, VkDescriptorPool descriptorPool,
+    VkDescriptorPoolResetFlags flags);
+
+void VKAPI_CALL DxvkMaliCompatLayer_DestroyDescriptorPool(
+    VkDevice device, VkDescriptorPool descriptorPool,
+    const VkAllocationCallbacks *pAllocator);
+
 } // extern "C"
 #endif

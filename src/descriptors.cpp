@@ -2,13 +2,84 @@
 #include "layer.hpp"
 #include "logger.hpp"
 #include "null_descriptors.hpp"
+#include <algorithm>
 #include <mutex>
 #include <shared_mutex>
+#include <vulkan/vulkan.h>
 
 std::shared_mutex descriptorSetLayoutsLock;
 
 DescriptorSetLayoutsMap descriptorSetLayoutsMap;
 DescriptorUpdateTemplatesMap descriptorUpdateTemplatesMap;
+
+std::shared_mutex descriptorSetsLock;
+DescriptorSetsMap descriptorSetsMap;
+
+std::shared_mutex descriptorPoolsLock;
+DescriptorPoolsMap descriptorPoolsMap;
+
+void track_descriptor_sets(VkDescriptorPool pool, uint32_t count,
+                           const VkDescriptorSetLayout *pLayouts,
+                           const VkDescriptorSet *pSets) {
+    {
+        std::unique_lock l(descriptorSetsLock); // writer
+        for (uint32_t i = 0; i < count; ++i) {
+            descriptorSetsMap[pSets[i]] = pLayouts[i];
+        }
+    }
+
+    {
+        std::unique_lock l(descriptorPoolsLock); // writer
+        auto &pool_sets = descriptorPoolsMap[pool];
+        pool_sets.insert(pool_sets.end(), pSets, pSets + count);
+    }
+}
+
+void untrack_descriptor_sets(uint32_t count, const VkDescriptorSet *pSets) {
+    {
+        std::unique_lock l(descriptorSetsLock); // writer
+        for (uint32_t i = 0; i < count; ++i) {
+            descriptorSetsMap.erase(pSets[i]);
+        }
+    }
+
+    {
+        std::unique_lock l_pool(descriptorPoolsLock); // writer
+        for (auto &pair : descriptorPoolsMap) {
+            auto &vec = pair.second;
+            for (uint32_t i = 0; i < count; ++i) {
+                vec.erase(std::remove(vec.begin(), vec.end(), pSets[i]),
+                          vec.end());
+            }
+        }
+    }
+}
+
+void untrack_descriptor_pool(VkDescriptorPool pool) {
+    std::vector<VkDescriptorSet> sets_to_remove;
+    {
+        std::unique_lock l_pool(descriptorPoolsLock);
+        auto it = descriptorPoolsMap.find(pool);
+        if (it != descriptorPoolsMap.end()) {
+            sets_to_remove = std::move(it->second);
+            descriptorPoolsMap.erase(it);
+        }
+    }
+    if (!sets_to_remove.empty()) {
+        std::unique_lock l(descriptorSetsLock);
+        for (auto set : sets_to_remove) {
+            descriptorSetsMap.erase(set);
+        }
+    }
+}
+
+VkDescriptorSetLayout get_layout_for_set(VkDescriptorSet set) {
+    auto it = descriptorSetsMap.find(set);
+    if (it != descriptorSetsMap.end()) {
+        return it->second;
+    }
+    return VK_NULL_HANDLE;
+}
 
 descriptor_set_layout *get_descriptor_set_layout(VkDescriptorSetLayout layout) {
     auto it = descriptorSetLayoutsMap.find(layout);
@@ -23,6 +94,64 @@ get_descriptor_update_template(VkDescriptorUpdateTemplate temp) {
     if (it == descriptorUpdateTemplatesMap.end())
         return nullptr;
     return it->second.get();
+}
+
+VK_LAYER_EXPORT VkResult VKAPI_CALL DxvkMaliCompatLayer_AllocateDescriptorSets(
+    VkDevice device, const VkDescriptorSetAllocateInfo *pAllocateInfo,
+    VkDescriptorSet *pDescriptorSets) {
+    struct device *dev = get_device(device);
+    if (!dev)
+        return VK_ERROR_UNKNOWN;
+
+    VkResult result = dev->table.AllocateDescriptorSets(device, pAllocateInfo,
+                                                        pDescriptorSets);
+    if (result == VK_SUCCESS) {
+        track_descriptor_sets(pAllocateInfo->descriptorPool,
+                              pAllocateInfo->descriptorSetCount,
+                              pAllocateInfo->pSetLayouts, pDescriptorSets);
+    }
+    return result;
+}
+
+VK_LAYER_EXPORT VkResult VKAPI_CALL DxvkMaliCompatLayer_FreeDescriptorSets(
+    VkDevice device, VkDescriptorPool descriptorPool,
+    uint32_t descriptorSetCount, const VkDescriptorSet *pDescriptorSets) {
+    struct device *dev = get_device(device);
+    if (!dev)
+        return VK_ERROR_UNKNOWN;
+
+    VkResult result = dev->table.FreeDescriptorSets(
+        device, descriptorPool, descriptorSetCount, pDescriptorSets);
+    if (result == VK_SUCCESS) {
+        untrack_descriptor_sets(descriptorSetCount, pDescriptorSets);
+    }
+    return result;
+}
+
+VK_LAYER_EXPORT VkResult VKAPI_CALL DxvkMaliCompatLayer_ResetDescriptorPool(
+    VkDevice device, VkDescriptorPool descriptorPool,
+    VkDescriptorPoolResetFlags flags) {
+    struct device *dev = get_device(device);
+    if (!dev)
+        return VK_ERROR_UNKNOWN;
+
+    VkResult result =
+        dev->table.ResetDescriptorPool(device, descriptorPool, flags);
+    if (result == VK_SUCCESS) {
+        untrack_descriptor_pool(descriptorPool);
+    }
+    return result;
+}
+
+VK_LAYER_EXPORT void VKAPI_CALL DxvkMaliCompatLayer_DestroyDescriptorPool(
+    VkDevice device, VkDescriptorPool descriptorPool,
+    const VkAllocationCallbacks *pAllocator) {
+    struct device *dev = get_device(device);
+    if (!dev)
+        return;
+
+    untrack_descriptor_pool(descriptorPool);
+    dev->table.DestroyDescriptorPool(device, descriptorPool, pAllocator);
 }
 
 VK_LAYER_EXPORT VkResult VKAPI_CALL

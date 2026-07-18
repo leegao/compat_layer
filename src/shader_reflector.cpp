@@ -252,6 +252,14 @@ void TrackPipelineDescriptorLayoutBindingTypes(
                 std::shared_lock l(descriptorSetLayoutsLock);
                 get_descriptor_set_layout(layoutHandle);
             });
+
+            if (descriptorSetLayout) {
+                std::unique_lock l_hints(descriptorSetLayout->hintsLock);
+                auto &hint =
+                    descriptorSetLayout->bindingHints[bindingInfo.binding];
+                hint.imageViewType = bindingInfo.imageViewType;
+                hint.format = bindingInfo.format;
+            }
         }
     }
 }

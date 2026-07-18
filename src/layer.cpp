@@ -1228,8 +1228,8 @@ DxvkMaliCompatLayer_GetDeviceProcAddr(VkDevice device, const char *pName) {
     GETPROCADDR(DestroyDescriptorSetLayout);
     GETPROCADDR(CreatePipelineLayout);
     GETPROCADDR(DestroyPipelineLayout);
-    // GETPROCADDR(CreateGraphicsPipelines);
-    // GETPROCADDR(CreateComputePipelines);
+    GETPROCADDR(CreateGraphicsPipelines);
+    GETPROCADDR(CreateComputePipelines);
     // GETPROCADDR(DestroyPipeline);
     GETPROCADDR(GetDeviceQueue);
     GETPROCADDR(QueueSubmit);
@@ -1237,6 +1237,10 @@ DxvkMaliCompatLayer_GetDeviceProcAddr(VkDevice device, const char *pName) {
     GETPROCADDR(CreateShaderModule);
     GETPROCADDR(DestroyShaderModule);
 
+    GETPROCADDR(AllocateDescriptorSets);
+    GETPROCADDR(FreeDescriptorSets);
+    GETPROCADDR(ResetDescriptorPool);
+    GETPROCADDR(DestroyDescriptorPool);
     GETPROCADDR(CmdPushDescriptorSetKHR);
     GETPROCADDR(CmdPushDescriptorSetWithTemplateKHR);
     if (!strcmp(pName, "vkCreateDescriptorUpdateTemplate") ||
