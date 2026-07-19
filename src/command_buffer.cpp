@@ -368,16 +368,22 @@ VK_LAYER_EXPORT void VKAPI_CALL DxvkMaliCompatLayer_CmdBindVertexBuffers(
         return;
     struct device *dev = cb->device;
 
-    // TODO(leegao): fix this up too
     if (dev->emulate_null_descriptor && pBuffers) {
         std::vector<VkBuffer> buffers(bindingCount);
-        for (int i = 0; i < bindingCount; i++) {
-            buffers[i] = pBuffers[i] != VK_NULL_HANDLE
-                             ? pBuffers[i]
-                             : dev->null_descriptors.null_buffer;
+        std::vector<VkDeviceSize> offsets(bindingCount);
+
+        for (uint32_t i = 0; i < bindingCount; i++) {
+            if (pBuffers[i] == VK_NULL_HANDLE) {
+                buffers[i] = dev->null_descriptors.null_buffer;
+                offsets[i] = 0;
+            } else {
+                buffers[i] = pBuffers[i];
+                offsets[i] = pOffsets ? pOffsets[i] : 0;
+            }
         }
         dev->table.CmdBindVertexBuffers(commandBuffer, firstBinding,
-                                        bindingCount, buffers.data(), pOffsets);
+                                        bindingCount, buffers.data(),
+                                        offsets.data());
     } else {
         dev->table.CmdBindVertexBuffers(commandBuffer, firstBinding,
                                         bindingCount, pBuffers, pOffsets);
@@ -395,25 +401,29 @@ VK_LAYER_EXPORT void VKAPI_CALL DxvkMaliCompatLayer_CmdBindVertexBuffers2(
 
     if (dev->emulate_null_descriptor && pBuffers) {
         std::vector<VkBuffer> buffers(bindingCount);
+        std::vector<VkDeviceSize> offsets(bindingCount);
         std::vector<VkDeviceSize> sizes;
         if (pSizes)
-            sizes.assign(pSizes, pSizes + bindingCount);
+            sizes.resize(bindingCount);
 
-        for (int i = 0; i < bindingCount; i++) {
+        for (uint32_t i = 0; i < bindingCount; i++) {
             if (pBuffers[i] == VK_NULL_HANDLE) {
                 buffers[i] = dev->null_descriptors.null_buffer;
+                offsets[i] = 0;
                 if (pSizes) {
-                    // Arbitrary clamp to 65536
-                    sizes[i] =
-                        std::min(pSizes[i], static_cast<VkDeviceSize>(65536));
+                    sizes[i] = 65536;
                 }
             } else {
                 buffers[i] = pBuffers[i];
+                offsets[i] = pOffsets ? pOffsets[i] : 0;
+                if (pSizes) {
+                    sizes[i] = pSizes[i];
+                }
             }
         }
         dev->table.CmdBindVertexBuffers2(
-            commandBuffer, firstBinding, bindingCount, buffers.data(), pOffsets,
-            pSizes ? sizes.data() : nullptr, pStrides);
+            commandBuffer, firstBinding, bindingCount, buffers.data(),
+            offsets.data(), pSizes ? sizes.data() : nullptr, pStrides);
     } else {
         dev->table.CmdBindVertexBuffers2(commandBuffer, firstBinding,
                                          bindingCount, pBuffers, pOffsets,
