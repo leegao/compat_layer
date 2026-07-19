@@ -6,6 +6,7 @@
 #include "pipeline_state.hpp"
 #include "pipelines.hpp"
 #include "staging_resources.hpp"
+#include "vk_func.hpp"
 #include <algorithm>
 #include <unordered_map>
 
@@ -321,6 +322,7 @@ VK_LAYER_EXPORT void VKAPI_CALL DxvkMaliCompatLayer_CmdPushDescriptorSetKHR(
         cb->liveDescriptorSets.push_back({pool, allocatedSet});
     }
 
+    track_descriptor_sets(pool, 1, &descriptorSetLayout->handle, &allocatedSet);
     std::vector<VkWriteDescriptorSet> updates(
         pDescriptorWrites, pDescriptorWrites + descriptorWriteCount);
     for (uint32_t i = 0; i < descriptorWriteCount; ++i) {
@@ -328,8 +330,8 @@ VK_LAYER_EXPORT void VKAPI_CALL DxvkMaliCompatLayer_CmdPushDescriptorSetKHR(
     }
 
     // TODO(leegao): look into late-binding instead of immediate state changes
-    dev->table.UpdateDescriptorSets(dev->handle, descriptorWriteCount,
-                                    updates.data(), 0, nullptr);
+    DxvkMaliCompatLayer_UpdateDescriptorSets(dev->handle, descriptorWriteCount,
+                                             updates.data(), 0, nullptr);
     dev->table.CmdBindDescriptorSets(commandBuffer, pipelineBindPoint, layout,
                                      set, 1, &allocatedSet, 0, nullptr);
 
@@ -399,10 +401,11 @@ DxvkMaliCompatLayer_CmdPushDescriptorSetWithTemplateKHR(
         cb->liveDescriptorSets.push_back({pool, allocatedSet});
     }
 
+    track_descriptor_sets(pool, 1, &descriptorSetLayout->handle, &allocatedSet);
     auto pipelineBindPoint = descriptor_update_template->pipelineBindPoint;
     // TODO(leegao): look into late-binding instead of immediate state changes
-    dev->table.UpdateDescriptorSetWithTemplate(dev->handle, allocatedSet,
-                                               descriptorUpdateTemplate, pData);
+    DxvkMaliCompatLayer_UpdateDescriptorSetWithTemplate(
+        dev->handle, allocatedSet, descriptorUpdateTemplate, pData);
     dev->table.CmdBindDescriptorSets(commandBuffer, pipelineBindPoint, layout,
                                      set, 1, &allocatedSet, 0, nullptr);
 
