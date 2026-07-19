@@ -165,6 +165,8 @@ void DescriptorSetAllocator::free(VkDescriptorPool pool,
     device->table.FreeDescriptorSets(device->handle, pool, 1, &descriptors);
     allocated_count--;
 
+    untrack_descriptor_sets(1, &descriptors);
+
     if (occupancy.find(pool) != occupancy.end() && occupancy[pool] > 0) {
         occupancy[pool]--;
     }

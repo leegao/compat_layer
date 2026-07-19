@@ -203,6 +203,27 @@ bool fix_null_descriptors(struct device *dev, uint32_t updatesCount,
             return std::get<std::vector<T>>(item);
         };
 
+        VkFormat formatHint = VK_FORMAT_UNDEFINED;
+        VkImageViewType viewTypeHint = VK_IMAGE_VIEW_TYPE_MAX_ENUM;
+
+        auto layoutHandle = get_layout_for_set(write.dstSet);
+        if (dev->emulate_precise_null_descriptor &&
+            layoutHandle != VK_NULL_HANDLE) {
+            auto *descriptorSetLayout = ({
+                std::shared_lock l(descriptorSetLayoutsLock);
+                get_descriptor_set_layout(layoutHandle);
+            });
+            if (descriptorSetLayout) {
+                std::shared_lock l_hints(descriptorSetLayout->hintsLock);
+                auto it =
+                    descriptorSetLayout->bindingHints.find(write.dstBinding);
+                if (it != descriptorSetLayout->bindingHints.end()) {
+                    formatHint = it->second.format;
+                    viewTypeHint = it->second.imageViewType;
+                }
+            }
+        }
+
         // Apply the nullDescriptor fixup patch to every descriptor write info
         const uint32_t n = write.descriptorCount;
         switch (write.descriptorType) {
@@ -211,9 +232,9 @@ bool fix_null_descriptors(struct device *dev, uint32_t updatesCount,
         case VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC:
         case VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC: {
             auto &bufferInfo = copy_descriptor_info(write.pBufferInfo, n);
-            null_descriptor_fixer::fixup(
-                dev, write.descriptorType, n, bufferInfo.data(), stride,
-                VK_FORMAT_UNDEFINED, VK_IMAGE_VIEW_TYPE_MAX_ENUM);
+            null_descriptor_fixer::fixup(dev, write.descriptorType, n,
+                                         bufferInfo.data(), stride, formatHint,
+                                         viewTypeHint);
             patchedUpdates[i].pBufferInfo = bufferInfo.data();
             break;
         }
@@ -223,18 +244,18 @@ bool fix_null_descriptors(struct device *dev, uint32_t updatesCount,
         case VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT:
         case VK_DESCRIPTOR_TYPE_SAMPLER: {
             auto &imageInfo = copy_descriptor_info(write.pImageInfo, n);
-            null_descriptor_fixer::fixup(
-                dev, write.descriptorType, n, imageInfo.data(), stride,
-                VK_FORMAT_UNDEFINED, VK_IMAGE_VIEW_TYPE_MAX_ENUM);
+            null_descriptor_fixer::fixup(dev, write.descriptorType, n,
+                                         imageInfo.data(), stride, formatHint,
+                                         viewTypeHint);
             patchedUpdates[i].pImageInfo = imageInfo.data();
             break;
         }
         case VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER:
         case VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER: {
             auto &bufferViews = copy_descriptor_info(write.pTexelBufferView, n);
-            null_descriptor_fixer::fixup(
-                dev, write.descriptorType, n, bufferViews.data(), stride,
-                VK_FORMAT_UNDEFINED, VK_IMAGE_VIEW_TYPE_MAX_ENUM);
+            null_descriptor_fixer::fixup(dev, write.descriptorType, n,
+                                         bufferViews.data(), stride, formatHint,
+                                         viewTypeHint);
             patchedUpdates[i].pTexelBufferView = bufferViews.data();
             break;
         }
@@ -289,9 +310,30 @@ bool fix_null_descriptor_templates(
 
     for (const auto &entry : updateTemplate->entries) {
         auto *dstPtr = patchedTemplateData.data() + entry.offset;
-        null_descriptor_fixer::fixup(
-            dev, entry.descriptorType, entry.descriptorCount, dstPtr,
-            entry.stride, VK_FORMAT_UNDEFINED, VK_IMAGE_VIEW_TYPE_MAX_ENUM);
+
+        VkFormat formatHint = VK_FORMAT_UNDEFINED;
+        VkImageViewType viewTypeHint = VK_IMAGE_VIEW_TYPE_MAX_ENUM;
+
+        if (dev->emulate_precise_null_descriptor &&
+            updateTemplate->layout != VK_NULL_HANDLE) {
+            auto *descriptorSetLayout = ({
+                std::shared_lock l(descriptorSetLayoutsLock);
+                get_descriptor_set_layout(updateTemplate->layout);
+            });
+            if (descriptorSetLayout) {
+                std::shared_lock l_hints(descriptorSetLayout->hintsLock);
+                auto it =
+                    descriptorSetLayout->bindingHints.find(entry.dstBinding);
+                if (it != descriptorSetLayout->bindingHints.end()) {
+                    formatHint = it->second.format;
+                    viewTypeHint = it->second.imageViewType;
+                }
+            }
+        }
+
+        null_descriptor_fixer::fixup(dev, entry.descriptorType,
+                                     entry.descriptorCount, dstPtr,
+                                     entry.stride, formatHint, viewTypeHint);
     }
 
     receiver(patchedTemplateData.data());
