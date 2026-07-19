@@ -1203,6 +1203,7 @@ VK_LAYER_EXPORT void VKAPI_CALL DxvkMaliCompatLayer_DestroyDevice(
 
 VK_LAYER_EXPORT PFN_vkVoidFunction VKAPI_CALL
 DxvkMaliCompatLayer_GetDeviceProcAddr(VkDevice device, const char *pName) {
+    GETPROCADDR(GetDeviceProcAddr);
     GETPROCADDR(DestroyDevice);
 
 #ifdef ENABLE_BUFFER_TRACKING
