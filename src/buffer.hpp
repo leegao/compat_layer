@@ -35,4 +35,6 @@ struct buffer *CreateStagingBuffer(
 
 struct dense_sparse_resource *find_sparse_buffer(VkBuffer buffer);
 
-uint32_t FindMemoryType(struct device *dev, uint32_t typeBits);
+uint32_t FindMemoryType(
+    struct device *dev, uint32_t typeBits,
+    VkMemoryPropertyFlags required = VK_MEMORY_PROPERTY_FLAG_BITS_MAX_ENUM);

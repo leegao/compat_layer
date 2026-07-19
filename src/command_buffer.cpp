@@ -3,9 +3,11 @@
 #include "descriptors.hpp"
 #include "layer.hpp"
 #include "logger.hpp"
+#include "null_descriptors.hpp"
 #include "pipeline_state.hpp"
-#include "pipelines.hpp"
+#include "push_descriptors.hpp"
 #include "staging_resources.hpp"
+#include "vk_func.hpp"
 #include <algorithm>
 #include <unordered_map>
 
@@ -265,14 +267,11 @@ VK_LAYER_EXPORT void VKAPI_CALL DxvkMaliCompatLayer_CmdPushDescriptorSetKHR(
     auto *cb = get_command_buffer(commandBuffer);
     auto *dev = cb->device;
 
-    auto *pipelineLayout = ({
-        std::shared_lock l(pipelineLayoutsLock); // reader
-        get_pipeline_layout(layout);
-    });
-    if (!pipelineLayout || set >= pipelineLayout->setLayouts.size()) {
+    auto *descriptorSetLayout = GetDescriptorSetLayout(layout, set);
+    if (dev->emulate_push_descriptors && !descriptorSetLayout) {
         Logger::log(
             "error",
-            "vkCmdPushDescriptorSetKHR: pipeline layout or set index invalid");
+            "vkCmdPushDescriptorSetKHR: descriptor set layout not found");
         if (dev->table.CmdPushDescriptorSet) {
             dev->table.CmdPushDescriptorSet(commandBuffer, pipelineBindPoint,
                                             layout, set, descriptorWriteCount,
@@ -281,57 +280,27 @@ VK_LAYER_EXPORT void VKAPI_CALL DxvkMaliCompatLayer_CmdPushDescriptorSetKHR(
         return;
     }
 
-    auto *descriptorSetLayout = ({
-        std::shared_lock l(descriptorSetLayoutsLock); // reader
-        pipelineLayout->GetDescriptorSetLayout(set);
-    });
-    if (!descriptorSetLayout ||
-        !descriptorSetLayout->isEmulatedPushDescriptor) {
-        if (!descriptorSetLayout)
-            Logger::log("error",
-                        "vkCmdPushDescriptorSetKHR: descriptor set layout "
-                        "not found");
-        if (dev->table.CmdPushDescriptorSet) {
+    if (!descriptorSetLayout->isEmulatedPushDescriptor) {
+        if (dev->emulate_null_descriptor) {
+            fix_null_descriptors(
+                dev, descriptorWriteCount, pDescriptorWrites,
+                [&](const VkWriteDescriptorSet *patchedDescriptorWrites) {
+                    dev->table.CmdPushDescriptorSet(
+                        commandBuffer, pipelineBindPoint, layout, set,
+                        descriptorWriteCount, patchedDescriptorWrites);
+                },
+                descriptorSetLayout->handle);
+        } else {
             dev->table.CmdPushDescriptorSet(commandBuffer, pipelineBindPoint,
                                             layout, set, descriptorWriteCount,
                                             pDescriptorWrites);
         }
-        return;
     }
 
     // Emulated path
-    VkDescriptorPool pool = VK_NULL_HANDLE;
-    VkDescriptorSet allocatedSet = VK_NULL_HANDLE;
-    VkResult res = dev->descriptorSetAllocator->allocate(
-        descriptorSetLayout->handle, &pool, &allocatedSet);
-    if (res != VK_SUCCESS) {
-        Logger::log("error",
-                    "vkCmdPushDescriptorSetKHR: "
-                    "DescriptorSetAllocator::allocate failed: %d",
-                    res);
-        return;
-    }
-
-    // Because command buffers can be recycled, and we're performing
-    // immediate descriptor set updates, we need to tie these to the
-    // lifecycle of the command buffer and not the submission.
-    // See https://github.com/leegao/compat_layer/issues/1
-    {
-        scoped_lock l(global_lock);
-        cb->liveDescriptorSets.push_back({pool, allocatedSet});
-    }
-
-    std::vector<VkWriteDescriptorSet> updates(
-        pDescriptorWrites, pDescriptorWrites + descriptorWriteCount);
-    for (uint32_t i = 0; i < descriptorWriteCount; ++i) {
-        updates[i].dstSet = allocatedSet;
-    }
-
-    // TODO(leegao): look into late-binding instead of immediate state changes
-    dev->table.UpdateDescriptorSets(dev->handle, descriptorWriteCount,
-                                    updates.data(), 0, nullptr);
-    dev->table.CmdBindDescriptorSets(commandBuffer, pipelineBindPoint, layout,
-                                     set, 1, &allocatedSet, 0, nullptr);
+    auto allocatedSet = BindEmulatedPushDescriptorSet(
+        cb, pipelineBindPoint, descriptorSetLayout->handle, layout, set,
+        descriptorWriteCount, pDescriptorWrites);
 
     if (pipelineBindPoint == VK_PIPELINE_BIND_POINT_COMPUTE) {
         cb->computePipelineState.TrackDescriptorSets(layout, set, 1,
@@ -347,13 +316,12 @@ DxvkMaliCompatLayer_CmdPushDescriptorSetWithTemplateKHR(
     struct command_buffer *cb = get_command_buffer(commandBuffer);
     struct device *dev = cb->device;
 
-    auto *descriptor_update_template = ({
-        std::shared_lock l(descriptorSetLayoutsLock); // reader
-        get_descriptor_update_template(descriptorUpdateTemplate);
-    });
-    if (!descriptor_update_template) {
-        Logger::log("error", "vkCmdPushDescriptorSetWithTemplateKHR: template "
-                             "not found");
+    VkPipelineBindPoint pipelineBindPoint;
+    auto *descriptorSetLayout =
+        GetDescriptorSetLayout(descriptorUpdateTemplate, pipelineBindPoint);
+    if (dev->emulate_push_descriptors && !descriptorSetLayout) {
+        Logger::log("error", "CmdPushDescriptorSetWithTemplate: descriptor set "
+                             "layout not found");
         if (dev->table.CmdPushDescriptorSetWithTemplate) {
             dev->table.CmdPushDescriptorSetWithTemplate(
                 commandBuffer, descriptorUpdateTemplate, layout, set, pData);
@@ -361,50 +329,30 @@ DxvkMaliCompatLayer_CmdPushDescriptorSetWithTemplateKHR(
         return;
     }
 
-    auto *descriptorSetLayout = ({
-        std::shared_lock l(descriptorSetLayoutsLock); // reader
-        get_descriptor_set_layout(descriptor_update_template->layout);
-    });
-    if (!descriptorSetLayout ||
-        !descriptorSetLayout->isEmulatedPushDescriptor) {
-        if (!descriptorSetLayout)
-            Logger::log("error",
-                        "vkCmdPushDescriptorSetWithTemplateKHR: layout "
-                        "not found or is not a push descriptor set");
-        if (dev->table.CmdPushDescriptorSetWithTemplate) {
+    if (!descriptorSetLayout->isEmulatedPushDescriptor) {
+        if (dev->emulate_null_descriptor) {
+            auto *descriptor_update_template = ({
+                std::shared_lock l(descriptorSetLayoutsLock); // reader
+                get_descriptor_update_template(descriptorUpdateTemplate);
+            });
+
+            fix_null_descriptor_templates(
+                dev, descriptor_update_template, pData,
+                [&](const void *patchedData) {
+                    dev->table.CmdPushDescriptorSetWithTemplate(
+                        commandBuffer, descriptorUpdateTemplate, layout, set,
+                        patchedData);
+                });
+        } else {
             dev->table.CmdPushDescriptorSetWithTemplate(
                 commandBuffer, descriptorUpdateTemplate, layout, set, pData);
         }
-        return;
     }
 
-    VkDescriptorPool pool = VK_NULL_HANDLE;
-    VkDescriptorSet allocatedSet = VK_NULL_HANDLE;
-    VkResult res = dev->descriptorSetAllocator->allocate(
-        descriptorSetLayout->handle, &pool, &allocatedSet);
-    if (res != VK_SUCCESS) {
-        Logger::log("error",
-                    "vkCmdPushDescriptorSetWithTemplateKHR: "
-                    "DescriptorSetAllocator::allocate failed: %d",
-                    res);
-        return;
-    }
-
-    // Because command buffers can be recycled, and we're performing
-    // immediate descriptor set updates, we need to tie these to the
-    // lifecycle of the command buffer and not the submission.
-    // See https://github.com/leegao/compat_layer/issues/1
-    {
-        scoped_lock l(global_lock);
-        cb->liveDescriptorSets.push_back({pool, allocatedSet});
-    }
-
-    auto pipelineBindPoint = descriptor_update_template->pipelineBindPoint;
-    // TODO(leegao): look into late-binding instead of immediate state changes
-    dev->table.UpdateDescriptorSetWithTemplate(dev->handle, allocatedSet,
-                                               descriptorUpdateTemplate, pData);
-    dev->table.CmdBindDescriptorSets(commandBuffer, pipelineBindPoint, layout,
-                                     set, 1, &allocatedSet, 0, nullptr);
+    // Emulated path
+    auto allocatedSet = BindEmulatedPushDescriptorSetTemplate(
+        cb, pipelineBindPoint, descriptorUpdateTemplate,
+        descriptorSetLayout->handle, layout, set, pData);
 
     if (pipelineBindPoint == VK_PIPELINE_BIND_POINT_COMPUTE) {
         cb->computePipelineState.TrackDescriptorSets(layout, set, 1,
@@ -420,6 +368,7 @@ VK_LAYER_EXPORT void VKAPI_CALL DxvkMaliCompatLayer_CmdBindVertexBuffers(
         return;
     struct device *dev = cb->device;
 
+    // TODO(leegao): fix this up too
     if (dev->emulate_null_descriptor && pBuffers) {
         std::vector<VkBuffer> buffers(bindingCount);
         for (int i = 0; i < bindingCount; i++) {

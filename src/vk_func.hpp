@@ -262,5 +262,29 @@ VkResult VKAPI_CALL DxvkMaliCompatLayer_QueueBindSparse(
     VkQueue queue, uint32_t bindInfoCount, const VkBindSparseInfo *pBindInfo,
     VkFence fence);
 
+VkResult VKAPI_CALL DxvkMaliCompatLayer_CreateShaderModule(
+    VkDevice device, const VkShaderModuleCreateInfo *pCreateInfo,
+    const VkAllocationCallbacks *pAllocator, VkShaderModule *pShaderModule);
+
+void VKAPI_CALL DxvkMaliCompatLayer_DestroyShaderModule(
+    VkDevice device, VkShaderModule shaderModule,
+    const VkAllocationCallbacks *pAllocator);
+
+VkResult VKAPI_CALL DxvkMaliCompatLayer_AllocateDescriptorSets(
+    VkDevice device, const VkDescriptorSetAllocateInfo *pAllocateInfo,
+    VkDescriptorSet *pDescriptorSets);
+
+VkResult VKAPI_CALL DxvkMaliCompatLayer_FreeDescriptorSets(
+    VkDevice device, VkDescriptorPool descriptorPool,
+    uint32_t descriptorSetCount, const VkDescriptorSet *pDescriptorSets);
+
+VkResult VKAPI_CALL DxvkMaliCompatLayer_ResetDescriptorPool(
+    VkDevice device, VkDescriptorPool descriptorPool,
+    VkDescriptorPoolResetFlags flags);
+
+void VKAPI_CALL DxvkMaliCompatLayer_DestroyDescriptorPool(
+    VkDevice device, VkDescriptorPool descriptorPool,
+    const VkAllocationCallbacks *pAllocator);
+
 } // extern "C"
 #endif

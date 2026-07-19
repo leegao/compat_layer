@@ -1,5 +1,6 @@
 #include "null_descriptors.hpp"
 
+#include "buffer.hpp"
 #include "descriptors.hpp"
 #include "layer.hpp"
 #include "logger.hpp"
@@ -9,6 +10,7 @@
 #include <functional>
 #include <variant>
 #include <vulkan/vulkan.h>
+#include <vulkan/vulkan_core.h>
 
 namespace null_descriptor_fixer {
 
@@ -84,8 +86,9 @@ inline bool needs_fixup(VkDescriptorType type, uint32_t count,
     return false;
 }
 
-inline void fixup(const device *dev, VkDescriptorType type, uint32_t count,
-                  void *dst_data, size_t stride) noexcept {
+inline void fixup(device *dev, VkDescriptorType type, uint32_t count,
+                  void *dst_data, size_t stride, VkFormat texelFormatHint,
+                  VkImageViewType imageViewTypeHint) noexcept {
     if (!dst_data)
         return;
     auto *ptr = reinterpret_cast<std::byte *>(dst_data);
@@ -93,6 +96,23 @@ inline void fixup(const device *dev, VkDescriptorType type, uint32_t count,
     const bool isSampler = type == VK_DESCRIPTOR_TYPE_SAMPLER ||
                            type == VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
     const bool isImageView = type != VK_DESCRIPTOR_TYPE_SAMPLER;
+
+    const VkImageViewType effectiveViewType =
+        (type == VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT &&
+         imageViewTypeHint == VK_IMAGE_VIEW_TYPE_MAX_ENUM)
+            ? VK_IMAGE_VIEW_TYPE_2D
+            : imageViewTypeHint;
+
+    VkImageView imageView = VK_NULL_HANDLE;
+    VkBufferView bufferView = VK_NULL_HANDLE;
+    if (isImageView) {
+        imageView = get_null_image_view(dev, effectiveViewType, texelFormatHint,
+                                        VK_SAMPLE_COUNT_1_BIT);
+    }
+    if (type == VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER ||
+        type == VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER) {
+        bufferView = get_null_buffer_view(dev, texelFormatHint);
+    }
 
     for (int i = 0; i < count; i++) {
         auto *current_elem = ptr + (i * stride);
@@ -118,7 +138,7 @@ inline void fixup(const device *dev, VkDescriptorType type, uint32_t count,
         case VK_DESCRIPTOR_TYPE_SAMPLER: {
             auto *img = reinterpret_cast<VkDescriptorImageInfo *>(current_elem);
             if (isImageView && img->imageView == VK_NULL_HANDLE) {
-                img->imageView = dev->null_descriptors.null_image_view;
+                img->imageView = imageView;
                 img->imageLayout = VK_IMAGE_LAYOUT_GENERAL;
             }
             if (isSampler && img->sampler == VK_NULL_HANDLE) {
@@ -130,7 +150,7 @@ inline void fixup(const device *dev, VkDescriptorType type, uint32_t count,
         case VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER: {
             auto *view = reinterpret_cast<VkBufferView *>(current_elem);
             if (*view == VK_NULL_HANDLE) {
-                *view = dev->null_descriptors.null_buffer_view;
+                *view = bufferView;
             }
             break;
         }
@@ -146,9 +166,10 @@ using DescriptorInfoVariant =
     std::variant<std::vector<VkDescriptorBufferInfo>,
                  std::vector<VkDescriptorImageInfo>, std::vector<VkBufferView>>;
 
-bool fix_null_descriptors(const device *dev, uint32_t updatesCount,
+bool fix_null_descriptors(struct device *dev, uint32_t updatesCount,
                           const VkWriteDescriptorSet *updates,
-                          std::function<void(decltype(updates))> receiver) {
+                          std::function<void(decltype(updates))> receiver,
+                          VkDescriptorSetLayout layoutHandle) {
     std::vector<VkWriteDescriptorSet> patchedUpdates;
     std::deque<DescriptorInfoVariant> allocations; // deque is ptr-stable
 
@@ -184,6 +205,31 @@ bool fix_null_descriptors(const device *dev, uint32_t updatesCount,
             return std::get<std::vector<T>>(item);
         };
 
+        VkFormat formatHint = VK_FORMAT_UNDEFINED;
+        VkImageViewType viewTypeHint = VK_IMAGE_VIEW_TYPE_MAX_ENUM;
+
+        if (dev->emulate_precise_null_descriptor &&
+            layoutHandle == VK_NULL_HANDLE) {
+            layoutHandle = get_layout_for_set(write.dstSet);
+        }
+
+        if (dev->emulate_precise_null_descriptor &&
+            layoutHandle != VK_NULL_HANDLE) {
+            auto *descriptorSetLayout = ({
+                std::shared_lock l(descriptorSetLayoutsLock);
+                get_descriptor_set_layout(layoutHandle);
+            });
+            if (descriptorSetLayout) {
+                std::shared_lock l_hints(descriptorSetLayout->hintsLock);
+                auto it =
+                    descriptorSetLayout->bindingHints.find(write.dstBinding);
+                if (it != descriptorSetLayout->bindingHints.end()) {
+                    formatHint = it->second.format;
+                    viewTypeHint = it->second.imageViewType;
+                }
+            }
+        }
+
         // Apply the nullDescriptor fixup patch to every descriptor write info
         const uint32_t n = write.descriptorCount;
         switch (write.descriptorType) {
@@ -193,7 +239,8 @@ bool fix_null_descriptors(const device *dev, uint32_t updatesCount,
         case VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC: {
             auto &bufferInfo = copy_descriptor_info(write.pBufferInfo, n);
             null_descriptor_fixer::fixup(dev, write.descriptorType, n,
-                                         bufferInfo.data(), stride);
+                                         bufferInfo.data(), stride, formatHint,
+                                         viewTypeHint);
             patchedUpdates[i].pBufferInfo = bufferInfo.data();
             break;
         }
@@ -204,7 +251,8 @@ bool fix_null_descriptors(const device *dev, uint32_t updatesCount,
         case VK_DESCRIPTOR_TYPE_SAMPLER: {
             auto &imageInfo = copy_descriptor_info(write.pImageInfo, n);
             null_descriptor_fixer::fixup(dev, write.descriptorType, n,
-                                         imageInfo.data(), stride);
+                                         imageInfo.data(), stride, formatHint,
+                                         viewTypeHint);
             patchedUpdates[i].pImageInfo = imageInfo.data();
             break;
         }
@@ -212,7 +260,8 @@ bool fix_null_descriptors(const device *dev, uint32_t updatesCount,
         case VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER: {
             auto &bufferViews = copy_descriptor_info(write.pTexelBufferView, n);
             null_descriptor_fixer::fixup(dev, write.descriptorType, n,
-                                         bufferViews.data(), stride);
+                                         bufferViews.data(), stride, formatHint,
+                                         viewTypeHint);
             patchedUpdates[i].pTexelBufferView = bufferViews.data();
             break;
         }
@@ -267,13 +316,237 @@ bool fix_null_descriptor_templates(
 
     for (const auto &entry : updateTemplate->entries) {
         auto *dstPtr = patchedTemplateData.data() + entry.offset;
+
+        VkFormat formatHint = VK_FORMAT_UNDEFINED;
+        VkImageViewType viewTypeHint = VK_IMAGE_VIEW_TYPE_MAX_ENUM;
+
+        if (dev->emulate_precise_null_descriptor &&
+            updateTemplate->layout != VK_NULL_HANDLE) {
+            auto *descriptorSetLayout = ({
+                std::shared_lock l(descriptorSetLayoutsLock);
+                get_descriptor_set_layout(updateTemplate->layout);
+            });
+            if (descriptorSetLayout) {
+                std::shared_lock l_hints(descriptorSetLayout->hintsLock);
+                auto it =
+                    descriptorSetLayout->bindingHints.find(entry.dstBinding);
+                if (it != descriptorSetLayout->bindingHints.end()) {
+                    formatHint = it->second.format;
+                    viewTypeHint = it->second.imageViewType;
+                }
+            }
+        }
+
         null_descriptor_fixer::fixup(dev, entry.descriptorType,
                                      entry.descriptorCount, dstPtr,
-                                     entry.stride);
+                                     entry.stride, formatHint, viewTypeHint);
     }
 
     receiver(patchedTemplateData.data());
     return true;
+}
+
+namespace {
+
+VkBufferView CreateNullBufferView(struct device *dev, VkFormat format) {
+    VkBufferViewCreateInfo info = {
+        .sType = VK_STRUCTURE_TYPE_BUFFER_VIEW_CREATE_INFO,
+        .buffer = dev->null_descriptors.null_buffer,
+        .format = format,
+        .offset = 0,
+        .range = VK_WHOLE_SIZE,
+    };
+    VkBufferView view = VK_NULL_HANDLE;
+    VkResult result =
+        dev->table.CreateBufferView(dev->handle, &info, dev->alloc, &view);
+    if (result != VK_SUCCESS) {
+        Logger::log(
+            "error",
+            "Failed to create null_buffer_view for format %d, result: %d",
+            static_cast<int>(format), result);
+        return VK_NULL_HANDLE;
+    }
+    return view;
+}
+
+null_image_resource CreateNullImageResource(struct device *dev,
+                                            VkImageViewType viewType,
+                                            VkFormat format,
+                                            VkSampleCountFlagBits samples) {
+    const auto &table = dev->table;
+    null_image_resource resource;
+
+    auto memoryProps = dev->memoryProps;
+
+    VkImageType imageType;
+    uint32_t arrayLayers = 1;
+    VkImageCreateFlags createFlags = 0;
+    switch (viewType) {
+    case VK_IMAGE_VIEW_TYPE_1D:
+        imageType = VK_IMAGE_TYPE_1D;
+        break;
+    case VK_IMAGE_VIEW_TYPE_1D_ARRAY:
+        imageType = VK_IMAGE_TYPE_1D;
+        arrayLayers = 1;
+        break;
+    case VK_IMAGE_VIEW_TYPE_3D:
+        imageType = VK_IMAGE_TYPE_3D;
+        break;
+    case VK_IMAGE_VIEW_TYPE_CUBE:
+        imageType = VK_IMAGE_TYPE_2D;
+        arrayLayers = 6;
+        createFlags |= VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT;
+        break;
+    case VK_IMAGE_VIEW_TYPE_CUBE_ARRAY:
+        imageType = VK_IMAGE_TYPE_2D;
+        arrayLayers = 6;
+        createFlags |= VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT;
+        break;
+    case VK_IMAGE_VIEW_TYPE_2D_ARRAY:
+        imageType = VK_IMAGE_TYPE_2D;
+        arrayLayers = 1;
+        break;
+    case VK_IMAGE_VIEW_TYPE_2D:
+    default:
+        imageType = VK_IMAGE_TYPE_2D;
+        break;
+    }
+
+    VkImageCreateInfo imageCreateInfo = {
+        .sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
+        .flags = createFlags,
+        .imageType = imageType,
+        .format = format,
+        .extent = {1, 1, imageType == VK_IMAGE_TYPE_3D ? 1u : 1u},
+        .mipLevels = 1,
+        .arrayLayers = arrayLayers,
+        .samples = samples,
+        .tiling = VK_IMAGE_TILING_OPTIMAL,
+        .usage = VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_STORAGE_BIT |
+                 VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT,
+        .sharingMode = VK_SHARING_MODE_EXCLUSIVE,
+        .initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,
+    };
+    VkResult result = DxvkMaliCompatLayer_CreateImage(
+        dev->handle, &imageCreateInfo, dev->alloc, &resource.image);
+    if (result != VK_SUCCESS) {
+        Logger::log("error",
+                    "Failed to create null image (viewType=%d, format=%d, "
+                    "samples=%d): %d",
+                    static_cast<int>(viewType), static_cast<int>(format),
+                    static_cast<int>(samples), result);
+        return resource;
+    }
+
+    VkMemoryRequirements memReqs;
+    table.GetImageMemoryRequirements(dev->handle, resource.image, &memReqs);
+    auto memoryType = FindMemoryType(dev, memReqs.memoryTypeBits);
+    if (memoryType == UINT32_MAX) {
+        Logger::log("error", "Failed to find memory type for null image");
+        DxvkMaliCompatLayer_DestroyImage(dev->handle, resource.image,
+                                         dev->alloc);
+        resource.image = VK_NULL_HANDLE;
+        return resource;
+    }
+
+    VkMemoryAllocateInfo allocInfo = {
+        .sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
+        .allocationSize = memReqs.size,
+        .memoryTypeIndex = memoryType,
+    };
+    result = table.AllocateMemory(dev->handle, &allocInfo, dev->alloc,
+                                  &resource.memory);
+    if (result != VK_SUCCESS) {
+        Logger::log("error",
+                    "Failed to allocate memory for null image, result: %d",
+                    result);
+        DxvkMaliCompatLayer_DestroyImage(dev->handle, resource.image,
+                                         dev->alloc);
+        resource.image = VK_NULL_HANDLE;
+        return resource;
+    }
+    table.BindImageMemory(dev->handle, resource.image, resource.memory, 0);
+
+    VkImageViewCreateInfo viewInfo = {
+        .sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
+        .image = resource.image,
+        .viewType = viewType == VK_IMAGE_VIEW_TYPE_MAX_ENUM
+                        ? VK_IMAGE_VIEW_TYPE_2D
+                        : viewType,
+        .format = format,
+        .components = {VK_COMPONENT_SWIZZLE_IDENTITY,
+                       VK_COMPONENT_SWIZZLE_IDENTITY,
+                       VK_COMPONENT_SWIZZLE_IDENTITY,
+                       VK_COMPONENT_SWIZZLE_IDENTITY},
+        .subresourceRange = {VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, arrayLayers},
+    };
+    result = DxvkMaliCompatLayer_CreateImageView(dev->handle, &viewInfo,
+                                                 dev->alloc, &resource.view);
+    if (result != VK_SUCCESS) {
+        Logger::log("error", "Failed to create null image view, result: %d",
+                    result);
+        table.FreeMemory(dev->handle, resource.memory, dev->alloc);
+        DxvkMaliCompatLayer_DestroyImage(dev->handle, resource.image,
+                                         dev->alloc);
+        resource.image = VK_NULL_HANDLE;
+        resource.memory = VK_NULL_HANDLE;
+    }
+    return resource;
+}
+
+} // namespace
+
+VkBufferView get_null_buffer_view(struct device *dev, VkFormat format) {
+    auto &nullDescriptors = dev->null_descriptors;
+    if (format == VK_FORMAT_UNDEFINED || format == VK_FORMAT_R32_UINT) {
+        return nullDescriptors.null_buffer_view;
+    }
+
+    {
+        std::shared_lock l(nullDescriptors.cacheLock);
+        auto it = nullDescriptors.bufferViewsByFormat.find(format);
+        if (it != nullDescriptors.bufferViewsByFormat.end())
+            return it->second;
+    }
+
+    VkBufferView view = CreateNullBufferView(dev, format);
+    std::unique_lock l(nullDescriptors.cacheLock); // writer
+    nullDescriptors.bufferViewsByFormat.emplace(format, view);
+    return view;
+}
+
+VkImageView get_null_image_view(struct device *dev, VkImageViewType viewType,
+                                VkFormat format,
+                                VkSampleCountFlagBits samples) {
+    auto &nullDescriptor = dev->null_descriptors;
+    const bool isDefaultShape =
+        (viewType == VK_IMAGE_VIEW_TYPE_MAX_ENUM ||
+         viewType == VK_IMAGE_VIEW_TYPE_2D) &&
+        (format == VK_FORMAT_UNDEFINED || format == VK_FORMAT_R8G8B8A8_UNORM) &&
+        samples == VK_SAMPLE_COUNT_1_BIT;
+    if (isDefaultShape) {
+        return nullDescriptor.null_image_rgba8_2d.view;
+    }
+
+    const VkFormat resolvedFormat =
+        format == VK_FORMAT_UNDEFINED ? VK_FORMAT_R8G8B8A8_UNORM : format;
+    const VkImageViewType resolvedViewType =
+        viewType == VK_IMAGE_VIEW_TYPE_MAX_ENUM ? VK_IMAGE_VIEW_TYPE_2D
+                                                : viewType;
+    auto key = GetImageShapeKey(resolvedViewType, resolvedFormat, samples);
+    {
+        std::shared_lock l(nullDescriptor.cacheLock);
+        auto it = nullDescriptor.imagesByShape.find(key);
+        if (it != nullDescriptor.imagesByShape.end())
+            return it->second.view;
+    }
+
+    auto nullImage =
+        CreateNullImageResource(dev, resolvedViewType, resolvedFormat, samples);
+    auto imageView = nullImage.view;
+    std::unique_lock l(nullDescriptor.cacheLock); // writer
+    nullDescriptor.imagesByShape.emplace(key, std::move(nullImage));
+    return imageView;
 }
 
 void create_null_resources(struct device *dev) {
@@ -281,10 +554,7 @@ void create_null_resources(struct device *dev) {
     auto device = dev->handle;
     VkResult result;
 
-    VkPhysicalDeviceMemoryProperties memoryProps{};
-    instanceDispatch[GetInstanceKey(dev->physical)]
-        .GetPhysicalDeviceMemoryProperties(dev->physical, &memoryProps);
-
+    const auto &memoryProps = dev->memoryProps;
     VkBufferCreateInfo bufferCreateInfo = {
         .sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
         .pNext = nullptr,
@@ -293,7 +563,8 @@ void create_null_resources(struct device *dev) {
         .usage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT |
                  VK_BUFFER_USAGE_STORAGE_BUFFER_BIT |
                  VK_BUFFER_USAGE_UNIFORM_TEXEL_BUFFER_BIT |
-                 VK_BUFFER_USAGE_STORAGE_TEXEL_BUFFER_BIT,
+                 VK_BUFFER_USAGE_STORAGE_TEXEL_BUFFER_BIT |
+                 VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
         .sharingMode = VK_SHARING_MODE_EXCLUSIVE,
     };
 
@@ -309,18 +580,8 @@ void create_null_resources(struct device *dev) {
     VkMemoryRequirements memoryReqs;
     table.GetBufferMemoryRequirements(device, dev->null_descriptors.null_buffer,
                                       &memoryReqs);
-    uint32_t memoryType = UINT32_MAX;
-    for (uint32_t i = 0; i < memoryProps.memoryTypeCount; i++) {
-        if ((memoryReqs.memoryTypeBits & (1u << i)) &&
-            (memoryProps.memoryTypes[i].propertyFlags &
-             VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT)) {
-            memoryType = i;
-            break;
-        }
-    }
-
-    // TODO: fall back to using a non-host_visible memory type and skip the
-    // vkMapMemory below
+    auto memoryType = FindMemoryType(dev, memoryReqs.memoryTypeBits,
+                                     VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
     if (memoryType == UINT32_MAX) {
         Logger::log("error",
                     "Failed to find suitable memory type for null_buffer "
@@ -367,73 +628,12 @@ void create_null_resources(struct device *dev) {
     }
 
     // TODO(leegao): support other formats as well
-    VkBufferViewCreateInfo bufferViewCreateInfo = {
-        .sType = VK_STRUCTURE_TYPE_BUFFER_VIEW_CREATE_INFO,
-        .pNext = nullptr,
-        .flags = 0,
-        .buffer = dev->null_descriptors.null_buffer,
-        .format = VK_FORMAT_R32_UINT,
-        .offset = 0,
-        .range = VK_WHOLE_SIZE};
-    if (table.CreateBufferView(device, &bufferViewCreateInfo, dev->alloc,
-                               &dev->null_descriptors.null_buffer_view) !=
-        VK_SUCCESS) {
-        Logger::log("error", "Failed to create null_buffer_view");
-    }
+    dev->null_descriptors.null_buffer_view =
+        CreateNullBufferView(dev, VK_FORMAT_R32_UINT);
 
-    // TODO(leegao): support 3D texture types and other formats as well
-    VkImageCreateInfo imageCreateInfo = {
-        .sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
-        .imageType = VK_IMAGE_TYPE_2D,
-        .format = VK_FORMAT_R8G8B8A8_UNORM,
-        .extent = {1, 1, 1}, // rely on VK_EXT_image_robustness
-        .mipLevels = 1,
-        .arrayLayers = 1,
-        .samples = VK_SAMPLE_COUNT_1_BIT,
-        .tiling = VK_IMAGE_TILING_OPTIMAL,
-        .usage = VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_STORAGE_BIT |
-                 VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT,
-        .sharingMode = VK_SHARING_MODE_EXCLUSIVE,
-        .initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,
-    };
-    if (table.CreateImage(device, &imageCreateInfo, dev->alloc,
-                          &dev->null_descriptors.null_image) == VK_SUCCESS) {
-        VkMemoryRequirements imageMemoryReqs;
-        table.GetImageMemoryRequirements(
-            device, dev->null_descriptors.null_image, &imageMemoryReqs);
-        uint32_t imageMemoryType = UINT32_MAX;
-        for (uint32_t i = 0; i < memoryProps.memoryTypeCount; i++) {
-            if (imageMemoryReqs.memoryTypeBits & (1u << i)) {
-                imageMemoryType = i;
-                break;
-            }
-        }
-        VkMemoryAllocateInfo imageMemoryAllocationInfo = {
-            .sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
-            .allocationSize = imageMemoryReqs.size,
-            .memoryTypeIndex = imageMemoryType,
-        };
-        if (imageMemoryType != UINT32_MAX &&
-            table.AllocateMemory(device, &imageMemoryAllocationInfo, dev->alloc,
-                                 &dev->null_descriptors.null_image_memory) ==
-                VK_SUCCESS) {
-            table.BindImageMemory(device, dev->null_descriptors.null_image,
-                                  dev->null_descriptors.null_image_memory, 0);
-            VkImageViewCreateInfo imageViewCreateInfo = {
-                .sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
-                .image = dev->null_descriptors.null_image,
-                .viewType = VK_IMAGE_VIEW_TYPE_2D,
-                .format = VK_FORMAT_R8G8B8A8_UNORM,
-                .components = {VK_COMPONENT_SWIZZLE_IDENTITY,
-                               VK_COMPONENT_SWIZZLE_IDENTITY,
-                               VK_COMPONENT_SWIZZLE_IDENTITY,
-                               VK_COMPONENT_SWIZZLE_IDENTITY},
-                .subresourceRange = {VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1},
-            };
-            table.CreateImageView(device, &imageViewCreateInfo, dev->alloc,
-                                  &dev->null_descriptors.null_image_view);
-        }
-    }
+    dev->null_descriptors.null_image_rgba8_2d = CreateNullImageResource(
+        dev, VK_IMAGE_VIEW_TYPE_2D, VK_FORMAT_R8G8B8A8_UNORM,
+        VK_SAMPLE_COUNT_1_BIT);
 
     VkSamplerCreateInfo samplerCreateInfo = {
         .sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO,
@@ -452,26 +652,42 @@ void create_null_resources(struct device *dev) {
 void destroy_null_resources(struct device *dev) {
     const auto &table = dev->table;
     VkDevice handle = dev->handle;
+    auto &nullDescriptor = dev->null_descriptors;
 
-    if (dev->null_descriptors.null_sampler != VK_NULL_HANDLE)
-        table.DestroySampler(handle, dev->null_descriptors.null_sampler,
-                             dev->alloc);
-    if (dev->null_descriptors.null_image_view != VK_NULL_HANDLE)
-        table.DestroyImageView(handle, dev->null_descriptors.null_image_view,
+    if (nullDescriptor.null_sampler != VK_NULL_HANDLE)
+        table.DestroySampler(handle, nullDescriptor.null_sampler, dev->alloc);
+
+    for (auto &[key, variant] : nullDescriptor.imagesByShape) {
+        if (variant.view != VK_NULL_HANDLE)
+            table.DestroyImageView(handle, variant.view, dev->alloc);
+        if (variant.image != VK_NULL_HANDLE)
+            DxvkMaliCompatLayer_DestroyImage(handle, variant.image, dev->alloc);
+        if (variant.memory != VK_NULL_HANDLE)
+            table.FreeMemory(handle, variant.memory, dev->alloc);
+    }
+    nullDescriptor.imagesByShape.clear();
+
+    for (auto &[format, view] : nullDescriptor.bufferViewsByFormat) {
+        if (view != VK_NULL_HANDLE)
+            table.DestroyBufferView(handle, view, dev->alloc);
+    }
+    nullDescriptor.bufferViewsByFormat.clear();
+
+    if (nullDescriptor.null_image_rgba8_2d.view != VK_NULL_HANDLE)
+        table.DestroyImageView(handle, nullDescriptor.null_image_rgba8_2d.view,
                                dev->alloc);
-    if (dev->null_descriptors.null_image != VK_NULL_HANDLE)
-        table.DestroyImage(handle, dev->null_descriptors.null_image,
-                           dev->alloc);
-    if (dev->null_descriptors.null_image_memory != VK_NULL_HANDLE)
-        table.FreeMemory(handle, dev->null_descriptors.null_image_memory,
+    if (nullDescriptor.null_image_rgba8_2d.image != VK_NULL_HANDLE)
+        DxvkMaliCompatLayer_DestroyImage(
+            handle, nullDescriptor.null_image_rgba8_2d.image, dev->alloc);
+    if (nullDescriptor.null_image_rgba8_2d.memory != VK_NULL_HANDLE)
+        table.FreeMemory(handle, nullDescriptor.null_image_rgba8_2d.memory,
                          dev->alloc);
-    if (dev->null_descriptors.null_buffer_view != VK_NULL_HANDLE)
-        table.DestroyBufferView(handle, dev->null_descriptors.null_buffer_view,
+    if (nullDescriptor.null_buffer_view != VK_NULL_HANDLE)
+        table.DestroyBufferView(handle, nullDescriptor.null_buffer_view,
                                 dev->alloc);
-    if (dev->null_descriptors.null_buffer != VK_NULL_HANDLE)
-        table.DestroyBuffer(handle, dev->null_descriptors.null_buffer,
-                            dev->alloc);
-    if (dev->null_descriptors.null_buffer_memory != VK_NULL_HANDLE)
-        table.FreeMemory(handle, dev->null_descriptors.null_buffer_memory,
-                         dev->alloc);
+    if (nullDescriptor.null_buffer != VK_NULL_HANDLE)
+        DxvkMaliCompatLayer_DestroyBuffer(handle, nullDescriptor.null_buffer,
+                                          dev->alloc);
+    if (nullDescriptor.null_buffer_memory != VK_NULL_HANDLE)
+        table.FreeMemory(handle, nullDescriptor.null_buffer_memory, dev->alloc);
 }

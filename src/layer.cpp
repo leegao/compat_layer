@@ -165,6 +165,8 @@ void DescriptorSetAllocator::free(VkDescriptorPool pool,
     device->table.FreeDescriptorSets(device->handle, pool, 1, &descriptors);
     allocated_count--;
 
+    untrack_descriptor_sets(1, &descriptors);
+
     if (occupancy.find(pool) != occupancy.end() && occupancy[pool] > 0) {
         occupancy[pool]--;
     }
@@ -833,13 +835,21 @@ VK_LAYER_EXPORT VkResult VKAPI_CALL DxvkMaliCompatLayer_CreateDevice(
         Logger::log("info", "Emulating VK_KHR_push_descriptor");
     }
 
+    auto emulate_precise_null_descriptor =
+        getenv("COMPAT_EMULATE_PRECISE_NULL_DESCRIPTORS")
+            ? atoi(getenv("COMPAT_EMULATE_PRECISE_NULL_DESCRIPTORS"))
+            : 0;
+
     auto emulate_null_descriptor =
         getenv("COMPAT_EMULATE_NULL_DESCRIPTORS")
             ? atoi(getenv("COMPAT_EMULATE_NULL_DESCRIPTORS"))
-            : !hasNullDescriptorSupport;
+            : !hasNullDescriptorSupport || emulate_precise_null_descriptor;
 
     if (emulate_null_descriptor) {
-        Logger::log("info", "Emulating VK_EXT_robustness2::nullDescriptor");
+        Logger::log(
+            "info",
+            "Emulating VK_EXT_robustness2::nullDescriptor, precision = %d",
+            emulate_precise_null_descriptor);
     }
 
     // Make sparse binding a forced toggle instead of inferred
@@ -1101,6 +1111,7 @@ VK_LAYER_EXPORT VkResult VKAPI_CALL DxvkMaliCompatLayer_CreateDevice(
     device->props2 = propertiesMap[GetKey(physicalDevice)];
     device->driverProps = driverPropertiesMap[GetKey(physicalDevice)];
     device->features = featuresMap[GetKey(physicalDevice)];
+    device->memoryProps = memoryProps;
     device->table = table;
     device->memoryIndex = memoryIndex;
     device->queue = queue;
@@ -1111,6 +1122,7 @@ VK_LAYER_EXPORT VkResult VKAPI_CALL DxvkMaliCompatLayer_CreateDevice(
     device->has_more_layers = has_more_layers;
     device->emulate_push_descriptors = emulate_push_descriptors;
     device->emulate_null_descriptor = emulate_null_descriptor;
+    device->emulate_precise_null_descriptor = emulate_precise_null_descriptor;
     device->emulate_sparse_binding = emulate_sparse_binding;
 
     device->syncPool = std::make_unique<SyncPool>(device->handle);
@@ -1171,14 +1183,16 @@ VK_LAYER_EXPORT void VKAPI_CALL DxvkMaliCompatLayer_DestroyDevice(
         dev->finalizer_thread.join();
     }
 
-    scoped_lock l(global_lock);
-    for (auto &stagingResources : dev->stagingResourcesQueue) {
-        stagingResources->Cleanup();
+    {
+        scoped_lock l(global_lock);
+        for (auto &stagingResources : dev->stagingResourcesQueue) {
+            stagingResources->Cleanup();
+        }
+        dev->stagingResourcesQueue.clear();
+        dev->syncPool.reset();
+        dev->descriptorSetAllocator->cleanup();
+        dev->descriptorSetAllocator.reset();
     }
-    dev->stagingResourcesQueue.clear();
-    dev->syncPool.reset();
-    dev->descriptorSetAllocator->cleanup();
-    dev->descriptorSetAllocator.reset();
     destroy_null_resources(dev);
 
     if (device != VK_NULL_HANDLE)
@@ -1216,13 +1230,19 @@ DxvkMaliCompatLayer_GetDeviceProcAddr(VkDevice device, const char *pName) {
     GETPROCADDR(DestroyDescriptorSetLayout);
     GETPROCADDR(CreatePipelineLayout);
     GETPROCADDR(DestroyPipelineLayout);
-    // GETPROCADDR(CreateGraphicsPipelines);
-    // GETPROCADDR(CreateComputePipelines);
+    GETPROCADDR(CreateGraphicsPipelines);
+    GETPROCADDR(CreateComputePipelines);
     // GETPROCADDR(DestroyPipeline);
     GETPROCADDR(GetDeviceQueue);
     GETPROCADDR(QueueSubmit);
     GETPROCADDR(QueueSubmit2);
+    GETPROCADDR(CreateShaderModule);
+    GETPROCADDR(DestroyShaderModule);
 
+    GETPROCADDR(AllocateDescriptorSets);
+    GETPROCADDR(FreeDescriptorSets);
+    GETPROCADDR(ResetDescriptorPool);
+    GETPROCADDR(DestroyDescriptorPool);
     GETPROCADDR(CmdPushDescriptorSetKHR);
     GETPROCADDR(CmdPushDescriptorSetWithTemplateKHR);
     if (!strcmp(pName, "vkCreateDescriptorUpdateTemplate") ||

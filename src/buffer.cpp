@@ -13,16 +13,14 @@ std::atomic<int> bufferIdCounter;
 
 #ifdef ENABLE_BUFFER_TRACKING
 
-uint32_t FindMemoryType(struct device *dev, uint32_t typeBits) {
+uint32_t FindMemoryType(struct device *dev, uint32_t typeBits,
+                        VkMemoryPropertyFlags required) {
     if (typeBits & (1u << dev->memoryIndex)) {
         return dev->memoryIndex;
     }
-
-    VkPhysicalDeviceMemoryProperties memProperties;
-    instanceDispatch[GetInstanceKey(dev->physical)]
-        .GetPhysicalDeviceMemoryProperties(dev->physical, &memProperties);
-    for (uint32_t i = 0; i < memProperties.memoryTypeCount; ++i) {
-        if (typeBits & (1u << i)) {
+    for (uint32_t i = 0; i < dev->memoryProps.memoryTypeCount; ++i) {
+        if (typeBits & (1u << i) &&
+            (dev->memoryProps.memoryTypes[i].propertyFlags & required)) {
             return i;
         }
     }
