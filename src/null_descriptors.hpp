@@ -46,7 +46,8 @@ VkImageView get_null_image_view(struct device *dev, VkImageViewType viewType,
 
 bool fix_null_descriptors(struct device *dev, uint32_t updatesCount,
                           const VkWriteDescriptorSet *updates,
-                          std::function<void(decltype(updates))> receiver);
+                          std::function<void(decltype(updates))> receiver,
+                          VkDescriptorSetLayout layoutHandle = VK_NULL_HANDLE);
 
 bool fix_null_descriptor_templates(
     device *dev, descriptor_update_template *updateTemplate, const void *pData,

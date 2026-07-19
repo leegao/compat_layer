@@ -10,6 +10,7 @@
 #include <functional>
 #include <variant>
 #include <vulkan/vulkan.h>
+#include <vulkan/vulkan_core.h>
 
 namespace null_descriptor_fixer {
 
@@ -167,7 +168,8 @@ using DescriptorInfoVariant =
 
 bool fix_null_descriptors(struct device *dev, uint32_t updatesCount,
                           const VkWriteDescriptorSet *updates,
-                          std::function<void(decltype(updates))> receiver) {
+                          std::function<void(decltype(updates))> receiver,
+                          VkDescriptorSetLayout layoutHandle) {
     std::vector<VkWriteDescriptorSet> patchedUpdates;
     std::deque<DescriptorInfoVariant> allocations; // deque is ptr-stable
 
@@ -206,7 +208,11 @@ bool fix_null_descriptors(struct device *dev, uint32_t updatesCount,
         VkFormat formatHint = VK_FORMAT_UNDEFINED;
         VkImageViewType viewTypeHint = VK_IMAGE_VIEW_TYPE_MAX_ENUM;
 
-        auto layoutHandle = get_layout_for_set(write.dstSet);
+        if (dev->emulate_precise_null_descriptor &&
+            layoutHandle == VK_NULL_HANDLE) {
+            layoutHandle = get_layout_for_set(write.dstSet);
+        }
+
         if (dev->emulate_precise_null_descriptor &&
             layoutHandle != VK_NULL_HANDLE) {
             auto *descriptorSetLayout = ({

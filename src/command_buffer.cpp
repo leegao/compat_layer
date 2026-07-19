@@ -3,8 +3,8 @@
 #include "descriptors.hpp"
 #include "layer.hpp"
 #include "logger.hpp"
+#include "null_descriptors.hpp"
 #include "pipeline_state.hpp"
-#include "pipelines.hpp"
 #include "push_descriptors.hpp"
 #include "staging_resources.hpp"
 #include "vk_func.hpp"
@@ -281,9 +281,20 @@ VK_LAYER_EXPORT void VKAPI_CALL DxvkMaliCompatLayer_CmdPushDescriptorSetKHR(
     }
 
     if (!descriptorSetLayout->isEmulatedPushDescriptor) {
-        dev->table.CmdPushDescriptorSet(commandBuffer, pipelineBindPoint,
-                                        layout, set, descriptorWriteCount,
-                                        pDescriptorWrites);
+        if (dev->emulate_null_descriptor) {
+            fix_null_descriptors(
+                dev, descriptorWriteCount, pDescriptorWrites,
+                [&](const VkWriteDescriptorSet *patchedDescriptorWrites) {
+                    dev->table.CmdPushDescriptorSet(
+                        commandBuffer, pipelineBindPoint, layout, set,
+                        descriptorWriteCount, patchedDescriptorWrites);
+                },
+                descriptorSetLayout->handle);
+        } else {
+            dev->table.CmdPushDescriptorSet(commandBuffer, pipelineBindPoint,
+                                            layout, set, descriptorWriteCount,
+                                            pDescriptorWrites);
+        }
     }
 
     // Emulated path
@@ -319,8 +330,23 @@ DxvkMaliCompatLayer_CmdPushDescriptorSetWithTemplateKHR(
     }
 
     if (!descriptorSetLayout->isEmulatedPushDescriptor) {
-        dev->table.CmdPushDescriptorSetWithTemplate(
-            commandBuffer, descriptorUpdateTemplate, layout, set, pData);
+        if (dev->emulate_null_descriptor) {
+            auto *descriptor_update_template = ({
+                std::shared_lock l(descriptorSetLayoutsLock); // reader
+                get_descriptor_update_template(descriptorUpdateTemplate);
+            });
+
+            fix_null_descriptor_templates(
+                dev, descriptor_update_template, pData,
+                [&](const void *patchedData) {
+                    dev->table.CmdPushDescriptorSetWithTemplate(
+                        commandBuffer, descriptorUpdateTemplate, layout, set,
+                        patchedData);
+                });
+        } else {
+            dev->table.CmdPushDescriptorSetWithTemplate(
+                commandBuffer, descriptorUpdateTemplate, layout, set, pData);
+        }
     }
 
     // Emulated path
@@ -342,6 +368,7 @@ VK_LAYER_EXPORT void VKAPI_CALL DxvkMaliCompatLayer_CmdBindVertexBuffers(
         return;
     struct device *dev = cb->device;
 
+    // TODO(leegao): fix this up too
     if (dev->emulate_null_descriptor && pBuffers) {
         std::vector<VkBuffer> buffers(bindingCount);
         for (int i = 0; i < bindingCount; i++) {
