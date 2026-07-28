@@ -1,0 +1,4 @@
+GPU: Mali-G77
+Driver: v1.r34p0-01eac0.627beafcac64515de80bf9ecb553387f
+Supported API: 1.1.191
+

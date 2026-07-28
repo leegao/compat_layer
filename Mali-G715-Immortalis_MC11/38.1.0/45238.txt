@@ -1,0 +1,4 @@
+GPU: Mali-G715-Immortalis MC11
+Driver: v1.r38p1-01eac0.c1a71ccca2acf211eb87c5db5322f569
+Supported API: 1.3.219
+

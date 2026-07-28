@@ -1,0 +1,4 @@
+GPU: Mali-G715
+Driver: v1.r54p1-11eac0.bf6659b634cc4428261e868dd766545b
+Supported API: 1.4.305
+

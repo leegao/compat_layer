@@ -1,0 +1,4 @@
+GPU: Mali-G68
+Driver: v1.r38p1-01eac0-mbs2v41_0.287cbd0dc0e94e886c10c68126ff4ad8
+Supported API: 1.3.219
+

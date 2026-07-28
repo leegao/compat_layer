@@ -1,0 +1,4 @@
+GPU: Mali-G1-Ultra MC12
+Driver: v1.r54p1-11eac0.2b8fe62.15f36b8c6518df15cadf5aced2a1638a
+Supported API: 1.3.305
+

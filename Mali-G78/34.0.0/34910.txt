@@ -1,0 +1,4 @@
+GPU: Mali-G78
+Driver: v1.r34p0-01eac0.a1b116bd871d46ef040e8feef9ed691e
+Supported API: 1.1.191
+

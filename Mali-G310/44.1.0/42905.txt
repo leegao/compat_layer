@@ -1,0 +1,4 @@
+GPU: Mali-G310
+Driver: v1.r44p1-01eac0.fb5d37b2ecae5c6a4b8166402c46d143
+Supported API: 1.3.247
+

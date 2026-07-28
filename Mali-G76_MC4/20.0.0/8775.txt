@@ -1,0 +1,4 @@
+GPU: Mali-G76 MC4
+Driver: v1.r20p0-01rel0.a41d1d553047de7edc8f79dbe3e575cd
+Supported API: 1.1.108
+

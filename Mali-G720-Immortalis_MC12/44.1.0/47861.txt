@@ -1,0 +1,4 @@
+GPU: Mali-G720-Immortalis MC12
+Driver: v1.r44p1-01eac0.7c759d1daf93e2baa476e2d4d07e761b
+Supported API: 1.3.247
+

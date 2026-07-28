@@ -1,0 +1,4 @@
+GPU: Mali-G57
+Driver: v1.r49p1-04eac0.afca207381db1d746838d72cbe2166d9
+Supported API: 1.3.278
+

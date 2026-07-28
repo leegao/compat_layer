@@ -1,0 +1,4 @@
+GPU: Mali-G71 MP2
+Driver: v1.r20p0-01rel0.3277c8cda2e6790715225033c288caf8
+Supported API: 1.1.108
+

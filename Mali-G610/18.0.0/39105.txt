@@ -1,0 +1,4 @@
+GPU: Mali-G610
+Driver: v1.g18p0-01eac0.9e534f339477793d151cc7ab4c27f2c0
+Supported API: 1.1.231
+

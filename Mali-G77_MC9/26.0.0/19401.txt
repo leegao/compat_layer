@@ -1,0 +1,4 @@
+GPU: Mali-G77 MC9
+Driver: v1.r26p0-01eac0.bed3b8f44871361148086fa6397ba747
+Supported API: 1.1.131
+

@@ -1,0 +1,4 @@
+GPU: Mali-G710
+Driver: v1.r54p0-00eac0.602107d7f6d65f962c2f47670a281773
+Supported API: 1.4.303
+

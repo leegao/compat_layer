@@ -1,0 +1,4 @@
+GPU: Mali-G57 MC4
+Driver: v1.r21p0-01rel0.ec569cabea7786150f2a7e0ef656be48
+Supported API: 1.1.117
+

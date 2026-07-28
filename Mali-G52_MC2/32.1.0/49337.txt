@@ -1,0 +1,4 @@
+GPU: Mali-G52 MC2
+Driver: v1.r32p1-01eac0.2a893c04ca0026c2e6802dbe7d7af5c5
+Supported API: 1.1.177
+

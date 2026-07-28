@@ -1,0 +1,4 @@
+GPU: panvk
+Driver: Mesa 26.0.0~git2511080200.f1cb63a21d4~p~mesaaco15
+Supported API: 1.4.330
+

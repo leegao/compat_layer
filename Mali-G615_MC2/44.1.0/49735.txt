@@ -1,0 +1,4 @@
+GPU: Mali-G615 MC2
+Driver: v1.r44p1-01eac0.148b774f93332d7e562320793fb6c4c9
+Supported API: 1.3.247
+

@@ -1,0 +1,4 @@
+GPU: Mali-G76
+Driver: v1.r26p0-01eac0.59d0fd7c52e6d936374ddbd26cef5028
+Supported API: 1.1.131
+

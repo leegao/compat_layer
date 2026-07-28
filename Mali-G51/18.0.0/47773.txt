@@ -1,0 +1,4 @@
+GPU: Mali-G51
+Driver: v1.r18p0-01rel0.caae7eec9919d9090a8a7e777d44918f
+Supported API: 1.1.97
+

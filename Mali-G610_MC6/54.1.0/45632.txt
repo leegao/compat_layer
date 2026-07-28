@@ -1,0 +1,4 @@
+GPU: Mali-G610 MC6
+Driver: v1.r54p1-08bet0.643fc834d99aa21b3bcca7b2ba5f8a5f
+Supported API: 1.3.305
+

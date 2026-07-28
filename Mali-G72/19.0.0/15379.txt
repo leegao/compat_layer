@@ -1,0 +1,4 @@
+GPU: Mali-G72
+Driver: v1.r19p0-01rel0.71a68ee2f6a25abf4f49a6a502842bc0
+Supported API: 1.1.108
+

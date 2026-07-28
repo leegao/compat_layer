@@ -1,0 +1,4 @@
+GPU: Mali-G72 MP3
+Driver: v1.r20p0-01rel0.5a1b26bb5d6f760a7fe004c7d2efd431
+Supported API: 1.1.108
+

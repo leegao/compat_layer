@@ -1,0 +1,4 @@
+GPU: Mali-G68 MC4
+Driver: v1.r32p1-01eac0.b8cf1793b1173c0bb23abcfef1974de4
+Supported API: 1.1.177
+

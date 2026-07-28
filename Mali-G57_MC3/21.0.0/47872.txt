@@ -1,0 +1,4 @@
+GPU: Mali-G57 MC3
+Driver: v1.r21p0-01rel0.c11ccc92e3ee92482b99c5f086460a1f
+Supported API: 1.1.117
+

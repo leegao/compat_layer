@@ -1,0 +1,4 @@
+GPU: Mali-G57 MC2
+Driver: v1.r32p1-01eac0.479f7c91bbdfefd5f0c368c0a30bcfd0
+Supported API: 1.1.177
+
