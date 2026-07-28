@@ -2,3 +2,8 @@ GPU: Mali-G715
 Driver: v1.r54p1-11eac0.bf6659b634cc4428261e868dd766545b
 Supported API: 1.4.305
 
+[PASSED] Profile: VP_WRAPPER_baseline
+  Description: Vulkan Wrapper minimum requirements
+  Vulkan API: 1.4.305, needs at least 1.1.0
+-----------------------------------------------------------------
+

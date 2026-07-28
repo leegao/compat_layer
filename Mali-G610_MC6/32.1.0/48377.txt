@@ -2,3 +2,15 @@ GPU: Mali-G610 MC6
 Driver: v1.r32p1-01eac0.54329dee8f160f288c574caaf67bbe3f
 Supported API: 1.1.177
 
+[FAILED] Profile: VP_WRAPPER_baseline
+  Description: Vulkan Wrapper minimum requirements
+  Vulkan API: 1.1.177, needs at least 1.1.0
+  - Missing/Insufficient Extensions:
+      * [???] VK_EXT_device_fault (Required version: 1)
+      * [???] VK_EXT_external_memory_host (Required version: 1)
+      * [???] VK_KHR_shader_atomic_int64 (Required version: 1)
+  - Missing Required Feature Flags:
+      * [???] VkPhysicalDeviceShaderAtomicInt64Features -> shaderBufferInt64Atomics 
+      * [???] VkPhysicalDeviceShaderAtomicInt64Features -> shaderSharedInt64Atomics 
+-----------------------------------------------------------------
+

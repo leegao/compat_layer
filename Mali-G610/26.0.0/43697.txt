@@ -2,3 +2,12 @@ GPU: panvk
 Driver: Mesa 26.0.0~git2511080200.f1cb63a21d4~p~mesaaco15
 Supported API: 1.4.330
 
+[FAILED] Profile: VP_WRAPPER_baseline
+  Description: Vulkan Wrapper minimum requirements
+  Vulkan API: 1.4.330, needs at least 1.1.0
+  - Missing/Insufficient Extensions:
+      * [???] VK_ANDROID_external_memory_android_hardware_buffer (Required version: 1)
+      * [???] VK_EXT_device_fault (Required version: 1)
+      * [???] VK_EXT_external_memory_host (Required version: 1)
+-----------------------------------------------------------------
+

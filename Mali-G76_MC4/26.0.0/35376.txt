@@ -2,3 +2,20 @@ GPU: Mali-G76 MC4
 Driver: v1.r26p0-01eac0.47724d85b0d6a635c0153b743011d062
 Supported API: 1.1.131
 
+[FAILED] Profile: VP_WRAPPER_baseline
+  Description: Vulkan Wrapper minimum requirements
+  Vulkan API: 1.1.131, needs at least 1.1.0
+  - Missing/Insufficient Extensions:
+      * [???] VK_EXT_device_fault (Required version: 1)
+      * [???] VK_EXT_external_memory_host (Required version: 1)
+      * [???] VK_KHR_shader_atomic_int64 (Required version: 1)
+  - Missing Required Feature Flags:
+      * [???] VkPhysicalDeviceShaderAtomicInt64Features -> shaderBufferInt64Atomics 
+      * [???] VkPhysicalDeviceShaderAtomicInt64Features -> shaderSharedInt64Atomics 
+      * [???] VkPhysicalDeviceVulkan12Features -> descriptorIndexing 
+      * [???] VkPhysicalDeviceVulkan12Features -> descriptorBindingSampledImageUpdateAfterBind 
+      * [???] VkPhysicalDeviceVulkan12Features -> descriptorBindingUpdateUnusedWhilePending 
+      * [???] VkPhysicalDeviceVulkan12Features -> descriptorBindingPartiallyBound 
+      * [???] VkPhysicalDeviceVulkan12Features -> runtimeDescriptorArray 
+-----------------------------------------------------------------
+

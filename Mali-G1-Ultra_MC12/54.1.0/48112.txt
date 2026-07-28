@@ -2,3 +2,8 @@ GPU: Mali-G1-Ultra MC12
 Driver: v1.r54p1-11eac0.611481db1590fdabdbf34ce748b686d8
 Supported API: 1.3.305
 
+[PASSED] Profile: VP_WRAPPER_baseline
+  Description: Vulkan Wrapper minimum requirements
+  Vulkan API: 1.3.305, needs at least 1.1.0
+-----------------------------------------------------------------
+

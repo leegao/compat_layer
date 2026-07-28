@@ -2,3 +2,10 @@ GPU: Mali-G710
 Driver: v1.r50p0-00eac0.a6e879c4404a36cfd91acdf7c049b72d
 Supported API: 1.3.283
 
+[FAILED] Profile: VP_WRAPPER_baseline
+  Description: Vulkan Wrapper minimum requirements
+  Vulkan API: 1.3.283, needs at least 1.1.0
+  - Missing/Insufficient Extensions:
+      * [???] VK_EXT_external_memory_host (Required version: 1)
+-----------------------------------------------------------------
+

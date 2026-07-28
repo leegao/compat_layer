@@ -2,3 +2,10 @@ GPU: Mali-G615 MC2
 Driver: v1.r44p1-01eac0.ed1fb6cfc1040479b92ddf50a952e57c
 Supported API: 1.3.247
 
+[FAILED] Profile: VP_WRAPPER_baseline
+  Description: Vulkan Wrapper minimum requirements
+  Vulkan API: 1.3.247, needs at least 1.1.0
+  - Missing/Insufficient Extensions:
+      * [???] VK_EXT_external_memory_host (Required version: 1)
+-----------------------------------------------------------------
+

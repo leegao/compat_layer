@@ -2,3 +2,10 @@ GPU: Mali-G310
 Driver: v1.r44p1-01eac0.fb5d37b2ecae5c6a4b8166402c46d143
 Supported API: 1.3.247
 
+[FAILED] Profile: VP_WRAPPER_baseline
+  Description: Vulkan Wrapper minimum requirements
+  Vulkan API: 1.3.247, needs at least 1.1.0
+  - Missing/Insufficient Extensions:
+      * [???] VK_EXT_external_memory_host (Required version: 1)
+-----------------------------------------------------------------
+

@@ -2,3 +2,10 @@ GPU: Mali-G68 MC4
 Driver: v1.r49p1-03bet0.3666fcaacb504f548df1f5efc729b42d
 Supported API: 1.3.278
 
+[FAILED] Profile: VP_WRAPPER_baseline
+  Description: Vulkan Wrapper minimum requirements
+  Vulkan API: 1.3.278, needs at least 1.1.0
+  - Missing/Insufficient Extensions:
+      * [???] VK_EXT_external_memory_host (Required version: 1)
+-----------------------------------------------------------------
+

@@ -2,3 +2,15 @@ GPU: Mali-G57
 Driver: v1.r40p0-01eac0.b0251c048237dcd59e6be15fba11a31a
 Supported API: 1.3.225
 
+[FAILED] Profile: VP_WRAPPER_baseline
+  Description: Vulkan Wrapper minimum requirements
+  Vulkan API: 1.3.225, needs at least 1.1.0
+  - Missing/Insufficient Extensions:
+      * [???] VK_EXT_device_fault (Required version: 1)
+      * [???] VK_EXT_external_memory_host (Required version: 1)
+      * [???] VK_KHR_shader_atomic_int64 (Required version: 1)
+  - Missing Required Feature Flags:
+      * [???] VkPhysicalDeviceShaderAtomicInt64Features (missing feature struct) -> shaderBufferInt64Atomics
+      * [???] VkPhysicalDeviceShaderAtomicInt64Features (missing feature struct) -> shaderSharedInt64Atomics
+-----------------------------------------------------------------
+

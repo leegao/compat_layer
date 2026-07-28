@@ -2,3 +2,18 @@ GPU: Mali-G57 MC3
 Driver: v1.r21p0-01rel0.c11ccc92e3ee92482b99c5f086460a1f
 Supported API: 1.1.117
 
+[FAILED] Profile: VP_WRAPPER_baseline
+  Description: Vulkan Wrapper minimum requirements
+  Vulkan API: 1.1.117, needs at least 1.1.0
+  - Missing/Insufficient Extensions:
+      * [???] VK_EXT_device_fault (Required version: 1)
+      * [???] VK_EXT_external_memory_dma_buf (Required version: 1)
+      * [???] VK_EXT_external_memory_host (Required version: 1)
+      * [???] VK_KHR_external_memory_fd (Required version: 1)
+      * [???] VK_KHR_shader_atomic_int64 (Required version: 1)
+      * [???] VK_KHR_timeline_semaphore (Required version: 1)
+  - Missing Required Feature Flags:
+      * [???] VkPhysicalDeviceShaderAtomicInt64Features -> shaderBufferInt64Atomics 
+      * [???] VkPhysicalDeviceShaderAtomicInt64Features -> shaderSharedInt64Atomics 
+-----------------------------------------------------------------
+

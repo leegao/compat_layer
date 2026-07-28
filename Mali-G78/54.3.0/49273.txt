@@ -2,3 +2,8 @@ GPU: Mali-G78
 Driver: v1.r54p3-01eac0.8acd90adf601ed5e7c6df1066c9b17c1
 Supported API: 1.4.305
 
+[PASSED] Profile: VP_WRAPPER_baseline
+  Description: Vulkan Wrapper minimum requirements
+  Vulkan API: 1.4.305, needs at least 1.1.0
+-----------------------------------------------------------------
+

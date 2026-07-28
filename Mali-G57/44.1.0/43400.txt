@@ -2,3 +2,10 @@ GPU: Mali-G57
 Driver: v1.r44p1-01eac0.c6156db5164e6fbe7014850ff0681b25
 Supported API: 1.3.247
 
+[FAILED] Profile: VP_WRAPPER_baseline
+  Description: Vulkan Wrapper minimum requirements
+  Vulkan API: 1.3.247, needs at least 1.1.0
+  - Missing/Insufficient Extensions:
+      * [???] VK_EXT_external_memory_host (Required version: 1)
+-----------------------------------------------------------------
+
