@@ -21,10 +21,5 @@ Supported API: 1.0.97
       * [???] VkPhysicalDeviceShaderAtomicInt64Features -> shaderSharedInt64Atomics 
       * [???] VkPhysicalDeviceShaderFloat16Int8FeaturesKHR -> shaderFloat16 
       * [???] VkPhysicalDeviceShaderFloat16Int8FeaturesKHR -> shaderInt8 
-      * [???] VkPhysicalDeviceVulkan12Features -> descriptorIndexing 
-      * [???] VkPhysicalDeviceVulkan12Features -> descriptorBindingSampledImageUpdateAfterBind 
-      * [???] VkPhysicalDeviceVulkan12Features -> descriptorBindingUpdateUnusedWhilePending 
-      * [???] VkPhysicalDeviceVulkan12Features -> descriptorBindingPartiallyBound 
-      * [???] VkPhysicalDeviceVulkan12Features -> runtimeDescriptorArray 
 -----------------------------------------------------------------
 

@@ -12,10 +12,5 @@ Supported API: 1.3.219
   - Missing Required Feature Flags:
       * [???] VkPhysicalDeviceShaderAtomicInt64Features (missing feature struct) -> shaderBufferInt64Atomics
       * [???] VkPhysicalDeviceShaderAtomicInt64Features (missing feature struct) -> shaderSharedInt64Atomics
-      * [???] VkPhysicalDeviceVulkan12Features -> descriptorIndexing 
-      * [???] VkPhysicalDeviceVulkan12Features -> descriptorBindingSampledImageUpdateAfterBind 
-      * [???] VkPhysicalDeviceVulkan12Features -> descriptorBindingUpdateUnusedWhilePending 
-      * [???] VkPhysicalDeviceVulkan12Features -> descriptorBindingPartiallyBound 
-      * [???] VkPhysicalDeviceVulkan12Features -> runtimeDescriptorArray 
 -----------------------------------------------------------------
 
