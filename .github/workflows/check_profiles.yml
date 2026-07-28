@@ -6,6 +6,7 @@ on:
             - "compatibility-vkd3d-2.14.1"
             - "compatibility-dxvk-2.7.1"
             - "compatibility-dxvk-3.0.1"
+            - "compatibility-wrapper"
         tags: ["*"]
         paths:
             - "VP_*.json"
@@ -23,7 +24,7 @@ jobs:
         runs-on: ubuntu-latest
         strategy:
             matrix:
-                target: [vkd3d-2.14.1, dxvk-2.7.1, dxvk-3.0.1]
+                target: [vkd3d-2.14.1, dxvk-2.7.1, dxvk-3.0.1, wrapper]
             fail-fast: false
 
         steps:
@@ -60,6 +61,9 @@ jobs:
                     mkdir -p "$TARGET_DIR"
 
                     case "${{ matrix.target }}" in
+                      "wrapper")
+                        python3 vkd3d_check.py "$file" "VP_WRAPPER_requirements.json" > "$TARGET_DIR/$device_id.txt"
+                        ;;
                       "dxvk-2.7.1")
                         python3 vkd3d_check.py "$file" "VP_DXVK_requirements_2.7.1.json" > "$TARGET_DIR/$device_id.txt"
                         ;;

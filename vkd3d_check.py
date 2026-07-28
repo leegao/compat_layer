@@ -544,6 +544,7 @@ def main():
         "VP_D3D12_FL_12_0_baseline",
         "VP_DXVK_d3d11_level_11_1_baseline",
         # "VP_DXVK_d3d11_level_11_1_optimal",
+        "VP_WRAPPER_baseline",
     ]
     for profile_name in to_check:
         if profile_name not in matcher.req_root.get("profiles", {}):

@@ -1,0 +1,68 @@
+{
+    "$schema": "https://schema.khronos.org/vulkan/profiles-0.8.1-224.json#",
+    "capabilities": {
+        "baseline": {
+            "extensions": {
+                "VK_EXT_external_memory_dma_buf": 1,
+                "VK_EXT_external_memory_host": 1,
+                "VK_KHR_timeline_semaphore": 1,
+                "VK_KHR_swapchain": 1,
+                "VK_KHR_image_format_list": 1,
+                "VK_KHR_maintenance2": 1,
+                "VK_KHR_maintenance1": 1,
+                "VK_KHR_8bit_storage": 1,
+                "VK_KHR_16bit_storage": 1,
+                "VK_KHR_shader_float16_int8": 1,
+                "VK_KHR_shader_atomic_int64": 1,
+                "VK_ANDROID_external_memory_android_hardware_buffer": 1,
+                "VK_KHR_external_fence": 1,
+                "VK_KHR_external_semaphore": 1,
+                "VK_KHR_external_memory": 1,
+                "VK_KHR_external_fence_fd": 1,
+                "VK_KHR_external_semaphore_fd": 1,
+                "VK_KHR_external_memory_fd": 1,
+                "VK_KHR_dedicated_allocation": 1,
+                "VK_EXT_queue_family_foreign": 1,
+                "VK_EXT_device_fault": 1
+            },
+            "features": {
+                "VkPhysicalDeviceFeatures": {
+                    "textureCompressionETC2": true,
+                    "textureCompressionASTC_LDR": true,
+                    "shaderInt16": true
+                },
+                "VkPhysicalDevice8BitStorageFeaturesKHR": {
+                    "storageBuffer8BitAccess": true
+                },
+                "VkPhysicalDevice16BitStorageFeaturesKHR": {
+                    "storageBuffer16BitAccess": true
+                },
+                "VkPhysicalDeviceShaderFloat16Int8FeaturesKHR": {
+                    "shaderFloat16": true,
+                    "shaderInt8": true
+                },
+                "VkPhysicalDeviceShaderAtomicInt64Features": {
+                    "shaderBufferInt64Atomics": true,
+                    "shaderSharedInt64Atomics": true
+                }
+            }
+        }
+    },
+    "profiles": {
+        "VP_WRAPPER_baseline": {
+            "version": 1,
+            "api-version": "1.1.0",
+            "label": "Vulkan Wrapper Baseline profile",
+            "description": "Vulkan Wrapper minimum requirements",
+            "capabilities": ["baseline"]
+        }
+    },
+    "history": [
+        {
+            "revision": 1,
+            "date": "2026-07-28",
+            "author": "Lee Gao",
+            "comment": "Initial revision"
+        }
+    ]
+}
