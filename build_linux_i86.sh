@@ -6,6 +6,7 @@ cmake -B build_i86 \
   -DOUT_NAME="descriptor_buffer_layer32" \
   -DCMAKE_CXX_FLAGS="-m32" \
   -DCMAKE_SHARED_LINKER_FLAGS="-m32" \
-  -DCMAKE_EXE_LINKER_FLAGS="-m32"
+  -DCMAKE_EXE_LINKER_FLAGS="-m32" \
+  -DBUILD_VARIANT=linux-i86
 
 cmake --build build_i86

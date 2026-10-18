@@ -13,5 +13,6 @@ cmake -B build_arm64 \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_TOOLCHAIN_FILE="${ANDROID_NDK_HOME}/build/cmake/android.toolchain.cmake" \
     -DCMAKE_WARN_DEPRECATED=OFF \
+    -DBUILD_VARIANT=android-arm64
 
 cmake --build build_arm64
