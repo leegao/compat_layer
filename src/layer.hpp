@@ -116,7 +116,7 @@ struct device {
     std::condition_variable hasCleanupWork;
     std::thread finalizer_thread;
     std::atomic_bool stop_thread{false};
-    std::string dump_buffers_path;
+    std::string dump_shaders_path;
     bool has_more_layers = false;
     null_descriptor_emulation null_descriptors;
     std::atomic<VkDeviceSize> sparseCommittedBytes{0};

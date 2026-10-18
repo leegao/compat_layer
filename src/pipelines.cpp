@@ -2,6 +2,10 @@
 #include "logger.hpp"
 #include "pipelines.hpp"
 #include "shader_reflector.hpp"
+#include <cstdint>
+#include <fstream>
+#include <spirv-tools/libspirv.hpp>
+#include <sstream>
 #include <vulkan/vulkan.h>
 
 std::shared_mutex pipelineLayoutsLock;
@@ -14,6 +18,37 @@ pipeline_layout *get_pipeline_layout(VkPipelineLayout layout) {
         return it->second.get();
     }
     return nullptr;
+}
+
+void DumpDisassembledSpirv(struct device *dev,
+                           const VkShaderModuleCreateInfo *pCreateInfo,
+                           VkShaderModule shaderModule) {
+    if (!pCreateInfo || !pCreateInfo->pCode || pCreateInfo->codeSize == 0 ||
+        dev->dump_shaders_path.empty()) {
+        return;
+    }
+
+    spvtools::SpirvTools tools(SPV_ENV_VULKAN_1_3);
+
+    uint32_t options = SPV_BINARY_TO_TEXT_OPTION_INDENT |
+                       SPV_BINARY_TO_TEXT_OPTION_FRIENDLY_NAMES;
+
+    std::string disassembly;
+    bool success = tools.Disassemble(pCreateInfo->pCode,
+                                     pCreateInfo->codeSize / sizeof(uint32_t),
+                                     &disassembly, options);
+
+    if (success) {
+        std::stringstream filename;
+        filename << std::hex << dev->dump_shaders_path << "/"
+                 << ((uintptr_t)shaderModule) << "_spv.txt";
+        Logger::log("info", "Dumping %s", filename.str().c_str());
+        std::ofstream out(filename.str(), std::ios::out);
+        out << disassembly;
+        out.close();
+    } else {
+        Logger::log("error", "Failed to disassemble SPIR-V bytecode.");
+    }
 }
 
 VK_LAYER_EXPORT VkResult VKAPI_CALL DxvkMaliCompatLayer_CreateShaderModule(
@@ -29,6 +64,8 @@ VK_LAYER_EXPORT VkResult VKAPI_CALL DxvkMaliCompatLayer_CreateShaderModule(
         Logger::log("error", "vkCreateShaderModule failed: %d", result);
         return result;
     }
+
+    DumpDisassembledSpirv(dev, pCreateInfo, *pShaderModule);
 
     if (dev->emulate_precise_null_descriptor)
         TrackShader(dev, *pShaderModule, pCreateInfo);

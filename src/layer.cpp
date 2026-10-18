@@ -13,6 +13,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <memory>
+#include <sys/stat.h>
 #include <unistd.h>
 #include <unordered_set>
 #include <utility>
@@ -224,8 +225,10 @@ VK_LAYER_EXPORT VkResult VKAPI_CALL DxvkMaliCompatLayer_CreateInstance(
         layerCreateInfo = (VkLayerInstanceCreateInfo *)layerCreateInfo->pNext;
     }
 
-    if (!layerCreateInfo)
+    if (!layerCreateInfo) {
+        Logger::log("error", "No layerCreateInfo, res %d", result);
         return VK_ERROR_INITIALIZATION_FAILED;
+    }
 
     PFN_vkGetInstanceProcAddr gip =
         layerCreateInfo->u.pLayerInfo->pfnNextGetInstanceProcAddr;
@@ -1124,6 +1127,13 @@ VK_LAYER_EXPORT VkResult VKAPI_CALL DxvkMaliCompatLayer_CreateDevice(
     device->emulate_null_descriptor = emulate_null_descriptor;
     device->emulate_precise_null_descriptor = emulate_precise_null_descriptor;
     device->emulate_sparse_binding = emulate_sparse_binding;
+
+    if (const char *dump_shaders_path = std::getenv("COMPAT_DUMP_SHADERS")) {
+        device->dump_shaders_path = dump_shaders_path;
+        mkdir(dump_shaders_path, 0755);
+    } else {
+        device->dump_shaders_path = "";
+    }
 
     device->syncPool = std::make_unique<SyncPool>(device->handle);
 
