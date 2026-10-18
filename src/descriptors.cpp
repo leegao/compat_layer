@@ -2,6 +2,7 @@
 #include "layer.hpp"
 #include "logger.hpp"
 #include "null_descriptors.hpp"
+#include "samplers.hpp"
 #include <algorithm>
 #include <mutex>
 #include <shared_mutex>
@@ -154,6 +155,60 @@ VK_LAYER_EXPORT void VKAPI_CALL DxvkMaliCompatLayer_DestroyDescriptorPool(
     dev->table.DestroyDescriptorPool(device, descriptorPool, pAllocator);
 }
 
+void PatchYCbCrSamplerBindings(
+    struct device *dev, VkDescriptorSetLayoutCreateInfo *pCreateInfo,
+    std::vector<VkDescriptorSetLayoutBinding> &patchedBindings,
+    std::vector<std::vector<VkSampler>> &patchedSamplersStorage) {
+    bool hasPatchedComputeYcbcr = false;
+
+    VkSampler fallbackSampler = dev->fallbackSampler;
+    if (fallbackSampler != VK_NULL_HANDLE && pCreateInfo->pBindings &&
+        pCreateInfo->bindingCount > 0) {
+        for (uint32_t i = 0; i < pCreateInfo->bindingCount; ++i) {
+            const auto &binding = pCreateInfo->pBindings[i];
+            if (!(binding.stageFlags & VK_SHADER_STAGE_COMPUTE_BIT) ||
+                !binding.pImmutableSamplers || binding.descriptorCount == 0) {
+                continue;
+            }
+
+            const bool hasYcbcr = std::any_of(binding.pImmutableSamplers,
+                                              binding.pImmutableSamplers +
+                                                  binding.descriptorCount,
+                                              IsYcbcrSampler);
+            if (!hasYcbcr) {
+                continue;
+            }
+
+            if (patchedBindings.empty()) {
+                patchedBindings.assign(pCreateInfo->pBindings,
+                                       pCreateInfo->pBindings +
+                                           pCreateInfo->bindingCount);
+                patchedSamplersStorage.resize(pCreateInfo->bindingCount);
+            }
+
+            auto &samplers = patchedSamplersStorage[i];
+            samplers.assign(binding.pImmutableSamplers,
+                            binding.pImmutableSamplers +
+                                binding.descriptorCount);
+            std::replace_if(samplers.begin(), samplers.end(), IsYcbcrSampler,
+                            fallbackSampler);
+
+            patchedBindings[i].pImmutableSamplers = samplers.data();
+            hasPatchedComputeYcbcr = true;
+        }
+    }
+
+    if (hasPatchedComputeYcbcr) {
+        static std::atomic<bool> warned{false};
+        if (!warned.exchange(true)) {
+            Logger::log(
+                "info",
+                "Patched immutable YCbCr samplers with linear samplers");
+        }
+        pCreateInfo->pBindings = patchedBindings.data();
+    }
+}
+
 VK_LAYER_EXPORT VkResult VKAPI_CALL
 DxvkMaliCompatLayer_CreateDescriptorSetLayout(
     VkDevice device, const VkDescriptorSetLayoutCreateInfo *pCreateInfo,
@@ -170,6 +225,11 @@ DxvkMaliCompatLayer_CreateDescriptorSetLayout(
         createInfo.flags &=
             ~VK_DESCRIPTOR_SET_LAYOUT_CREATE_PUSH_DESCRIPTOR_BIT_KHR;
     }
+
+    std::vector<VkDescriptorSetLayoutBinding> patchedBindings;
+    std::vector<std::vector<VkSampler>> patchedSamplersStorage;
+    PatchYCbCrSamplerBindings(dev, &createInfo, patchedBindings,
+                              patchedSamplersStorage);
 
     VkResult result = dev->table.CreateDescriptorSetLayout(
         device, &createInfo, pAllocator, pSetLayout);

@@ -286,5 +286,13 @@ void VKAPI_CALL DxvkMaliCompatLayer_DestroyDescriptorPool(
     VkDevice device, VkDescriptorPool descriptorPool,
     const VkAllocationCallbacks *pAllocator);
 
+VkResult VKAPI_CALL DxvkMaliCompatLayer_CreateSampler(
+    VkDevice device, const VkSamplerCreateInfo *pCreateInfo,
+    const VkAllocationCallbacks *pAllocator, VkSampler *pSampler);
+
+void VKAPI_CALL
+DxvkMaliCompatLayer_DestroySampler(VkDevice device, VkSampler sampler,
+                                   const VkAllocationCallbacks *pAllocator);
+
 } // extern "C"
 #endif

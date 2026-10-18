@@ -120,6 +120,8 @@ struct device {
     bool has_more_layers = false;
     null_descriptor_emulation null_descriptors;
     std::atomic<VkDeviceSize> sparseCommittedBytes{0};
+    std::shared_mutex fallbackSamplerLock;
+    VkSampler fallbackSampler = VK_NULL_HANDLE;
 };
 
 struct device *get_device(VkDevice);

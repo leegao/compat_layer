@@ -4,10 +4,10 @@
 #include "image.hpp"
 #include "logger.hpp"
 #include "null_descriptors.hpp"
+#include "samplers.hpp"
 #include "sparse_binding.hpp"
 #include "spoof_profile.hpp"
 #include "vk_func.hpp"
-#include "vulkan/vk_layer.h"
 
 #include <algorithm>
 #include <cstdlib>
@@ -18,6 +18,7 @@
 #include <unordered_set>
 #include <utility>
 #include <vector>
+#include <vulkan/vk_layer.h>
 #include <vulkan/vulkan.h>
 
 std::unordered_map<void *, VkLayerInstanceDispatchTable> instanceDispatch;
@@ -1205,6 +1206,8 @@ VK_LAYER_EXPORT void VKAPI_CALL DxvkMaliCompatLayer_DestroyDevice(
     }
     destroy_null_resources(dev);
 
+    DestroyYcbcrFallbackSampler(dev);
+
     if (device != VK_NULL_HANDLE)
         dev->table.DestroyDevice(device, pAllocator);
 
@@ -1249,6 +1252,9 @@ DxvkMaliCompatLayer_GetDeviceProcAddr(VkDevice device, const char *pName) {
     GETPROCADDR(QueueSubmit2);
     GETPROCADDR(CreateShaderModule);
     GETPROCADDR(DestroyShaderModule);
+
+    GETPROCADDR(CreateSampler);
+    GETPROCADDR(DestroySampler);
 
     GETPROCADDR(AllocateDescriptorSets);
     GETPROCADDR(FreeDescriptorSets);
