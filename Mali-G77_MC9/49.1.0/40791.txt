@@ -9,6 +9,7 @@ Supported API: 1.3.278
       * [xxx] VK_EXT_calibrated_timestamps (Required version: 1)
       * [ ✓(emulated) ] VK_EXT_robustness2 (Required version: 1)
       * [ W ] VK_EXT_vertex_attribute_divisor (Required version: 3)
+      * [???] VK_KHR_calibrated_timestamps (Required version: 1)
   - Missing Required Feature Flags:
       * [ W ] VkPhysicalDeviceFeatures -> multiDrawIndirect 
       * [ W ] VkPhysicalDeviceFeatures -> fillModeNonSolid 

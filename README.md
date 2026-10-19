@@ -5,9 +5,9 @@
 No potential issues.
 ```
 
-#### Driver `54.2.0` (10 gpu profiles, 0 issues)
+#### Driver `54.2.0` (10 gpu profiles, 1 issues)
 ```text
-No potential issues.
+* [???] VK_KHR_calibrated_timestamps (Required version: 1) - 1 gpu profiles (Mali-G610)
 ```
 
 #### Driver `54.1.0` (27 gpu profiles, 0 issues)
@@ -35,8 +35,9 @@ No potential issues.
 No potential issues.
 ```
 
-#### Driver `49.1.0` (28 gpu profiles, 17 issues)
+#### Driver `49.1.0` (28 gpu profiles, 18 issues)
 ```text
+* [???] VK_KHR_calibrated_timestamps (Required version: 1) - 6 gpu profiles (Mali-G57, Mali-G77_MC9)
 * [???] VkPhysicalDeviceVulkan12Features -> descriptorIndexing - 5 gpu profiles (Mali-G52, Mali-G52_MC2)
 * [???] VkPhysicalDeviceVulkan12Features -> shaderUniformTexelBufferArrayDynamicIndexing - 5 gpu profiles (Mali-G52, Mali-G52_MC2)
 * [???] VkPhysicalDeviceVulkan12Features -> shaderStorageTexelBufferArrayDynamicIndexing - 5 gpu profiles (Mali-G52, Mali-G52_MC2)
@@ -56,38 +57,39 @@ No potential issues.
 * [???] VkPhysicalDeviceVulkan12Features -> runtimeDescriptorArray - 5 gpu profiles (Mali-G52, Mali-G52_MC2)
 ```
 
-#### Driver `48.0.0` (14 gpu profiles, 0 issues)
+#### Driver `48.0.0` (14 gpu profiles, 1 issues)
 ```text
-No potential issues.
+* [???] VK_KHR_calibrated_timestamps (Required version: 1) - 14 gpu profiles (Mali-G57_MC2, Mali-G710, Mali-G715, Mali-G78)
 ```
 
-#### Driver `47.0.0` (11 gpu profiles, 0 issues)
+#### Driver `47.0.0` (11 gpu profiles, 1 issues)
 ```text
-No potential issues.
+* [???] VK_KHR_calibrated_timestamps (Required version: 1) - 11 gpu profiles (Mali-G710, Mali-G715, Mali-G78)
 ```
 
-#### Driver `44.1.0` (12 gpu profiles, 0 issues)
+#### Driver `44.1.0` (12 gpu profiles, 1 issues)
 ```text
-No potential issues.
+* [???] VK_KHR_calibrated_timestamps (Required version: 1) - 12 gpu profiles (Mali-G310, Mali-G57, Mali-G615_MC2, Mali-G615_MC6, Mali-G720-Immortalis_MC12)
 ```
 
-#### Driver `44.0.0` (10 gpu profiles, 0 issues)
+#### Driver `44.0.0` (10 gpu profiles, 1 issues)
 ```text
-No potential issues.
+* [???] VK_KHR_calibrated_timestamps (Required version: 1) - 10 gpu profiles (Mali-G310, Mali-G57, Mali-G710, Mali-G715, Mali-G78)
 ```
 
-#### Driver `41.0.0` (5 gpu profiles, 0 issues)
+#### Driver `41.0.0` (5 gpu profiles, 1 issues)
 ```text
-No potential issues.
+* [???] VK_KHR_calibrated_timestamps (Required version: 1) - 5 gpu profiles (Mali-G57)
 ```
 
-#### Driver `40.0.0` (7 gpu profiles, 0 issues)
+#### Driver `40.0.0` (7 gpu profiles, 1 issues)
 ```text
-No potential issues.
+* [???] VK_KHR_calibrated_timestamps (Required version: 1) - 7 gpu profiles (Mali-G57, Mali-G710, Mali-G78)
 ```
 
-#### Driver `38.1.0` (50 gpu profiles, 18 issues)
+#### Driver `38.1.0` (50 gpu profiles, 19 issues)
 ```text
+* [???] VK_KHR_calibrated_timestamps (Required version: 1) - 50 gpu profiles (Mali-G52, Mali-G57_MC2, Mali-G610_MC4, Mali-G610_MC6, Mali-G68, Mali-G710, Mali-G710_MC10, Mali-G715-Immortalis_MC11, Mali-G72, Mali-G76, Mali-G77, Mali-G78)
 * [???] VkPhysicalDeviceVulkan12Features -> descriptorIndexing - 15 gpu profiles (Mali-G52, Mali-G72, Mali-G76)
 * [???] VkPhysicalDeviceVulkan12Features -> shaderUniformTexelBufferArrayDynamicIndexing - 15 gpu profiles (Mali-G52, Mali-G72, Mali-G76)
 * [???] VkPhysicalDeviceVulkan12Features -> shaderStorageTexelBufferArrayDynamicIndexing - 15 gpu profiles (Mali-G52, Mali-G72, Mali-G76)
@@ -108,13 +110,14 @@ No potential issues.
 * [???] VkPhysicalDeviceFeatures -> samplerAnisotropy - 5 gpu profiles (Mali-G72)
 ```
 
-#### Driver `38.0.0` (5 gpu profiles, 0 issues)
+#### Driver `38.0.0` (5 gpu profiles, 1 issues)
 ```text
-No potential issues.
+* [???] VK_KHR_calibrated_timestamps (Required version: 1) - 5 gpu profiles (Mali-G78)
 ```
 
-#### Driver `34.0.0` (22 gpu profiles, 17 issues)
+#### Driver `34.0.0` (22 gpu profiles, 18 issues)
 ```text
+* [???] VK_KHR_calibrated_timestamps (Required version: 1) - 22 gpu profiles (Mali-G52, Mali-G57, Mali-G76, Mali-G77, Mali-G78)
 * [???] VkPhysicalDeviceVulkan12Features -> descriptorIndexing - 10 gpu profiles (Mali-G52, Mali-G76)
 * [???] VkPhysicalDeviceVulkan12Features -> shaderUniformTexelBufferArrayDynamicIndexing - 10 gpu profiles (Mali-G52, Mali-G76)
 * [???] VkPhysicalDeviceVulkan12Features -> shaderStorageTexelBufferArrayDynamicIndexing - 10 gpu profiles (Mali-G52, Mali-G76)
@@ -134,8 +137,9 @@ No potential issues.
 * [???] VkPhysicalDeviceVulkan12Features -> runtimeDescriptorArray - 10 gpu profiles (Mali-G52, Mali-G76)
 ```
 
-#### Driver `32.1.0` (45 gpu profiles, 23 issues)
+#### Driver `32.1.0` (45 gpu profiles, 24 issues)
 ```text
+* [???] VK_KHR_calibrated_timestamps (Required version: 1) - 45 gpu profiles (Mali-G52_MC2, Mali-G57_MC2, Mali-G610_MC6, Mali-G68, Mali-G68_MC4, Mali-G710_MC10, Mali-G72, Mali-G76, Mali-G77_MC9, Mali-G78)
 * [???] VkPhysicalDeviceVulkan12Features -> descriptorIndexing - 15 gpu profiles (Mali-G52_MC2, Mali-G72, Mali-G76)
 * [???] VkPhysicalDeviceVulkan12Features -> shaderUniformTexelBufferArrayDynamicIndexing - 15 gpu profiles (Mali-G52_MC2, Mali-G72, Mali-G76)
 * [???] VkPhysicalDeviceVulkan12Features -> shaderStorageTexelBufferArrayDynamicIndexing - 15 gpu profiles (Mali-G52_MC2, Mali-G72, Mali-G76)
@@ -161,9 +165,10 @@ No potential issues.
 * [???] VkPhysicalDeviceTransformFeedbackPropertiesEXT -> transformFeedbackDraw: Not specified/supported by device (Requires False) - 1 gpu profiles (Mali-G78)
 ```
 
-#### Driver `28.0.0` (12 gpu profiles, 35 issues)
+#### Driver `28.0.0` (12 gpu profiles, 36 issues)
 ```text
 * [???] VK_EXT_custom_border_color (Required version: 1) - 12 gpu profiles (Mali-G57, Mali-T830, Mali-T880)
+* [???] VK_KHR_calibrated_timestamps (Required version: 1) - 12 gpu profiles (Mali-G57, Mali-T830, Mali-T880)
 * [???] VkPhysicalDeviceCustomBorderColorFeaturesEXT -> customBorderColors - 12 gpu profiles (Mali-G57, Mali-T830, Mali-T880)
 * [???] VkPhysicalDeviceCustomBorderColorFeaturesEXT -> customBorderColorWithoutFormat - 12 gpu profiles (Mali-G57, Mali-T830, Mali-T880)
 * [???] VkPhysicalDeviceCustomBorderColorPropertiesEXT -> maxCustomBorderColorSamplers: Not specified/supported by device (Requires 2048) - 12 gpu profiles (Mali-G57, Mali-T830, Mali-T880)
@@ -200,9 +205,10 @@ No potential issues.
 * [???] VkPhysicalDeviceTransformFeedbackPropertiesEXT -> transformFeedbackDraw: Not specified/supported by device (Requires False) - 10 gpu profiles (Mali-T830, Mali-T880)
 ```
 
-#### Driver `27.0.0` (5 gpu profiles, 21 issues)
+#### Driver `27.0.0` (5 gpu profiles, 22 issues)
 ```text
 * [???] VK_EXT_custom_border_color (Required version: 1) - 5 gpu profiles (Mali-G52)
+* [???] VK_KHR_calibrated_timestamps (Required version: 1) - 5 gpu profiles (Mali-G52)
 * [???] VkPhysicalDeviceCustomBorderColorFeaturesEXT -> customBorderColors - 5 gpu profiles (Mali-G52)
 * [???] VkPhysicalDeviceCustomBorderColorFeaturesEXT -> customBorderColorWithoutFormat - 5 gpu profiles (Mali-G52)
 * [???] VkPhysicalDeviceVulkan12Features -> descriptorIndexing - 5 gpu profiles (Mali-G52)
@@ -225,9 +231,10 @@ No potential issues.
 * [???] VkPhysicalDeviceCustomBorderColorPropertiesEXT -> maxCustomBorderColorSamplers: Not specified/supported by device (Requires 2048) - 5 gpu profiles (Mali-G52)
 ```
 
-#### Driver `26.0.0` (37 gpu profiles, 30 issues)
+#### Driver `26.0.0` (37 gpu profiles, 31 issues)
 ```text
 * [???] VK_EXT_custom_border_color (Required version: 1) - 36 gpu profiles (Mali-G52, Mali-G52_MC2, Mali-G57_MC2, Mali-G68_MC4, Mali-G71, Mali-G72, Mali-G72_MP3, Mali-G76, Mali-G76_MC4, Mali-G77, Mali-G77_MC9, Mali-G78)
+* [???] VK_KHR_calibrated_timestamps (Required version: 1) - 36 gpu profiles (Mali-G52, Mali-G52_MC2, Mali-G57_MC2, Mali-G68_MC4, Mali-G71, Mali-G72, Mali-G72_MP3, Mali-G76, Mali-G76_MC4, Mali-G77, Mali-G77_MC9, Mali-G78)
 * [???] VkPhysicalDeviceCustomBorderColorFeaturesEXT -> customBorderColors - 36 gpu profiles (Mali-G52, Mali-G52_MC2, Mali-G57_MC2, Mali-G68_MC4, Mali-G71, Mali-G72, Mali-G72_MP3, Mali-G76, Mali-G76_MC4, Mali-G77, Mali-G77_MC9, Mali-G78)
 * [???] VkPhysicalDeviceCustomBorderColorFeaturesEXT -> customBorderColorWithoutFormat - 36 gpu profiles (Mali-G52, Mali-G52_MC2, Mali-G57_MC2, Mali-G68_MC4, Mali-G71, Mali-G72, Mali-G72_MP3, Mali-G76, Mali-G76_MC4, Mali-G77, Mali-G77_MC9, Mali-G78)
 * [???] VkPhysicalDeviceCustomBorderColorPropertiesEXT -> maxCustomBorderColorSamplers: Not specified/supported by device (Requires 2048) - 36 gpu profiles (Mali-G52, Mali-G52_MC2, Mali-G57_MC2, Mali-G68_MC4, Mali-G71, Mali-G72, Mali-G72_MP3, Mali-G76, Mali-G76_MC4, Mali-G77, Mali-G77_MC9, Mali-G78)
@@ -259,10 +266,11 @@ No potential issues.
 * [???] VkPhysicalDeviceTransformFeedbackFeaturesEXT -> transformFeedback - 1 gpu profiles (Mali-G610)
 ```
 
-#### Driver `21.0.0` (13 gpu profiles, 33 issues)
+#### Driver `21.0.0` (13 gpu profiles, 34 issues)
 ```text
 * [???] VK_EXT_custom_border_color (Required version: 1) - 13 gpu profiles (Mali-G31, Mali-G52, Mali-G57, Mali-G57_MC3, Mali-G57_MC4, Mali-G77)
 * [???] VK_EXT_transform_feedback (Required version: 1) - 13 gpu profiles (Mali-G31, Mali-G52, Mali-G57, Mali-G57_MC3, Mali-G57_MC4, Mali-G77)
+* [???] VK_KHR_calibrated_timestamps (Required version: 1) - 13 gpu profiles (Mali-G31, Mali-G52, Mali-G57, Mali-G57_MC3, Mali-G57_MC4, Mali-G77)
 * [???] VkPhysicalDeviceCustomBorderColorFeaturesEXT -> customBorderColors - 13 gpu profiles (Mali-G31, Mali-G52, Mali-G57, Mali-G57_MC3, Mali-G57_MC4, Mali-G77)
 * [???] VkPhysicalDeviceCustomBorderColorFeaturesEXT -> customBorderColorWithoutFormat - 13 gpu profiles (Mali-G31, Mali-G52, Mali-G57, Mali-G57_MC3, Mali-G57_MC4, Mali-G77)
 * [???] VkPhysicalDeviceTransformFeedbackFeaturesEXT -> transformFeedback - 13 gpu profiles (Mali-G31, Mali-G52, Mali-G57, Mali-G57_MC3, Mali-G57_MC4, Mali-G77)
@@ -296,10 +304,11 @@ No potential issues.
 * [???] VkPhysicalDeviceVulkan12Features -> runtimeDescriptorArray - 5 gpu profiles (Mali-G31, Mali-G52)
 ```
 
-#### Driver `20.0.0` (19 gpu profiles, 34 issues)
+#### Driver `20.0.0` (19 gpu profiles, 35 issues)
 ```text
 * [???] VK_EXT_custom_border_color (Required version: 1) - 19 gpu profiles (Mali-G52_MC2, Mali-G71_MP2, Mali-G72_MP3, Mali-G76_MC4, Mali-G77)
 * [???] VK_EXT_transform_feedback (Required version: 1) - 19 gpu profiles (Mali-G52_MC2, Mali-G71_MP2, Mali-G72_MP3, Mali-G76_MC4, Mali-G77)
+* [???] VK_KHR_calibrated_timestamps (Required version: 1) - 19 gpu profiles (Mali-G52_MC2, Mali-G71_MP2, Mali-G72_MP3, Mali-G76_MC4, Mali-G77)
 * [???] VkPhysicalDeviceCustomBorderColorFeaturesEXT -> customBorderColors - 19 gpu profiles (Mali-G52_MC2, Mali-G71_MP2, Mali-G72_MP3, Mali-G76_MC4, Mali-G77)
 * [???] VkPhysicalDeviceCustomBorderColorFeaturesEXT -> customBorderColorWithoutFormat - 19 gpu profiles (Mali-G52_MC2, Mali-G71_MP2, Mali-G72_MP3, Mali-G76_MC4, Mali-G77)
 * [???] VkPhysicalDeviceTransformFeedbackFeaturesEXT -> transformFeedback - 19 gpu profiles (Mali-G52_MC2, Mali-G71_MP2, Mali-G72_MP3, Mali-G76_MC4, Mali-G77)
@@ -334,10 +343,11 @@ No potential issues.
 * [???] VkPhysicalDeviceFeatures -> samplerAnisotropy - 1 gpu profiles (Mali-G71_MP2)
 ```
 
-#### Driver `19.0.0` (17 gpu profiles, 35 issues)
+#### Driver `19.0.0` (17 gpu profiles, 36 issues)
 ```text
 * [???] VK_EXT_custom_border_color (Required version: 1) - 17 gpu profiles (Mali-G52, Mali-G71, Mali-G72, Mali-G76)
 * [???] VK_EXT_transform_feedback (Required version: 1) - 17 gpu profiles (Mali-G52, Mali-G71, Mali-G72, Mali-G76)
+* [???] VK_KHR_calibrated_timestamps (Required version: 1) - 17 gpu profiles (Mali-G52, Mali-G71, Mali-G72, Mali-G76)
 * [???] VkPhysicalDeviceCustomBorderColorFeaturesEXT -> customBorderColors - 17 gpu profiles (Mali-G52, Mali-G71, Mali-G72, Mali-G76)
 * [???] VkPhysicalDeviceCustomBorderColorFeaturesEXT -> customBorderColorWithoutFormat - 17 gpu profiles (Mali-G52, Mali-G71, Mali-G72, Mali-G76)
 * [???] VkPhysicalDeviceTransformFeedbackFeaturesEXT -> transformFeedback - 17 gpu profiles (Mali-G52, Mali-G71, Mali-G72, Mali-G76)
@@ -373,8 +383,9 @@ No potential issues.
 * [???] VkPhysicalDeviceFeatures -> samplerAnisotropy - 10 gpu profiles (Mali-G71, Mali-G72)
 ```
 
-#### Driver `18.0.0` (23 gpu profiles, 35 issues)
+#### Driver `18.0.0` (23 gpu profiles, 36 issues)
 ```text
+* [???] VK_KHR_calibrated_timestamps (Required version: 1) - 23 gpu profiles (Mali-G51, Mali-G52, Mali-G610, Mali-G72, Mali-G76)
 * [???] VK_EXT_custom_border_color (Required version: 1) - 18 gpu profiles (Mali-G51, Mali-G52, Mali-G72, Mali-G76)
 * [???] VK_EXT_transform_feedback (Required version: 1) - 18 gpu profiles (Mali-G51, Mali-G52, Mali-G72, Mali-G76)
 * [???] VkPhysicalDeviceCustomBorderColorFeaturesEXT -> customBorderColors - 18 gpu profiles (Mali-G51, Mali-G52, Mali-G72, Mali-G76)
@@ -412,10 +423,11 @@ No potential issues.
 * [???] VkPhysicalDeviceFeatures -> samplerAnisotropy - 5 gpu profiles (Mali-G72)
 ```
 
-#### Driver `16.0.0` (5 gpu profiles, 35 issues)
+#### Driver `16.0.0` (5 gpu profiles, 36 issues)
 ```text
 * [???] VK_EXT_custom_border_color (Required version: 1) - 5 gpu profiles (Mali-G71)
 * [???] VK_EXT_transform_feedback (Required version: 1) - 5 gpu profiles (Mali-G71)
+* [???] VK_KHR_calibrated_timestamps (Required version: 1) - 5 gpu profiles (Mali-G71)
 * [???] VkPhysicalDeviceCustomBorderColorFeaturesEXT -> customBorderColors - 5 gpu profiles (Mali-G71)
 * [???] VkPhysicalDeviceCustomBorderColorFeaturesEXT -> customBorderColorWithoutFormat - 5 gpu profiles (Mali-G71)
 * [???] VkPhysicalDeviceFeatures -> samplerAnisotropy - 5 gpu profiles (Mali-G71)
