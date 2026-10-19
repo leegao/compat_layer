@@ -6,6 +6,7 @@ on:
             - "compatibility-vkd3d-2.14.1"
             - "compatibility-dxvk-2.7.1"
             - "compatibility-dxvk-3.0.1"
+            - "compatibility-dxvk-3.1.1"
             - "compatibility-wrapper"
         tags: ["*"]
         paths:
@@ -24,7 +25,8 @@ jobs:
         runs-on: ubuntu-latest
         strategy:
             matrix:
-                target: [vkd3d-2.14.1, dxvk-2.7.1, dxvk-3.0.1, wrapper]
+                target:
+                    [vkd3d-2.14.1, dxvk-2.7.1, dxvk-3.0.1, dxvk-3.1.1, wrapper]
             fail-fast: false
 
         steps:
@@ -69,6 +71,9 @@ jobs:
                         ;;
                       "dxvk-3.0.1")
                         python3 vkd3d_check.py "$file" "VP_DXVK_requirements_3.0.1.json" > "$TARGET_DIR/$device_id.txt"
+                        ;;
+                      "dxvk-3.1.1")
+                        python3 vkd3d_check.py "$file" "VP_DXVK_requirements_3.1.1.json" > "$TARGET_DIR/$device_id.txt"
                         ;;
                       *)
                         # vkd3d-2.14.1
