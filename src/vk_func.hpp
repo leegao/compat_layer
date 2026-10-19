@@ -294,5 +294,16 @@ void VKAPI_CALL
 DxvkMaliCompatLayer_DestroySampler(VkDevice device, VkSampler sampler,
                                    const VkAllocationCallbacks *pAllocator);
 
+VK_LAYER_EXPORT VkResult VKAPI_CALL
+DxvkMaliCompatLayer_GetPhysicalDeviceCalibrateableTimeDomainsKHR(
+    VkPhysicalDevice physicalDevice, uint32_t *pTimeDomainCount,
+    VkTimeDomainKHR *pTimeDomains);
+
+VK_LAYER_EXPORT VkResult VKAPI_CALL
+DxvkMaliCompatLayer_GetCalibratedTimestampsKHR(
+    VkDevice device, uint32_t timestampCount,
+    const VkCalibratedTimestampInfoKHR *pTimestampInfos, uint64_t *pTimestamps,
+    uint64_t *pMaxDeviation);
+
 } // extern "C"
 #endif

@@ -230,6 +230,9 @@ typedef struct VkLayerDispatchTable_ {
     PFN_vkCmdPushDescriptorSetWithTemplateKHR CmdPushDescriptorSetWithTemplate;
     PFN_vkCmdBindVertexBuffers2 CmdBindVertexBuffers2;
     PFN_vkGetBufferMemoryRequirements2 GetBufferMemoryRequirements2;
+    PFN_vkGetCalibratedTimestampsEXT GetCalibratedTimestampsEXT;
+    PFN_vkGetCalibratedTimestampsKHR GetCalibratedTimestampsKHR;
+
     void (*DeviceSetApiDumpState)(VkDevice, bool);
 } VkLayerDispatchTable;
 
@@ -307,6 +310,10 @@ typedef struct VkLayerInstanceDispatchTable_ {
         GetPhysicalDeviceSparseImageFormatProperties2;
     PFN_vkGetPhysicalDeviceQueueFamilyProperties2
         GetPhysicalDeviceQueueFamilyProperties2;
+    PFN_vkGetPhysicalDeviceCalibrateableTimeDomainsEXT
+        GetPhysicalDeviceCalibrateableTimeDomainsEXT;
+    PFN_vkGetPhysicalDeviceCalibrateableTimeDomainsKHR
+        GetPhysicalDeviceCalibrateableTimeDomainsKHR;
 } VkLayerInstanceDispatchTable;
 
 // ------------------------------------------------------------------------------------------------

@@ -10,6 +10,7 @@ const SpoofedExtension SPOOFED_EXTENSIONS[] = {
     { "VK_EXT_robustness2", 1 },
     { "VK_EXT_transform_feedback", 1 },
     { "VK_EXT_vertex_attribute_divisor", 3 },
+    { "VK_KHR_calibrated_timestamps", 1 },
     { "VK_KHR_maintenance5", 1 },
     { "VK_KHR_push_descriptor", 1 },
     { "VK_KHR_swapchain", 1 },

@@ -294,6 +294,12 @@ VK_LAYER_EXPORT VkResult VKAPI_CALL DxvkMaliCompatLayer_CreateInstance(
     table.GetPhysicalDeviceQueueFamilyProperties2 =
         (PFN_vkGetPhysicalDeviceQueueFamilyProperties2)gip(
             *pInstance, "vkGetPhysicalDeviceQueueFamilyProperties2");
+    table.GetPhysicalDeviceCalibrateableTimeDomainsEXT =
+        (PFN_vkGetPhysicalDeviceCalibrateableTimeDomainsEXT)gip(
+            *pInstance, "vkGetPhysicalDeviceCalibrateableTimeDomainsEXT");
+    table.GetPhysicalDeviceCalibrateableTimeDomainsKHR =
+        (PFN_vkGetPhysicalDeviceCalibrateableTimeDomainsKHR)gip(
+            *pInstance, "vkGetPhysicalDeviceCalibrateableTimeDomainsKHR");
 
     {
         scoped_lock l(global_lock);
@@ -1288,6 +1294,8 @@ DxvkMaliCompatLayer_GetDeviceProcAddr(VkDevice device, const char *pName) {
     GETPROCADDR(GetBufferMemoryRequirements2);
     GETPROCADDR(GetImageSparseMemoryRequirements);
     GETPROCADDR(QueueBindSparse);
+    GETPROCADDR(GetPhysicalDeviceCalibrateableTimeDomainsKHR);
+    GETPROCADDR(GetCalibratedTimestampsKHR);
 
     {
         scoped_lock l(global_lock);
@@ -1324,6 +1332,8 @@ DxvkMaliCompatLayer_GetInstanceProcAddr(VkInstance instance,
     GETPROCADDR(GetPhysicalDeviceQueueFamilyProperties);
     GETPROCADDR(GetPhysicalDeviceQueueFamilyProperties2);
     GETPROCADDR(GetPhysicalDeviceSparseImageFormatProperties2);
+    GETPROCADDR(GetPhysicalDeviceCalibrateableTimeDomainsKHR);
+    GETPROCADDR(GetCalibratedTimestampsKHR);
 
     {
         scoped_lock l(global_lock);
