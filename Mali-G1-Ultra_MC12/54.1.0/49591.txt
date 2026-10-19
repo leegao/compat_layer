@@ -1,0 +1,20 @@
+GPU: Mali-G1-Ultra MC12
+Driver: v1.r54p1-11eac0.2b8fe62.15f36b8c6518df15cadf5aced2a1638a
+Supported API: 1.3.305
+
+[FAILED] Profile: VP_DXVK_d3d11_level_11_1_baseline
+  Description: DXVK for D3D11 Feature Level 11.1 minimum requirements
+  Vulkan API: 1.3.305, needs at least 1.3.204
+  - Missing/Insufficient Extensions:
+      * [???] VK_KHR_load_store_op_none (Required version: 1)
+      * [???] VK_KHR_maintenance6 (Required version: 1)
+  - Missing Required Feature Flags:
+      * [ W ] VkPhysicalDeviceFeatures -> fillModeNonSolid 
+      * [ W ] VkPhysicalDeviceFeatures -> shaderClipDistance 
+      * [ W ] VkPhysicalDeviceFeatures -> shaderCullDistance 
+      * [ ✓(emulated) ] VkPhysicalDeviceFeatures -> textureCompressionBC 
+      * [ ✓ ] VkPhysicalDeviceFeatures -> vertexPipelineStoresAndAtomics 
+      * [???] VkPhysicalDeviceMaintenance6FeaturesKHR -> maintenance6 
+      * [???] VkPhysicalDeviceTransformFeedbackFeaturesEXT -> geometryStreams 
+-----------------------------------------------------------------
+
