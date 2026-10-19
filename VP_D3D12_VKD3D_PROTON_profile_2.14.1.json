@@ -10,7 +10,8 @@
                 "VK_EXT_depth_clip_enable": 1,
                 "VK_EXT_robustness2": 1,
                 "VK_EXT_transform_feedback": 1,
-                "VK_EXT_vertex_attribute_divisor": 3
+                "VK_EXT_vertex_attribute_divisor": 3,
+                "VK_KHR_maintenance5": 1
             },
             "features": {
                 "VkPhysicalDeviceCustomBorderColorFeaturesEXT": {
@@ -566,7 +567,6 @@
                 "VK_EXT_image_sliced_view_of_3d": 1,
                 "VK_EXT_memory_priority": 1,
                 "VK_EXT_device_generated_commands": 1,
-                "VK_KHR_maintenance5": 1,
                 "VK_KHR_maintenance6": 1,
                 "VK_EXT_depth_bias_control": 1
             },

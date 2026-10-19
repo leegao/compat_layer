@@ -137,7 +137,7 @@ def generate_cpp_header(aggregated_data):
 
 
 def main():
-    profile_path = "VP_D3D12_VKD3D_PROTON_profile.json"
+    profile_path = "VP_D3D12_VKD3D_PROTON_profile_2.14.1.json"
     if not os.path.exists(profile_path):
         print(f"Error: Profile definition file '{profile_path}' not found.")
         sys.exit(1)
