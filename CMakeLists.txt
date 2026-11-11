@@ -105,6 +105,14 @@ target_include_directories(dxvk_mali_compat_layer PRIVATE
     ${CMAKE_CURRENT_BINARY_DIR}/src
 )
 
+if(CMAKE_STRIP)
+    add_custom_command(
+        TARGET dxvk_mali_compat_layer POST_BUILD
+        COMMAND ${CMAKE_STRIP} --strip-unneeded $<TARGET_FILE:dxvk_mali_compat_layer>
+        COMMENT "Stripping unnecessary symbols from dxvk_mali_compat_layer"
+    )
+endif()
+
 install(TARGETS dxvk_mali_compat_layer DESTINATION ${LIB_INSTALL_DIR})
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/libdxvk_mali_compat_layer.json" DESTINATION ${JSON_INSTALL_DIR})
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/libdxvk_mali_compat_layer32.json" DESTINATION ${JSON_INSTALL_DIR})
