@@ -369,3 +369,23 @@ typedef struct {
         PFN_vkSetDeviceLoaderData pfnSetDeviceLoaderData;
     } u;
 } VkLayerDeviceCreateInfo;
+
+#ifndef IS_DEFINED_PFN_GetPhysicalDeviceProcAddr
+typedef PFN_vkVoidFunction (VKAPI_PTR *PFN_GetPhysicalDeviceProcAddr)(VkInstance instance, const char* pName);
+#define IS_DEFINED_PFN_GetPhysicalDeviceProcAddr
+#endif
+
+typedef enum VkNegotiateLayerStructType {
+    LAYER_NEGOTIATE_UNINTIALIZED = 0,
+    LAYER_NEGOTIATE_INTERFACE_STRUCT = 1,
+} VkNegotiateLayerStructType;
+
+typedef struct VkNegotiateLayerInterface {
+    VkNegotiateLayerStructType sType;
+    void *pNext;
+    uint32_t loaderLayerInterfaceVersion;
+    PFN_vkGetInstanceProcAddr pfnGetInstanceProcAddr;
+    PFN_vkGetDeviceProcAddr pfnGetDeviceProcAddr;
+    PFN_GetPhysicalDeviceProcAddr pfnGetPhysicalDeviceProcAddr;
+} VkNegotiateLayerInterface;
+

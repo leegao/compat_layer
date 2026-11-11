@@ -30,6 +30,8 @@ std::unordered_map<void *, std::unordered_set<std::string>> deviceExtensionsMap;
 
 std::mutex global_lock;
 
+static PFN_vkGetInstanceProcAddr g_next_gipa = nullptr;
+
 void *GetInstanceKey(VkPhysicalDevice physicalDevice) {
     auto instance = instanceMap[GetKey(physicalDevice)];
     if (!instance) {
@@ -229,6 +231,7 @@ VK_LAYER_EXPORT VkResult VKAPI_CALL DxvkMaliCompatLayer_CreateInstance(
 
     PFN_vkGetInstanceProcAddr gip =
         layerCreateInfo->u.pLayerInfo->pfnNextGetInstanceProcAddr;
+    g_next_gipa = gip; // Store for global queries
     layerCreateInfo->u.pLayerInfo = layerCreateInfo->u.pLayerInfo->pNext;
 
     PFN_vkCreateInstance createInstance =
@@ -329,6 +332,7 @@ DxvkMaliCompatLayer_EnumeratePhysicalDevices(
 
     for (uint32_t index = 0; index < *pPhysicalDeviceCount; index++) {
         VkPhysicalDevice pd = pPhysicalDevices[index];
+        instanceMap[GetKey(pd)] = instance;
         VkPhysicalDeviceFeatures features{};
         instanceDispatch[GetKey(instance)].GetPhysicalDeviceFeatures(pd,
                                                                      &features);
@@ -896,6 +900,15 @@ VK_LAYER_EXPORT VkResult VKAPI_CALL DxvkMaliCompatLayer_CreateDevice(
         createInfo.enabledExtensionCount > 0) {
         for (uint32_t i = 0; i < createInfo.enabledExtensionCount; ++i) {
             const char *extName = createInfo.ppEnabledExtensionNames[i];
+
+            // Always preserve WSI extensions so layers underneath (like wsi_layer) receive them
+            if (!strcmp(extName, "VK_KHR_swapchain") || 
+                !strcmp(extName, "VK_KHR_swapchain_mutable_format") ||
+                !strcmp(extName, "VK_EXT_swapchain_maintenance1")) {
+                enabledExtensions.push_back(extName);
+                continue;
+            }
+
             bool is_spoofed = false;
             for (size_t k = 0; k < SPOOFED_EXTENSIONS_COUNT; ++k) {
                 if (SPOOFED_EXTENSIONS[k].name == extName) {
@@ -1285,6 +1298,28 @@ DxvkMaliCompatLayer_GetDeviceProcAddr(VkDevice device, const char *pName) {
 
 VK_LAYER_EXPORT PFN_vkVoidFunction VKAPI_CALL
 DxvkMaliCompatLayer_GetInstanceProcAddr(VkInstance instance,
+                                        const char *pName);
+
+VK_LAYER_EXPORT PFN_vkVoidFunction VKAPI_CALL
+DxvkMaliCompatLayer_GetDeviceProcAddr(VkDevice device, const char *pName);
+
+VK_LAYER_EXPORT VkResult VKAPI_CALL
+DxvkMaliCompatLayer_NegotiateLoaderLayerInterfaceVersion(VkNegotiateLayerInterface *pVersionStruct) {
+    if (!pVersionStruct || pVersionStruct->sType != LAYER_NEGOTIATE_INTERFACE_STRUCT)
+        return VK_ERROR_INITIALIZATION_FAILED;
+
+    if (pVersionStruct->loaderLayerInterfaceVersion >= 2) {
+        pVersionStruct->loaderLayerInterfaceVersion = 2;
+    }
+
+    pVersionStruct->pfnGetInstanceProcAddr = &DxvkMaliCompatLayer_GetInstanceProcAddr;
+    pVersionStruct->pfnGetDeviceProcAddr = &DxvkMaliCompatLayer_GetDeviceProcAddr;
+    pVersionStruct->pfnGetPhysicalDeviceProcAddr = nullptr;
+    return VK_SUCCESS;
+}
+
+VK_LAYER_EXPORT PFN_vkVoidFunction VKAPI_CALL
+DxvkMaliCompatLayer_GetInstanceProcAddr(VkInstance instance,
                                         const char *pName) {
     GETPROCADDR(GetInstanceProcAddr); // Layers have to also hook their own
                                       // GetInstanceProcAddr
@@ -1309,9 +1344,17 @@ DxvkMaliCompatLayer_GetInstanceProcAddr(VkInstance instance,
     GETPROCADDR(GetPhysicalDeviceQueueFamilyProperties2);
     GETPROCADDR(GetPhysicalDeviceSparseImageFormatProperties2);
 
+    if (!instance) {
+        if (g_next_gipa) return g_next_gipa(VK_NULL_HANDLE, pName);
+        return nullptr;
+    }
     {
         scoped_lock l(global_lock);
-        VkLayerInstanceDispatchTable table = instanceDispatch[GetKey(instance)];
-        return table.GetInstanceProcAddr(instance, pName);
+        auto it = instanceDispatch.find(GetKey(instance));
+        if (it != instanceDispatch.end()) {
+            return it->second.GetInstanceProcAddr(instance, pName);
+        }
+        if (g_next_gipa) return g_next_gipa(instance, pName);
+        return nullptr;
     }
 }

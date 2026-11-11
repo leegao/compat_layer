@@ -8,6 +8,7 @@
         "implementation_version": "1",
         "description": "Descriptor Buffer Layer",
         "functions": {
+            "vkNegotiateLoaderLayerInterfaceVersion": "DxvkMaliCompatLayer_NegotiateLoaderLayerInterfaceVersion",
             "vkGetInstanceProcAddr": "DxvkMaliCompatLayer_GetInstanceProcAddr",
             "vkGetDeviceProcAddr": "DxvkMaliCompatLayer_GetDeviceProcAddr"
         },
