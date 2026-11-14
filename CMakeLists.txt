@@ -103,6 +103,7 @@ set_target_properties(dxvk_mali_compat_layer PROPERTIES
 target_include_directories(dxvk_mali_compat_layer PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src
     ${CMAKE_CURRENT_BINARY_DIR}/src
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../include
 )
 
 if(CMAKE_STRIP)
